@@ -1,0 +1,58 @@
+.icon_1 {
+  width: 40px;
+  height: 40px;
+}
+
+.icon_1 img {
+  width: 60%;
+}
+
+.svg_btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+.svg_btn img {
+  width: 100%;
+  margin: auto;
+}
+
+.logo_dashboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo_dashboard img {
+  width: 60%;
+}
+
+.carotv_background {
+  background-image: url("./../../assets/backgroung_carotv.svg");
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.coin_dashboard {
+  background-image: url("./../../assets/Dashboard/backText.svg");
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  display: flex;
+}
+
+.coin_dashboard img {
+  width: 25px;
+}
+
+.setting_dashboard img {
+  width: 40px;
+}
+
+.extend .svg_btn img {
+  max-width: 50px;
+  border-color: #5c3c25 !important;
+  border-width: 1.5px !important;
+}

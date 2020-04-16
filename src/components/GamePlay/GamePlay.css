@@ -1,0 +1,54 @@
+.square-empty {
+  border: 0.1px solid #343a40;
+  width: 100%;
+  cursor: pointer;
+}
+
+.square {
+  border: 0.1px solid #343a40;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.square img {
+  max-width: 60%;
+}
+
+.square:hover {
+  background-color: chartreuse;
+}
+
+.square-empty:after {
+  content: "";
+  display: block;
+  margin: 100%;
+}
+
+p {
+  margin: 0px;
+}
+
+.row_ {
+  display: flex;
+  margin: auto;
+  max-width: 100vw;
+}
+
+.game-play-body {
+  width: 100vw;
+}
+
+.game-play {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 50%;
+}
+
+.number-bottom {
+  width: 100%;
+  display: block;
+  text-align: center;
+  font-size: 4vw;
+}

@@ -1,0 +1,27 @@
+.playow-body {
+  min-height: 100vh;
+  height: 100%;
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 50%;
+}
+
+.user-icon {
+  height: 50px;
+  width: 50px;
+}
+
+.play-now-btn img {
+  display: block;
+  margin: 0 auto;
+  max-width: 40%;
+}
+
+.player {
+  border: 2px solid #4e311d;
+  border-radius: 3px;
+}
+
+.player img {
+  border-color: #4e311d !important;
+  border-width: 2px !important;
+}

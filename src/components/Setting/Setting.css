@@ -1,0 +1,11 @@
+.setting-body {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 50%;
+  min-height: 100vh;
+  height: 100%;
+}
+
+.setting-btn img {
+  max-width: 40%;
+  margin: 0 auto;
+}

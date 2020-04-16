@@ -1,0 +1,57 @@
+.rooms-lobby {
+  height: 100%;
+  min-height: 100vh;
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 60%;
+}
+
+.room-item {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 40%;
+  width: 100%;
+  border: 2px solid #4e311d;
+  border-radius: 0.25rem !important;
+}
+
+.room-item-head {
+  border-bottom: 2px solid #4e311d;
+  border-left: 1px solid #4e311d;
+  border-right: 1px solid #4e311d;
+  border-top: 1px solid #4e311d;
+}
+
+.room-item-body {
+  width: 100%;
+}
+
+.player-inroom-img {
+  width: 3em;
+}
+
+.lock-room {
+  margin: auto;
+}
+
+.lock-room img {
+  width: 2em;
+}
+
+.room-item-row:last-child {
+  margin-bottom: 10px;
+}
+
+.room-menu {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 40%;
+  border-bottom: 2px solid #4e311d;
+}
+
+.coin_dashboard {
+  display: flex;
+  border-left: 1px solid #4e311d;
+  border-right: 1px solid #4e311d;
+}
+
+.coin_dashboard img {
+  width: 25px;
+}

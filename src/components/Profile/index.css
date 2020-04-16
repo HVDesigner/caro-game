@@ -1,0 +1,33 @@
+.proflie-body {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 50%;
+  height: 100%;
+  min-height: 100vh;
+}
+
+.header-profile img {
+  width: 90px;
+  height: 90px;
+  border: 2px solid #4e311d;
+}
+
+.header-profile h4 {
+  text-decoration: underline;
+}
+
+.statistic .list-group-item {
+  border-color: #4e311d;
+  /* border-width: 3px; */
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 30%;
+}
+
+.statistic .list-group-item .title {
+  margin-right: auto;
+}
+
+.profile-body img {
+  width: 50%;
+  margin: 0 auto;
+  display: block;
+}
