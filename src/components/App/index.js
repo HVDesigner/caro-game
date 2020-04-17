@@ -81,7 +81,7 @@ function App() {
     case "lobby":
       return (
         <React.Suspense fallback={<div>Loading...</div>}>
-          <Lobby />
+          <Lobby firebase={firebase} />
         </React.Suspense>
       );
     case "profile":

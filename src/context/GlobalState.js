@@ -6,7 +6,7 @@ import { CHANGE_ROUTE, SET_USER_INFO } from "./ActionTypes";
 function GlobalState(props) {
   const InitialGlobalState = {
     route: {
-      path: "dashboard",
+      path: "lobby",
     },
     userInfo: {
       id: "",

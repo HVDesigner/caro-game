@@ -1,134 +1,124 @@
 import React from "react";
 import "./index.css";
-import { Container, Row, Col, Nav, Modal } from "react-bootstrap";
+import { Container, Row, Col, Nav } from "react-bootstrap";
 
-import UserSVG from "./../../assets/Dashboard/user.svg";
-import LockSVG from "./../../assets/Rooms/lock.svg";
-import MoreSVG from "./../../assets/Rooms/more.svg";
+import Room from "./Room/";
+
 import CoinSVG from "./../../assets/Dashboard/Coin.svg";
 import LeftSVG from "./../../assets/chevron-left.svg";
 import AddCoinSVG from "./../../assets/Dashboard/add_coin.svg";
 
-import AppContext from './../../context/';
+import AppContext from "./../../context/";
 
-function Lobby() {
+function Lobby({ firebase }) {
   const StateGlobal = React.useContext(AppContext);
   const { state, changeRoute } = StateGlobal;
 
-  const [show, setShow] = React.useState(false);
+  // true: Gomoku
+  // false: Block Two Head
+  const [gameType, setGameType] = React.useState(true);
 
-  const handleClose = () => { setShow(false) };
-  const handleShow = () => { setShow(true) };
+  const [listRooms, setListRooms] = React.useState([]);
+  const [roomsDetail, setRoomsDetail] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (gameType) {
+      firebase()
+        .database.ref("rooms/gomoku")
+        .on("value", (snapshot) => {
+          setListRooms(Object.keys(snapshot.val()));
+          setRoomsDetail(snapshot.val());
+          setLoading(false);
+        });
+
+      return () => firebase().database.ref("rooms/gomoku").off();
+    } else {
+      firebase()
+        .database.ref("rooms/block-head")
+        .on("value", (snapshot) => {
+          setListRooms(Object.keys(snapshot.val()));
+          setRoomsDetail(snapshot.val());
+          setLoading(false);
+        });
+
+      return () => firebase().database.ref("rooms/block-head").off();
+    }
+  }, [gameType, firebase]);
+
+  const changGameType = (status) => {
+    setGameType(status);
+    setLoading(true);
+  };
 
   return (
     <Container className="rooms-lobby">
-      <Row className="sticky-top room-menu">
-        <Nav>
-          <Nav.Item className="d-flex">
-            <Nav.Link onClick={() => {
-              changeRoute("dashboard");
-            }} className="wood-btn-back">
-              <img
-                src={LeftSVG}
-                alt="back-btn"
-                style={{ height: "1.5em" }}
-              ></img>
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item className="text-white coin_lobby d-flex align-items-center pl-2 pr-2">
-            <img src={CoinSVG} alt="logo"></img>
-            <h5 className="ml-3 mr-3 mb-0 d-flex align-items-center">
-              2.00<span className="text-warning">K</span>
+      <Row className="sticky-top room-menu shadow-sm">
+        <div className="menu-top">
+          <Nav>
+            <Nav.Item className="d-flex">
+              <Nav.Link
+                onClick={() => {
+                  changeRoute("dashboard");
+                }}
+                className="wood-btn-back"
+              >
+                <img
+                  src={LeftSVG}
+                  alt="back-btn"
+                  style={{ height: "1.5em" }}
+                ></img>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item className="text-white coin_lobby d-flex align-items-center pl-2 pr-2">
+              <img src={CoinSVG} alt="logo"></img>
+              <h5 className="ml-3 mr-3 mb-0 d-flex align-items-center">
+                2.00<span className="text-warning">K</span>
+              </h5>
+              <img src={AddCoinSVG} alt="logo" className="m-0 wood-btn"></img>
+            </Nav.Item>
+          </Nav>
+        </div>
+        <Nav fill className="game-type">
+          <Nav.Item
+            className={`text-white game-gomoku ${gameType ? "bg-success" : ""}`}
+            onClick={() => {
+              changGameType(true);
+            }}
+          >
+            <h5 className="p-1 m-0">
+              Gomoku<span className="text-warning ml-1">(0)</span>
             </h5>
-            <img src={AddCoinSVG} alt="logo" className="m-0 wood-btn"></img>
+          </Nav.Item>
+          <Nav.Item
+            className={`text-white ${!gameType ? "bg-success" : ""}`}
+            onClick={() => {
+              changGameType(false);
+            }}
+          >
+            <h5 className="p-1 m-0">
+              Chặn 2 đầu<span className="text-warning ml-1">(0)</span>
+            </h5>
           </Nav.Item>
         </Nav>
       </Row>
+
       <Row>
-        <Col className="room-item-col">
-          <div className="room-item d-flex flex-column shadow mt-2">
-            <div className="d-flex room-item-head pl-2 text-white bg-success">
-              <span>id: 1234</span>
-            </div>
-            <div className="d-flex room-item-body p-2">
-              <div className="d-flex align-items-center">
-                <img
-                  src={UserSVG}
-                  alt="user-playing"
-                  className="player-inroom-img mr-2"
-                />
-                <div className="d-flex flex-column text-white">
-                  <span>Viet</span>
-                  <span>Elo: 1000</span>
-                </div>
-              </div>
-              <div className="lock-room">
-                <img src={LockSVG} alt="lock" className="wood-btn" onClick={() => { setShow(true) }} />
-              </div>
-              <div className="d-flex justify-content-end align-items-center">
-                <div className="d-flex flex-column text-white text-right">
-                  <span>Viet</span>
-                  <span>Elo: 1000</span>
-                </div>
-                <img
-                  src={UserSVG}
-                  alt="user-playing"
-                  className="player-inroom-img ml-2"
-                />
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col className="room-item-col">
-          <div className="room-item d-flex flex-column shadow mt-2">
-            <div className="d-flex room-item-head pl-2 text-white bg-success">
-              <span>id: 1234</span>
-            </div>
-            <div className="d-flex room-item-body p-2">
-              <div className="d-flex align-items-center">
-                <img
-                  src={UserSVG}
-                  alt="user-playing"
-                  className="player-inroom-img mr-2"
-                />
-                <div className="d-flex flex-column text-white">
-                  <span>Viet</span>
-                  <span>Elo: 1000</span>
-                </div>
-              </div>
-              <div className="lock-room">
-                <img src={MoreSVG} alt="lock" className="wood-btn" />
-              </div>
-              <div className="d-flex justify-content-end align-items-center">
-                <div className="d-flex flex-column text-white text-right">
-                  <span>Viet</span>
-                  <span>Elo: 1000</span>
-                </div>
-                <img
-                  src={UserSVG}
-                  alt="user-playing"
-                  className="player-inroom-img ml-2"
-                />
-              </div>
-            </div>
-          </div>
-        </Col>
+        {loading ? (
+          <Col>
+            <p className="text-white text-center mt-3">Loading...</p>
+          </Col>
+        ) : (
+          listRooms.map((value, key) => {
+            return (
+              <Col className="room-item-col" key={key}>
+                <Room roomId={value} roomsDetail={roomsDetail} />
+              </Col>
+            );
+          })
+        )}
       </Row>
-      <React.StrictMode>
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-          <Modal.Footer>
-
-
-          </Modal.Footer>
-        </Modal>
-      </React.StrictMode>
     </Container>
-
-
   );
 }
 export default Lobby;

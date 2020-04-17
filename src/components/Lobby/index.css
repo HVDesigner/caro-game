@@ -21,6 +21,10 @@
   width: 100%;
 }
 
+.room-item-footer {
+  border-top: 2px solid #4e311d;
+}
+
 .player-inroom-img {
   width: 3em;
 }
@@ -52,4 +56,36 @@
 .coin_lobby img {
   /* width: 25px; */
   height: 1.5em;
+}
+
+.modal-password {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 60%;
+  border: 2px solid #4e311d;
+}
+
+.input-carotv {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
+  border-bottom: 1px solid #4e311d;
+}
+
+.input-carotv::placeholder {
+  color: #ffc107;
+  text-align: center;
+}
+
+.menu-top {
+  border-bottom: 2px solid #4e311d;
+  width: 100%;
+}
+
+.game-type {
+  width: 100%;
+}
+
+.game-gomoku {
+  border-right: 2px solid #4e311d;
 }
