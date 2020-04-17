@@ -15,9 +15,6 @@
 
 .room-item-head {
   border-bottom: 2px solid #4e311d;
-  border-left: 1px solid #4e311d;
-  border-right: 1px solid #4e311d;
-  border-top: 1px solid #4e311d;
 }
 
 .room-item-body {
@@ -33,10 +30,10 @@
 }
 
 .lock-room img {
-  width: 2em;
+  height: 2em;
 }
 
-.room-item-row:last-child {
+.room-item-col:last-child {
   margin-bottom: 10px;
 }
 
@@ -46,12 +43,13 @@
   border-bottom: 2px solid #4e311d;
 }
 
-.coin_dashboard {
+.coin_lobby {
   display: flex;
   border-left: 1px solid #4e311d;
   border-right: 1px solid #4e311d;
 }
 
-.coin_dashboard img {
-  width: 25px;
+.coin_lobby img {
+  /* width: 25px; */
+  height: 1.5em;
 }
