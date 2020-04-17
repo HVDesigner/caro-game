@@ -47,8 +47,10 @@ function Lobby({ firebase }) {
   }, [gameType, firebase]);
 
   const changGameType = (status) => {
-    setGameType(status);
-    setLoading(true);
+    if (gameType !== status) {
+      setGameType(status);
+      setLoading(true);
+    }
   };
 
   return (
