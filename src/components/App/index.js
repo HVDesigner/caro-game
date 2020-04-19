@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import firebase from "./../Firebase/";
+import firebase from "./../../Firebase/";
 
 import AppContext from "./../../context/";
 
@@ -14,68 +14,62 @@ const Lobby = React.lazy(() => import("./../Lobby/"));
 function App() {
   const StateGlobal = React.useContext(AppContext);
 
-  const { state, setUserInfo } = StateGlobal;
-
-  const [playerName, setPlayerName] = React.useState("");
-  const [playerPicURL, setPlayerPicURL] = React.useState("");
-  const [playerId, setPlayerId] = React.useState("3664117230328911");
+  const { state, setUserInfo, changeRoute } = StateGlobal;
 
   React.useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://connect.facebook.net/en_US/fbinstant.6.3.js";
-    script.id = "fbinstant";
-    document.body.appendChild(script);
+    return window.FBInstant.initializeAsync().then(function () {
+      return window.FBInstant.startGameAsync().then(() => {
+        const playerName = window.FBInstant.player.getName();
+        const playerPic = window.FBInstant.player.getPhoto();
+        const playerId = window.FBInstant.player.getID();
 
-    script.onload = () => {
-      window.FBInstant.initializeAsync().then(function () {
-        window.FBInstant.startGameAsync().then(() => {
-          const playerName = window.FBInstant.player.getName();
-          const playerPic = window.FBInstant.player.getPhoto();
-          const playerId = window.FBInstant.player.getID();
+        firebase()
+          .database.ref("users/" + playerId)
+          .on("value", function (snapshot) {
+            if (snapshot.val()) {
+              changeRoute(snapshot.val().location.page);
+              if (snapshot.val().name.status === "original") {
+                setUserInfo(playerId, playerName, playerPic);
+              } else {
+                setUserInfo(playerId, snapshot.val().name.value, playerPic);
+              }
+            } else {
+              firebase()
+                .database.ref("users/" + playerId)
+                .set({
+                  coin: 1000,
+                  elo: 1000,
+                  name: { status: "original", value: playerName },
+                  setting: {
+                    sound: true,
+                    language: "vn",
+                    matchingByElo: true,
+                  },
+                  location: {
+                    page: "dashboard",
+                  },
+                  createdAt: Date.now(),
+                  updatedAt: Date.now(),
+                });
+            }
+          });
 
-          setPlayerName(playerName);
-          setPlayerPicURL(playerPic);
-          setPlayerId(playerId);
-        });
-      });
-    };
-  });
-
-  React.useEffect(() => {
-    firebase()
-      .database.ref("users/" + playerId)
-      .once("value")
-      .then(function (snapshot) {
-        if (snapshot.val()) {
-          if (snapshot.val().name.status === "original") {
-            setUserInfo(playerId, playerName, playerPicURL);
-          } else {
-            setUserInfo(playerId, snapshot.val().name.value, playerPicURL);
-          }
-        } else {
-          return firebase()
+        return () => {
+          firebase()
             .database.ref("users/" + playerId)
-            .set({
-              coin: 1000,
-              elo: 1000,
-              name: { status: "original", value: playerName },
-              setting: {
-                sound: true,
-                language: "vn",
-                matchingByElo: true,
-              },
-            });
-        }
+            .off();
+        };
       });
+    });
+  }, [state, setUserInfo, changeRoute]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerId, playerName, playerPicURL]);
+  console.log(state);
 
   switch (state.route.path) {
     case "dashboard":
       return (
         <React.Suspense fallback={<div>Loading...</div>}>
-          <Dashboard playerPicURL={playerPicURL} />
+          <Dashboard />
         </React.Suspense>
       );
     case "lobby":

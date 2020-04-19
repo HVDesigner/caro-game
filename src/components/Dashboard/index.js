@@ -22,9 +22,9 @@ import UserSVG from "./../../assets/Dashboard/user.svg";
 // Contexts
 import AppContext from "./../../context/";
 
-function Dashboard({ playerPicURL }) {
+function Dashboard() {
   const GlobalState = React.useContext(AppContext);
-  const { changeRoute } = GlobalState;
+  const { state, changeRoute } = GlobalState;
 
   return (
     <div
@@ -142,10 +142,16 @@ function Dashboard({ playerPicURL }) {
               </div>
               <div className="svg_btn">
                 <img
-                  src={playerPicURL ? playerPicURL : UserSVG}
+                  src={
+                    state.userInfo.image_url
+                      ? state.userInfo.image_url
+                      : UserSVG
+                  }
                   alt="user"
                   className={
-                    playerPicURL ? "rounded-circle border" : "wood-btn"
+                    state.userInfo.image_url
+                      ? "rounded-circle border"
+                      : "wood-btn"
                   }
                   onClick={() => {
                     changeRoute("profile");

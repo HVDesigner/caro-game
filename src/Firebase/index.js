@@ -1,5 +1,6 @@
 import * as firebase from "firebase/app";
 import "firebase/database";
+import "firebase/functions";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCx5AD4sWwFIMuNyT1T3eftcC-783_0Ssc",
@@ -15,10 +16,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 function firebaseClient() {
-
   const database = firebase.database();
+  const functions = firebase.functions();
 
-  return { database };
+  return { database, functions };
 }
 
 export default firebaseClient;
