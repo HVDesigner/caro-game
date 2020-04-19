@@ -10,29 +10,34 @@ const Profile = React.lazy(() => import("./../Profile/"));
 const GamePlay = React.lazy(() => import("./../GamePlay/"));
 const PlayNow = React.lazy(() => import("./../PlayNow/"));
 const Lobby = React.lazy(() => import("./../Lobby/"));
+const Login = React.lazy(() => import("./../login/"));
 
 function App() {
   const StateGlobal = React.useContext(AppContext);
 
-  const { state, setUserInfo, changeRoute } = StateGlobal;
+  const { state, setUserInfo } = StateGlobal;
+
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    return window.FBInstant.initializeAsync().then(function () {
-      return window.FBInstant.startGameAsync().then(() => {
+    window.FBInstant.initializeAsync().then(function () {
+      window.FBInstant.startGameAsync().then(() => {
         const playerName = window.FBInstant.player.getName();
         const playerPic = window.FBInstant.player.getPhoto();
         const playerId = window.FBInstant.player.getID();
+        const playerLocale = window.FBInstant.getLocale();
 
         firebase()
           .database.ref("users/" + playerId)
-          .on("value", function (snapshot) {
+          .once("value")
+          .then(function (snapshot) {
             if (snapshot.val()) {
-              changeRoute(snapshot.val().location.page);
               if (snapshot.val().name.status === "original") {
                 setUserInfo(playerId, playerName, playerPic);
               } else {
                 setUserInfo(playerId, snapshot.val().name.value, playerPic);
               }
+              setLoading(false);
             } else {
               firebase()
                 .database.ref("users/" + playerId)
@@ -42,28 +47,74 @@ function App() {
                   name: { status: "original", value: playerName },
                   setting: {
                     sound: true,
-                    language: "vn",
+                    language: {
+                      status: "original",
+                      value: playerLocale,
+                    },
                     matchingByElo: true,
-                  },
-                  location: {
-                    page: "dashboard",
                   },
                   createdAt: Date.now(),
                   updatedAt: Date.now(),
+                })
+                .then(() => {
+                  setUserInfo(playerId, playerName, playerPic);
+                  setLoading(false);
                 });
             }
           });
-
-        return () => {
-          firebase()
-            .database.ref("users/" + playerId)
-            .off();
-        };
       });
     });
-  }, [state, setUserInfo, changeRoute]);
 
-  console.log(state);
+    console.log();
+
+    if (process.env.NODE_ENV === "development" && state.userInfo.id) {
+      firebase()
+        .database.ref("users/" + state.userInfo.id)
+        .once("value")
+        .then(function (snapshot) {
+          if (snapshot.val()) {
+            if (snapshot.val().name.status === "original") {
+              setUserInfo(state.userInfo.id, state.userInfo.name, "");
+            } else {
+              setUserInfo(state.userInfo.id, state.userInfo.name, "");
+            }
+            setLoading(false);
+          } else {
+            firebase()
+              .database.ref("users/" + state.userInfo.id)
+              .set({
+                coin: 1000,
+                elo: 1000,
+                name: { status: "original", value: state.userInfo.name },
+                setting: {
+                  sound: true,
+                  language: {
+                    status: "original",
+                    value: "vn",
+                  },
+                  matchingByElo: true,
+                },
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+              })
+              .then(() => {
+                setUserInfo(state.userInfo.id, state.userInfo.name, "");
+                setLoading(false);
+              });
+          }
+        });
+    }
+  }, [state, setUserInfo]);
+
+  if (loading) {
+    // return <div>Loading...</div>;
+  }
+  if (!state.userInfo.name && !state.userInfo.id)
+    return (
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <Login />
+      </React.Suspense>
+    );
 
   switch (state.route.path) {
     case "dashboard":
@@ -109,3 +160,31 @@ function App() {
 }
 
 export default App;
+
+// getLocale: ƒ ()
+// getPlatform: ƒ ()
+// getSDKVersion: ƒ ()
+// initializeAsync: ƒ ()
+// _populatePlatform: ƒ ()
+// setLoadingProgress: ƒ (a)
+// getSupportedAPIs: ƒ ()
+// getEntryPointData: ƒ ()
+// getEntryPointAsync: ƒ ()
+// setSessionData: ƒ (a)
+// startGameAsync: ƒ ()
+// player: {getID: ƒ, getSignedPlayerInfoAsync: ƒ, canSubscribeBotAsync: ƒ, subscribeBotAsync: ƒ, getName: ƒ, …}
+// context: {getID: ƒ, getType: ƒ, isSizeBetween: ƒ, switchAsync: ƒ, chooseAsync: ƒ, …}
+// payments: {consumePurchaseAsync: ƒ, getCatalogAsync: ƒ, getPurchasesAsync: ƒ, purchaseAsync: ƒ, onReady: ƒ, …}
+// shareAsync: ƒ (a)
+// updateAsync: ƒ (a)
+// switchGameAsync: ƒ (a,c)
+// canCreateShortcutAsync: ƒ ()
+// createShortcutAsync: ƒ ()
+// quit: ƒ ()
+// logEvent: ƒ (a,c,d)
+// onPause: ƒ (a)
+// getInterstitialAdAsync: ƒ (a)
+// getRewardedVideoAsync: ƒ (a)
+// matchPlayerAsync: ƒ (a,c)
+// checkCanPlayerMatchAsync: ƒ ()
+// getLeaderboardAsync: ƒ (a)

@@ -1,6 +1,6 @@
 import React from "react";
-import ProfileJPG from "./../../assets/profile_pic.jpg";
 import ExitSVG from "./../../assets/Exit.svg";
+import UserSVG from "./../../assets/Dashboard/user.svg";
 import { ListGroup, Container, Row, Col } from "react-bootstrap";
 import "./index.css";
 
@@ -9,7 +9,7 @@ import AppContext from "./../../context/";
 function ProfileComponent() {
   const StateGlobal = React.useContext(AppContext);
 
-  const { changeRoute } = StateGlobal;
+  const { state, changeRoute } = StateGlobal;
 
   return (
     <Container className="proflie-body">
@@ -18,11 +18,16 @@ function ProfileComponent() {
           <div className="d-flex flex-column align-items-center header-profile mt-3">
             <h4 className="text-white mb-3">Thông tin</h4>
             <img
-              src={ProfileJPG}
+              src={
+                state.userInfo.image_url ? state.userInfo.image_url : UserSVG
+              }
               alt="img-profile"
-              className="rounded-circle shadow"
+              className={state.userInfo.image_url ? "rounded-circle shadow" : ""}
+              style={state.userInfo.image_url ? {} : { border: "none" }}
             />
-            <p className="text-white">Việt</p>
+            <p className="text-white">
+              {state.userInfo.name ? state.userInfo.name : "..."}
+            </p>
           </div>
         </Col>
       </Row>

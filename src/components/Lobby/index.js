@@ -6,13 +6,12 @@ import Room from "./Room/";
 
 import CoinSVG from "./../../assets/Dashboard/Coin.svg";
 import LeftSVG from "./../../assets/chevron-left.svg";
-import AddCoinSVG from "./../../assets/Dashboard/add_coin.svg";
 
 import AppContext from "./../../context/";
 
 function Lobby({ firebase }) {
   const StateGlobal = React.useContext(AppContext);
-  const { state, changeRoute } = StateGlobal;
+  const { changeRoute } = StateGlobal;
 
   // true: Gomoku
   // false: Block Two Head
@@ -72,12 +71,11 @@ function Lobby({ firebase }) {
                 ></img>
               </Nav.Link>
             </Nav.Item>
-            <Nav.Item className="text-white coin_lobby d-flex align-items-center pl-2 pr-2">
+            <Nav.Item className="text-white coin_lobby d-flex align-items-center pl-2">
               <img src={CoinSVG} alt="logo"></img>
               <h5 className="ml-3 mr-3 mb-0 d-flex align-items-center">
                 2.00<span className="text-warning">K</span>
               </h5>
-              <img src={AddCoinSVG} alt="logo" className="m-0 wood-btn"></img>
             </Nav.Item>
           </Nav>
         </div>
