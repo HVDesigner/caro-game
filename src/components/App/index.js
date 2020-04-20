@@ -20,52 +20,56 @@ function App() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    window.FBInstant.initializeAsync().then(function () {
-      window.FBInstant.startGameAsync().then(() => {
-        const playerName = window.FBInstant.player.getName();
-        const playerPic = window.FBInstant.player.getPhoto();
-        const playerId = window.FBInstant.player.getID();
-        const playerLocale = window.FBInstant.getLocale();
+    // window.FBInstant.initializeAsync().then(function () {
+    //   window.FBInstant.startGameAsync().then(() => {
+    //     const playerName = window.FBInstant.player.getName();
+    //     const playerPic = window.FBInstant.player.getPhoto();
+    //     const playerId = window.FBInstant.player.getID();
+    //     const playerLocale = window.FBInstant.getLocale();
 
-        firebase()
-          .database.ref("users/" + playerId)
-          .once("value")
-          .then(function (snapshot) {
-            if (snapshot.val()) {
-              if (snapshot.val().name.status === "original") {
-                setUserInfo(playerId, playerName, playerPic);
-              } else {
-                setUserInfo(playerId, snapshot.val().name.value, playerPic);
-              }
-              setLoading(false);
-            } else {
-              firebase()
-                .database.ref("users/" + playerId)
-                .set({
-                  coin: 1000,
-                  elo: 1000,
-                  name: { status: "original", value: playerName },
-                  setting: {
-                    sound: true,
-                    language: {
-                      status: "original",
-                      value: playerLocale,
-                    },
-                    matchingByElo: true,
-                  },
-                  createdAt: Date.now(),
-                  updatedAt: Date.now(),
-                })
-                .then(() => {
-                  setUserInfo(playerId, playerName, playerPic);
-                  setLoading(false);
-                });
-            }
-          });
-      });
-    });
-
-    console.log();
+    //     firebase()
+    //       .database.ref("users/" + playerId)
+    //       .once("value")
+    //       .then(function (snapshot) {
+    //         if (snapshot.val()) {
+    //           if (snapshot.val().name.status === "original") {
+    //             setUserInfo(playerId, playerName, playerPic, playerLocale);
+    //           } else {
+    //             setUserInfo(
+    //               playerId,
+    //               snapshot.val().name.value,
+    //               playerPic,
+    //               playerLocale
+    //             );
+    //           }
+    //           setLoading(false);
+    //         } else {
+    //           firebase()
+    //             .database.ref("users/" + playerId)
+    //             .set({
+    //               coin: 1000,
+    //               elo: 1000,
+    //               name: { status: "original", value: playerName },
+    //               locale: playerLocale,
+    //               setting: {
+    //                 sound: true,
+    //                 language: {
+    //                   status: "original",
+    //                   value: playerLocale === "vi_VN" ? "vn" : "en",
+    //                 },
+    //                 matchingByElo: true,
+    //               },
+    //               createdAt: Date.now(),
+    //               updatedAt: Date.now(),
+    //             })
+    //             .then(() => {
+    //               setUserInfo(playerId, playerName, playerPic);
+    //               setLoading(false);
+    //             });
+    //         }
+    //       });
+    //   });
+    // });
 
     if (process.env.NODE_ENV === "development" && state.userInfo.id) {
       firebase()
@@ -74,9 +78,20 @@ function App() {
         .then(function (snapshot) {
           if (snapshot.val()) {
             if (snapshot.val().name.status === "original") {
-              setUserInfo(state.userInfo.id, state.userInfo.name, "");
+              console.log(snapshot.val());
+              setUserInfo(
+                state.userInfo.id,
+                state.userInfo.name,
+                "",
+                snapshot.val().locale
+              );
             } else {
-              setUserInfo(state.userInfo.id, state.userInfo.name, "");
+              setUserInfo(
+                state.userInfo.id,
+                state.userInfo.name,
+                "",
+                snapshot.val().locale
+              );
             }
             setLoading(false);
           } else {
@@ -86,6 +101,7 @@ function App() {
                 coin: 1000,
                 elo: 1000,
                 name: { status: "original", value: state.userInfo.name },
+                locale: "vi_VN",
                 setting: {
                   sound: true,
                   language: {
@@ -98,17 +114,29 @@ function App() {
                 updatedAt: Date.now(),
               })
               .then(() => {
-                setUserInfo(state.userInfo.id, state.userInfo.name, "");
+                setUserInfo(
+                  state.userInfo.id,
+                  state.userInfo.name,
+                  "",
+                  "vi_VN"
+                );
                 setLoading(false);
               });
           }
         });
+    } else {
+      setLoading(false);
     }
-  }, [state, setUserInfo]);
+
+    return () => {};
+  }, []);
 
   if (loading) {
-    // return <div>Loading...</div>;
+    return <div>Loading...</div>;
   }
+
+  // console.log(state);
+
   if (!state.userInfo.name && !state.userInfo.id)
     return (
       <React.Suspense fallback={<div>Loading...</div>}>

@@ -4,21 +4,23 @@ import AppContext from "./../../context/";
 import Exit from "./../../assets/Exit.svg";
 import FindSVG from "./../../assets/find_enemy.svg";
 import CheckButton from "./../CheckButton/";
-import ProfileJPG from "./../../assets/profile_pic.jpg";
+
 import UserSVG from "./../../assets/Dashboard/user.svg";
 import DefaultSVG from "./../../assets/default-btn.svg";
 
 function PlayNow() {
   const GlobalState = React.useContext(AppContext);
-  const { changeRoute } = GlobalState;
+  const { changeRoute, state } = GlobalState;
 
   const [gomoku, setGomoku] = React.useState({ status: true, type: "Gomoku" });
+
   const [twoHeadBlock, setTwoHeadBlock] = React.useState({
     status: false,
     type: "Block Two Head",
   });
 
   const [sixWin, setSixWin] = React.useState({ status: true, type: "Six Win" });
+
   const [sixNotWin, setSixNotWin] = React.useState({
     status: false,
     type: "Six Not Win",
@@ -28,16 +30,19 @@ function PlayNow() {
     status: true,
     type: "Free Enemy",
   });
+
   const [enemySimilar, setEnemySimilar] = React.useState({
     status: false,
     type: "Similar Enemy",
   });
 
   const [tenSecond, setTenSecond] = React.useState({ status: false, type: 10 });
+
   const [twentySecond, setTwentySecond] = React.useState({
     status: false,
     type: 20,
   });
+
   const [thirtySecond, setThirtySecond] = React.useState({
     status: true,
     type: 30,
@@ -196,12 +201,16 @@ function PlayNow() {
       <div className="d-flex align-items-center mt-3 mb-3">
         <div style={{ width: "50%" }} className="player p-2 ml-2 mr-1 shadow">
           <img
-            src={ProfileJPG}
+            src={state.userInfo.image_url ? state.userInfo.image_url : UserSVG}
             alt="proflie_image"
             style={{ width: "15vw" }}
-            className="rounded-circle m-auto d-block border"
+            className={`${
+              state.userInfo.image_url ? "rounded-circle border" : ""
+            } m-auto d-block`}
           />
-          <p className="text-center text-white mb-0">Việt</p>
+          <p className="text-center text-white mb-0">
+            {state.userInfo.name ? state.userInfo.name : "..."}
+          </p>
           <p className="text-center text-white mb-0">Elo: 1000</p>
         </div>
 

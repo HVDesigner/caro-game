@@ -12,6 +12,7 @@ function GlobalState(props) {
       id: "",
       name: "",
       image_url: "",
+      locale: "",
     },
   };
 
@@ -24,10 +25,10 @@ function GlobalState(props) {
     });
   };
 
-  const setUserInfo = (id, name, image_url) => {
+  const setUserInfo = (id, name, image_url, locale) => {
     return dispatch({
       type: SET_USER_INFO,
-      payload: { id, name, image_url },
+      payload: { id, name, image_url, locale },
     });
   };
 

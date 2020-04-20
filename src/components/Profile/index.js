@@ -3,6 +3,7 @@ import ExitSVG from "./../../assets/Exit.svg";
 import UserSVG from "./../../assets/Dashboard/user.svg";
 import { ListGroup, Container, Row, Col } from "react-bootstrap";
 import "./index.css";
+import { LANGUAGE_BY_LOCALE } from "./../../locale-constant";
 
 import AppContext from "./../../context/";
 
@@ -22,11 +23,18 @@ function ProfileComponent() {
                 state.userInfo.image_url ? state.userInfo.image_url : UserSVG
               }
               alt="img-profile"
-              className={state.userInfo.image_url ? "rounded-circle shadow" : ""}
+              className={
+                state.userInfo.image_url ? "rounded-circle shadow" : ""
+              }
               style={state.userInfo.image_url ? {} : { border: "none" }}
             />
-            <p className="text-white">
+            <p className="text-white m-0">
               {state.userInfo.name ? state.userInfo.name : "..."}
+            </p>
+            <p className="text-white">
+              {state.userInfo.locale
+                ? LANGUAGE_BY_LOCALE[state.userInfo.locale]
+                : "..."}
             </p>
           </div>
         </Col>
