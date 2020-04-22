@@ -4,14 +4,14 @@ import AppContext from "./../../context/";
 
 function Login() {
   const StateGlobal = React.useContext(AppContext);
-  const { setUserInfo } = StateGlobal;
+  const { getUserInfo } = StateGlobal;
 
   const [id, setID] = React.useState("");
   const [name, setName] = React.useState("");
 
   const submitForm = (e) => {
     e.preventDefault();
-    setUserInfo(id, name, "");
+    getUserInfo(id, name, "", "vi_VN");
   };
 
   return (

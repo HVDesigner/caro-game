@@ -10,8 +10,7 @@ import LeftSVG from "./../../assets/chevron-left.svg";
 import AppContext from "./../../context/";
 
 function Lobby({ firebase }) {
-  const StateGlobal = React.useContext(AppContext);
-  const { changeRoute } = StateGlobal;
+  const { changeRoute } = React.useContext(AppContext);
 
   // true: Gomoku
   // false: Block Two Head
@@ -112,11 +111,21 @@ function Lobby({ firebase }) {
           listRooms.map((value, key) => {
             return (
               <Col className="room-item-col" key={key}>
-                <Room roomId={value} roomsDetail={roomsDetail} />
+                <Room roomId={value} data={roomsDetail[value]} />
               </Col>
             );
           })
         )}
+      </Row>
+      <Row className="">
+        <Nav className="fixed-bottom footer-lobby justify-content-center">
+          <Nav.Item
+            className="text-white p-2 text-center wood-btn-back"
+            style={{ width: "100%" }}
+          >
+            <h5 className="m-0">TẠO PHÒNG</h5>
+          </Nav.Item>
+        </Nav>
       </Row>
     </Container>
   );

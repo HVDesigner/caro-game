@@ -38,7 +38,7 @@
 }
 
 .room-item-col:last-child {
-  margin-bottom: 10px;
+  margin-bottom: 4em;
 }
 
 .room-menu {
@@ -88,4 +88,10 @@
 
 .game-gomoku {
   border-right: 2px solid #4e311d;
+}
+
+.footer-lobby {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 40%;
+  border-top: 2px solid #4e311d;
 }

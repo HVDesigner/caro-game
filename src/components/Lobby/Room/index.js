@@ -1,12 +1,27 @@
 import React from "react";
 import "./index.css";
 
-import UserSVG from "./../../../assets/Dashboard/user.svg";
+import MasterComponent from "./Master/";
+import PlayerComponent from "./Player/";
+
 import LockSVG from "./../../../assets/Rooms/lock.svg";
 import MoreSVG from "./../../../assets/Rooms/more.svg";
 import LeftSVG from "./../../../assets/chevron-left.svg";
 
-function Room({ roomId, roomsDetail }) {
+function Room({ roomId, data }) {
+  const [masterUser, setMasterUser] = React.useState("");
+  const [playerUser, setPlayerUser] = React.useState("");
+
+  React.useEffect(() => {
+    Object.keys(data.participants).forEach((element) => {
+      if (data.participants[element].type === "master") {
+        setMasterUser(element);
+      } else if (data.participants[element].type === "player") {
+        setPlayerUser(element);
+      }
+    });
+  });
+
   const [showFooter, setShowFooter] = React.useState(false);
 
   return (
@@ -15,18 +30,8 @@ function Room({ roomId, roomsDetail }) {
         <span>id: {roomId}</span>
       </div>
       <div className="d-flex room-item-body p-2">
-        <div className="d-flex align-items-center">
-          <img
-            src={UserSVG}
-            alt="user-playing"
-            className="player-inroom-img mr-2"
-          />
-          <div className="d-flex flex-column text-white">
-            <span>Viet</span>
-            <span>Elo: 1K</span>
-          </div>
-        </div>
-        {roomsDetail && roomsDetail[roomId].password.status ? (
+        <MasterComponent masterUser={masterUser} />
+        {data && data.password.status ? (
           <div className="lock-room">
             <img
               src={LockSVG}
@@ -42,17 +47,7 @@ function Room({ roomId, roomsDetail }) {
             <img src={MoreSVG} alt="lock" className="wood-btn" />
           </div>
         )}
-        <div className="d-flex justify-content-end align-items-center">
-          <div className="d-flex flex-column text-white text-right">
-            <span>Viet</span>
-            <span>Elo: 1K</span>
-          </div>
-          <img
-            src={UserSVG}
-            alt="user-playing"
-            className="player-inroom-img ml-2"
-          />
-        </div>
+        <PlayerComponent playerUser={playerUser} />
       </div>
       {showFooter ? (
         <div className="room-item-footer p-2 d-flex">
