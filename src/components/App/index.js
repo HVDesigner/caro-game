@@ -41,16 +41,16 @@ function App() {
     return <LoadingComponent />;
   }
 
-  // if (
-  //   !state.userInfo.name &&
-  //   !state.userInfo.id &&
-  //   process.env.NODE_ENV === "development"
-  // )
-  //   return (
-  //     <React.Suspense fallback={<LoadingComponent />}>
-  //       <Login />
-  //     </React.Suspense>
-  //   );
+  if (
+    !state.userInfo.name &&
+    !state.userInfo.id &&
+    process.env.NODE_ENV === "development"
+  )
+    return (
+      <React.Suspense fallback={<LoadingComponent />}>
+        <Login />
+      </React.Suspense>
+    );
 
   switch (state.route.path) {
     case "dashboard":

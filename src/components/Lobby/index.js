@@ -21,28 +21,36 @@ function Lobby({ firebase }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    const gomokuRef = firebase().database.ref("rooms/gomoku");
+    const blockHeadRef = firebase().database.ref("rooms/block-head");
+
     if (gameType) {
-      firebase()
-        .database.ref("rooms/gomoku")
-        .on("value", (snapshot) => {
+      const unsubscribe = gomokuRef.on("value", (snapshot) => {
+        if (snapshot.val()) {
           setListRooms(Object.keys(snapshot.val()));
           setRoomsDetail(snapshot.val());
-          setLoading(false);
-        });
-
-      return () => firebase().database.ref("rooms/gomoku").off();
+        }
+        setLoading(false);
+      });
     } else {
-      firebase()
-        .database.ref("rooms/block-head")
-        .on("value", (snapshot) => {
+      const unsubscribe = blockHeadRef.on("value", (snapshot) => {
+        if (snapshot.val()) {
           setListRooms(Object.keys(snapshot.val()));
           setRoomsDetail(snapshot.val());
-          setLoading(false);
-        });
-
-      return () => firebase().database.ref("rooms/block-head").off();
+        }
+        setLoading(false);
+      });
     }
-  }, [gameType, firebase]);
+
+    return () => {
+      if (gameType) {
+        gomokuRef.off();
+      } else {
+        blockHeadRef.off();
+      }
+      unsubscribe();
+    };
+  });
 
   const changGameType = (status) => {
     if (gameType !== status) {
@@ -108,21 +116,23 @@ function Lobby({ firebase }) {
             <p className="text-white text-center mt-3">Loading...</p>
           </Col>
         ) : (
-            listRooms.map((value, key) => {
-              return (
-                <Col className="room-item-col" key={key}>
-                  <Room roomId={value} data={roomsDetail[value]} />
-                </Col>
-              );
-            })
-          )}
+          listRooms.map((value, key) => {
+            return (
+              <Col className="room-item-col" key={key}>
+                <Room roomId={value} data={roomsDetail[value]} />
+              </Col>
+            );
+          })
+        )}
       </Row>
       <Row className="">
         <Nav className="fixed-bottom footer-lobby justify-content-center">
           <Nav.Item
             className="text-white p-2 text-center wood-btn-back"
             style={{ width: "100%" }}
-            onClick={() => { changeRoute('create-room') }}
+            onClick={() => {
+              changeRoute("create-room");
+            }}
           >
             <h5 className="m-0">TẠO PHÒNG</h5>
           </Nav.Item>

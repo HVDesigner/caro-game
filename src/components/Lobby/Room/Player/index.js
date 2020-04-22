@@ -5,20 +5,25 @@ import AppContext from "./../../../../context/";
 function PlayerInRoom({ playerUser }) {
   const { firebase } = React.useContext(AppContext);
 
+  const [name, setName] = React.useState("");
+  const [elo, setElo] = React.useState(0);
+  const [imageUrl, setImageUrl] = React.useState("");
+
   React.useEffect(() => {
-    console.log(playerUser);
-    firebase()
-      .database.ref("users/" + playerUser)
-      .once("value", function (snapshot) {
-        console.log(snapshot.val());
-      });
-  }, [playerUser, firebase]);
+    if (playerUser) {
+      firebase()
+        .database.ref("users/" + playerUser)
+        .once("value", function (snapshot) {
+          console.log(snapshot.val());
+        });
+    }
+  });
 
   return (
     <div className="d-flex justify-content-end align-items-center">
       <div className="d-flex flex-column text-white text-right">
-        <span>Viet</span>
-        <span>Elo: 1K</span>
+        <span>{name}</span>
+        <span>Elo: {elo}</span>
       </div>
       <img
         src={UserSVG}

@@ -1,25 +1,27 @@
 .create-room-body {
-    min-height: 100vh;
-    height: 100%;
-    background-image: url("./../../../assets/matching_background.svg");
-    background-size: 50%;
-    color: white;
-}
-
-.create-room-body input {
-    /* width: 100%; */
+  min-height: 100vh;
+  height: 100%;
+  background-image: url("./../../../assets/matching_background.svg");
+  background-size: 50%;
+  color: white;
 }
 
 .create-room-menu {
-    background-image: url("./../../../assets/matching_background.svg");
-    background-size: 40%;
+  background-image: url("./../../../assets/matching_background.svg");
+  background-size: 40%;
 }
 
 .exit-create-room {
-    border-right: 1px solid #4e311d;
+  border-right: 1px solid #4e311d;
 }
 
 .create-room-menu-top {
-    border-bottom: 2px solid #4e311d;
-    width: 100%;
+  border-bottom: 2px solid #4e311d;
+  width: 100%;
+}
+
+.footer-create-room {
+  background-image: url("./../../../assets/matching_background.svg");
+  background-size: 40%;
+  border-top: 2px solid #4e311d;
 }
