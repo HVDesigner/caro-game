@@ -12,6 +12,7 @@ const GamePlay = React.lazy(() => import("./../GamePlay/"));
 const PlayNow = React.lazy(() => import("./../PlayNow/"));
 const Lobby = React.lazy(() => import("./../Lobby/"));
 const Login = React.lazy(() => import("./../login/"));
+const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
 
 function App() {
   const { state, getUserInfo } = React.useContext(AppContext);
@@ -62,6 +63,12 @@ function App() {
       return (
         <React.Suspense fallback={<LoadingComponent />}>
           <Lobby firebase={firebase} />
+        </React.Suspense>
+      );
+    case "create-room":
+      return (
+        <React.Suspense fallback={<LoadingComponent />}>
+          <CreateRoom firebase={firebase} />
         </React.Suspense>
       );
     case "profile":

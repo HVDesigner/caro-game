@@ -108,20 +108,21 @@ function Lobby({ firebase }) {
             <p className="text-white text-center mt-3">Loading...</p>
           </Col>
         ) : (
-          listRooms.map((value, key) => {
-            return (
-              <Col className="room-item-col" key={key}>
-                <Room roomId={value} data={roomsDetail[value]} />
-              </Col>
-            );
-          })
-        )}
+            listRooms.map((value, key) => {
+              return (
+                <Col className="room-item-col" key={key}>
+                  <Room roomId={value} data={roomsDetail[value]} />
+                </Col>
+              );
+            })
+          )}
       </Row>
       <Row className="">
         <Nav className="fixed-bottom footer-lobby justify-content-center">
           <Nav.Item
             className="text-white p-2 text-center wood-btn-back"
             style={{ width: "100%" }}
+            onClick={() => { changeRoute('create-room') }}
           >
             <h5 className="m-0">TẠO PHÒNG</h5>
           </Nav.Item>

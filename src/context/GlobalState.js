@@ -7,7 +7,7 @@ import firebase from "./../Firebase/index";
 function GlobalState(props) {
   const InitialGlobalState = {
     route: {
-      path: "lobby",
+      path: "create-room",
     },
     userInfo: {
       id: "",

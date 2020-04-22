@@ -15,3 +15,16 @@ button:focus {
 .wood-btn:active {
   filter: saturate(2);
 }
+
+.input-carotv {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
+  border-bottom: 1px solid #4e311d;
+}
+
+.input-carotv::placeholder {
+  color: #ffc107;
+  text-align: center;
+}

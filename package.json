@@ -20,7 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "fb-build":"npm run build && cp ../fbapp-config.json build"
+    "fb-build": "npm run build && cp ../fbapp-config.json build"
   },
   "eslintConfig": {
     "extends": "react-app"

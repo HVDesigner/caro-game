@@ -1,0 +1,25 @@
+.create-room-body {
+    min-height: 100vh;
+    height: 100%;
+    background-image: url("./../../../assets/matching_background.svg");
+    background-size: 50%;
+    color: white;
+}
+
+.create-room-body input {
+    /* width: 100%; */
+}
+
+.create-room-menu {
+    background-image: url("./../../../assets/matching_background.svg");
+    background-size: 40%;
+}
+
+.exit-create-room {
+    border-right: 1px solid #4e311d;
+}
+
+.create-room-menu-top {
+    border-bottom: 2px solid #4e311d;
+    width: 100%;
+}
