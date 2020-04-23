@@ -3,7 +3,7 @@ import UserSVG from "./../../../../assets/Dashboard/user.svg";
 import AppContext from "./../../../../context/";
 
 function MasterInRoom({ masterUser }) {
-  const { firebase } = React.useContext(AppContext);
+  const { firebase, state } = React.useContext(AppContext);
 
   const [name, setName] = React.useState("");
   const [elo, setElo] = React.useState(0);
@@ -11,18 +11,24 @@ function MasterInRoom({ masterUser }) {
 
   React.useEffect(() => {
     if (masterUser) {
-      firebase()
-        .database.ref(`users/${masterUser}`)
-        .once("value")
-        .then((snapshot) => {
-          if (snapshot.val()) {
-            setName(snapshot.val().name.value);
-            setElo(snapshot.val().elo);
-            setImageUrl(snapshot.val().image_url);
-          }
-        });
+      if (masterUser === state.userInfo.id) {
+        setName(state.userInfo.name);
+        setElo("1000");
+        setImageUrl(state.userInfo.image_url);
+      } else {
+        firebase()
+          .database.ref(`users/${masterUser}`)
+          .once("value")
+          .then((snapshot) => {
+            if (snapshot.val()) {
+              setName(snapshot.val().name.value);
+              setElo(snapshot.val().elo);
+              setImageUrl(snapshot.val().image_url);
+            }
+          });
+      }
     }
-  });
+  }, [masterUser, state.userInfo.id, state.userInfo.name, state.userInfo.image_url, firebase]);
 
   return (
     <div className="d-flex align-items-center">

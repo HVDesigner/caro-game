@@ -21,36 +21,20 @@ function Lobby({ firebase }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const gomokuRef = firebase().database.ref("rooms/gomoku");
-    const blockHeadRef = firebase().database.ref("rooms/block-head");
+    const roomsRef = gameType ? firebase().database.ref("rooms/gomoku") : firebase().database.ref("rooms/block-head");
 
-    if (gameType) {
-      const unsubscribe = gomokuRef.on("value", (snapshot) => {
-        if (snapshot.val()) {
-          setListRooms(Object.keys(snapshot.val()));
-          setRoomsDetail(snapshot.val());
-        }
-        setLoading(false);
-      });
-    } else {
-      const unsubscribe = blockHeadRef.on("value", (snapshot) => {
-        if (snapshot.val()) {
-          setListRooms(Object.keys(snapshot.val()));
-          setRoomsDetail(snapshot.val());
-        }
-        setLoading(false);
-      });
-    }
+    roomsRef.on("value", (snapshot) => {
+      if (snapshot.val()) {
+        setListRooms(Object.keys(snapshot.val()));
+        setRoomsDetail(snapshot.val());
+      }
+      setLoading(false);
+    });
 
     return () => {
-      if (gameType) {
-        gomokuRef.off();
-      } else {
-        blockHeadRef.off();
-      }
-      unsubscribe();
+      roomsRef.off();
     };
-  });
+  }, [firebase, gameType]);
 
   const changGameType = (status) => {
     if (gameType !== status) {
@@ -116,14 +100,14 @@ function Lobby({ firebase }) {
             <p className="text-white text-center mt-3">Loading...</p>
           </Col>
         ) : (
-          listRooms.map((value, key) => {
-            return (
-              <Col className="room-item-col" key={key}>
-                <Room roomId={value} data={roomsDetail[value]} />
-              </Col>
-            );
-          })
-        )}
+            listRooms.map((value, key) => {
+              return (
+                <Col className="room-item-col" key={key}>
+                  <Room roomId={value} data={roomsDetail[value]} />
+                </Col>
+              );
+            })
+          )}
       </Row>
       <Row className="">
         <Nav className="fixed-bottom footer-lobby justify-content-center">
