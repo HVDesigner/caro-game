@@ -13,7 +13,6 @@ function Room({ roomId, data }) {
   const [playerUser, setPlayerUser] = React.useState("");
 
   React.useEffect(() => {
-    console.log(data);
     if (data.participants) {
       Object.keys(data.participants).forEach((element) => {
         if (data.participants[element].type === "master") {
@@ -46,10 +45,10 @@ function Room({ roomId, data }) {
             />
           </div>
         ) : (
-            <div className="lock-room">
-              <img src={MoreSVG} alt="lock" className="wood-btn" />
-            </div>
-          )}
+          <div className="lock-room">
+            <img src={MoreSVG} alt="lock" className="wood-btn" />
+          </div>
+        )}
         <PlayerComponent playerUser={playerUser} />
       </div>
       {showFooter ? (
@@ -68,8 +67,8 @@ function Room({ roomId, data }) {
           ></img>
         </div>
       ) : (
-          <div></div>
-        )}
+        <div></div>
+      )}
     </div>
   );
 }

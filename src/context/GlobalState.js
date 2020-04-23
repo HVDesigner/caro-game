@@ -1,10 +1,17 @@
 import React from "react";
 import AppContext from "./index";
 import { reducer } from "./Reducers";
-import { CHANGE_ROUTE, SET_USER_INFO } from "./ActionTypes";
-import firebase from "./../Firebase/index";
+import {
+  CHANGE_ROUTE,
+  SET_USER_INFO,
+  GET_ROOMS_BLOCK_HEAD,
+  GET_ROOMS_GOMOKU,
+} from "./ActionTypes";
+import { FirebaseContext } from "./../Firebase/";
 
 function GlobalState(props) {
+  const firebase = React.useContext(FirebaseContext);
+
   const InitialGlobalState = {
     route: {
       path: "dashboard",
@@ -16,8 +23,8 @@ function GlobalState(props) {
       locale: "",
     },
     rooms: {
-      gomoku: {},
-      "block-head": {},
+      gomoku: [],
+      "block-head": [],
     },
   };
 
@@ -30,8 +37,32 @@ function GlobalState(props) {
     });
   };
 
+  // const updateRoomGomoku = () => {
+  //   const childChangeRef = firebase().database.ref("rooms/gomoku");
+
+  //   childChangeRef.on("child_changed", (snapshot) => {
+  //     console.log({ id: snapshot.key, ...snapshot.val() });
+  //   });
+
+  //   return childChangeRef;
+  // };
+
+  const getRoomsGomoku = (finalArr) => {
+    return dispatch({
+      type: GET_ROOMS_GOMOKU,
+      payload: finalArr,
+    });
+  };
+
+  const getRoomsBlockHead = (finalArr) => {
+    return dispatch({
+      type: GET_ROOMS_BLOCK_HEAD,
+      payload: finalArr,
+    });
+  };
+
   const getUserInfo = (id, name, image_url, locale) => {
-    const userRef = firebase().database.ref("users/" + id);
+    const userRef = firebase.database().ref("users/" + id);
 
     return userRef.once("value").then((snapshot) => {
       if (snapshot.val()) {
@@ -103,7 +134,9 @@ function GlobalState(props) {
         state,
         changeRoute,
         getUserInfo,
-        firebase,
+        getRoomsGomoku,
+        // updateRoomGomoku,
+        getRoomsBlockHead,
       }}
     >
       {props.children}

@@ -9,32 +9,53 @@ import LeftSVG from "./../../assets/chevron-left.svg";
 
 import AppContext from "./../../context/";
 
-function Lobby({ firebase }) {
-  const { changeRoute } = React.useContext(AppContext);
+import { FirebaseContext } from "./../../Firebase/";
+
+function Lobby() {
+  const {
+    changeRoute,
+    // state,
+  } = React.useContext(AppContext);
+
+  const firebase = React.useContext(FirebaseContext);
 
   // true: Gomoku
   // false: Block Two Head
   const [gameType, setGameType] = React.useState(true);
-
-  const [listRooms, setListRooms] = React.useState([]);
-  const [roomsDetail, setRoomsDetail] = React.useState({});
   const [loading, setLoading] = React.useState(true);
 
+  const [gomokuListRooms, setGomokuListRoom] = React.useState([]);
+  const [blockHeadListRoom, setBlockHeadListRoom] = React.useState([]);
+
+  const roomsRef = firebase.database().ref("rooms");
+
   React.useEffect(() => {
-    const roomsRef = gameType ? firebase().database.ref("rooms/gomoku") : firebase().database.ref("rooms/block-head");
+    function converToArr(value) {
+      const keysArr = Object.keys(value);
+      const finalArr = [];
+
+      for (let index = 0; index < keysArr.length; index++) {
+        const element = keysArr[index];
+
+        finalArr.push({ id: element, ...value[element] });
+      }
+
+      return finalArr;
+    }
 
     roomsRef.on("value", (snapshot) => {
       if (snapshot.val()) {
-        setListRooms(Object.keys(snapshot.val()));
-        setRoomsDetail(snapshot.val());
+        if (gameType) {
+          setGomokuListRoom(converToArr(snapshot.val().gomoku));
+        } else {
+          setBlockHeadListRoom(converToArr(snapshot.val()["block-head"]));
+        }
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => {
-      roomsRef.off();
-    };
-  }, [firebase, gameType]);
+    return () => roomsRef.off("value");
+  }, [roomsRef, gameType]);
 
   const changGameType = (status) => {
     if (gameType !== status) {
@@ -94,21 +115,18 @@ function Lobby({ firebase }) {
         </Nav>
       </Row>
 
-      <Row>
-        {loading ? (
+      {loading ? (
+        <Row>
           <Col>
             <p className="text-white text-center mt-3">Loading...</p>
           </Col>
-        ) : (
-            listRooms.map((value, key) => {
-              return (
-                <Col className="room-item-col" key={key}>
-                  <Room roomId={value} data={roomsDetail[value]} />
-                </Col>
-              );
-            })
-          )}
-      </Row>
+        </Row>
+      ) : gameType ? (
+        <GomokuRoomsComponent data={gomokuListRooms} />
+      ) : (
+        <BlockHeadRoomsComponent data={blockHeadListRoom} />
+      )}
+
       <Row className="">
         <Nav className="fixed-bottom footer-lobby justify-content-center">
           <Nav.Item
@@ -126,3 +144,31 @@ function Lobby({ firebase }) {
   );
 }
 export default Lobby;
+
+function GomokuRoomsComponent({ data }) {
+  return (
+    <Row>
+      {data.map((value) => {
+        return (
+          <Col className="room-item-col" key={value.id}>
+            <Room roomId={value.id} data={value} />
+          </Col>
+        );
+      })}
+    </Row>
+  );
+}
+
+function BlockHeadRoomsComponent({ data }) {
+  return (
+    <Row>
+      {data.map((value) => {
+        return (
+          <Col className="room-item-col" key={value.id}>
+            <Room roomId={value.id} data={value} />
+          </Col>
+        );
+      })}
+    </Row>
+  );
+}

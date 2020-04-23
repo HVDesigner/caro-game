@@ -1,4 +1,5 @@
-import * as firebase from "firebase/app";
+import React, { createContext } from "react";
+import app from "firebase/app";
 import "firebase/database";
 import "firebase/functions";
 
@@ -13,13 +14,24 @@ const firebaseConfig = {
   measurementId: "G-WXMV1VTJT8",
 };
 
-firebase.initializeApp(firebaseConfig);
+// firebase.initializeApp(firebaseConfig);
 
-function firebaseClient() {
-  const database = firebase.database();
-  const functions = firebase.functions();
+// function firebaseClient() {
+//   const database = firebase.database();
+//   const functions = firebase.functions();
 
-  return { database, functions };
-}
+//   return { database, functions };
+// }
 
-export default firebaseClient;
+const FirebaseContext = createContext(null);
+
+export { FirebaseContext };
+
+export default ({ children }) => {
+  if (!app.apps.length) {
+    app.initializeApp(firebaseConfig);
+  }
+  return (
+    <FirebaseContext.Provider value={app}>{children}</FirebaseContext.Provider>
+  );
+};

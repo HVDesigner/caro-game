@@ -4,9 +4,11 @@ import { Form, Container, Row, Col, Nav } from "react-bootstrap";
 import CheckButton from "./../../CheckButton/";
 import LeftSVG from "./../../../assets/chevron-left.svg";
 import AppContext from "./../../../context/";
+import { FirebaseContext } from "./../../../Firebase/";
 
 function CreateRoom() {
-  const { changeRoute, firebase, state } = React.useContext(AppContext);
+  const { changeRoute, state } = React.useContext(AppContext);
+  const firebase = React.useContext(FirebaseContext);
 
   const [name, setName] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -60,7 +62,7 @@ function CreateRoom() {
       return time[0];
     };
 
-    const createRoom = firebase().functions.httpsCallable("createRoom");
+    const createRoom = firebase.functions().httpsCallable("createRoom");
 
     createRoom({
       password,

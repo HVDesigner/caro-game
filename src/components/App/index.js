@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import firebase from "./../../Firebase/";
+import { FirebaseContext } from "./../../Firebase/";
 
 import AppContext from "./../../context/";
 import LoadingComponent from "./../Loading/";
@@ -16,6 +16,7 @@ const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
 
 function App() {
   const { state, getUserInfo } = React.useContext(AppContext);
+  const firebase = React.useContext(FirebaseContext);
 
   const [loading, setLoading] = React.useState(true);
 
