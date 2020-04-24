@@ -38,11 +38,13 @@ function Room({ roomId, data, type }) {
 
   const onPasswordSubmit = (e) => {
     e.preventDefault();
-    const createRoom = firebase.functions().httpsCallable("loginRoom");
+    if (pass) {
+      const createRoom = firebase.functions().httpsCallable("loginRoom");
 
-    createRoom({ roomId, pass, type }).then(function (result) {
-      console.log(result);
-    });
+      createRoom({ roomId, pass, type }).then(function (result) {
+        console.log(result);
+      });
+    }
   };
 
   const [showFooter, setShowFooter] = React.useState(false);
