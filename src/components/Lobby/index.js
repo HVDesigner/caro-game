@@ -1,6 +1,7 @@
 import React from "react";
 import "./index.css";
 import { Container, Row, Col, Nav } from "react-bootstrap";
+import numeral from "numeral";
 
 import Room from "./Room/";
 
@@ -12,10 +13,7 @@ import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
 
 function Lobby() {
-  const {
-    changeRoute,
-    // state,
-  } = React.useContext(AppContext);
+  const { changeRoute } = React.useContext(AppContext);
 
   const firebase = React.useContext(FirebaseContext);
 
@@ -27,7 +25,12 @@ function Lobby() {
   const [gomokuListRooms, setGomokuListRoom] = React.useState([]);
   const [blockHeadListRoom, setBlockHeadListRoom] = React.useState([]);
 
+  const [blockHeadQuantity, setBlockHeadQuantity] = React.useState(0);
+  const [gomokuQuantity, setGomokuQuantity] = React.useState(0);
+
   const roomsRef = firebase.database().ref("rooms");
+
+  const roomsQuantityRef = firebase.database().ref("rooms-quantity");
 
   React.useEffect(() => {
     function converToArr(value) {
@@ -43,6 +46,13 @@ function Lobby() {
       return finalArr;
     }
 
+    roomsQuantityRef.on("value", function (snapshot) {
+      if (snapshot.val()) {
+        setGomokuQuantity(snapshot.val().gomoku.value);
+        setBlockHeadQuantity(snapshot.val()["block-head"].value);
+      }
+    });
+
     roomsRef.on("value", (snapshot) => {
       if (snapshot.val()) {
         if (gameType) {
@@ -54,8 +64,12 @@ function Lobby() {
       }
     });
 
-    return () => roomsRef.off("value");
-  }, [roomsRef, gameType]);
+    return () => {
+      return [roomsRef.off("value"), roomsQuantityRef.off("value")];
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameType]);
 
   const changGameType = (status) => {
     if (gameType !== status) {
@@ -86,7 +100,7 @@ function Lobby() {
             <Nav.Item className="text-white coin_lobby d-flex align-items-center pl-2">
               <img src={CoinSVG} alt="logo"></img>
               <h5 className="ml-3 mr-3 mb-0 d-flex align-items-center">
-                2.00<span className="text-warning">K</span>
+                {numeral(21928).format("0.0 a")}
               </h5>
             </Nav.Item>
           </Nav>
@@ -99,7 +113,8 @@ function Lobby() {
             }}
           >
             <h5 className="p-1 m-0">
-              Gomoku<span className="text-warning ml-1">(0)</span>
+              Gomoku
+              <span className="text-warning ml-1">({gomokuQuantity})</span>
             </h5>
           </Nav.Item>
           <Nav.Item
@@ -109,7 +124,8 @@ function Lobby() {
             }}
           >
             <h5 className="p-1 m-0">
-              Chặn 2 đầu<span className="text-warning ml-1">(0)</span>
+              Chặn 2 đầu
+              <span className="text-warning ml-1">({blockHeadQuantity})</span>
             </h5>
           </Nav.Item>
         </Nav>
@@ -151,7 +167,7 @@ function GomokuRoomsComponent({ data }) {
       {data.map((value) => {
         return (
           <Col className="room-item-col" key={value.id}>
-            <Room roomId={value.id} data={value} />
+            <Room roomId={value.id} data={value} type={"gomoku"} />
           </Col>
         );
       })}
@@ -165,7 +181,7 @@ function BlockHeadRoomsComponent({ data }) {
       {data.map((value) => {
         return (
           <Col className="room-item-col" key={value.id}>
-            <Room roomId={value.id} data={value} />
+            <Room roomId={value.id} data={value} type={"block-head"} />
           </Col>
         );
       })}

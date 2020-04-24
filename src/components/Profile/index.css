@@ -17,9 +17,7 @@
 
 .statistic .list-group-item {
   border-color: #4e311d;
-  /* border-width: 3px; */
-  background-image: url("./../../assets/matching_background.svg");
-  background-size: 30%;
+  background-color: transparent;
 }
 
 .statistic .list-group-item .title {

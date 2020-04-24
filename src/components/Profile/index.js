@@ -12,6 +12,8 @@ function ProfileComponent() {
 
   const { state, changeRoute } = StateGlobal;
 
+  console.log(state);
+
   return (
     <Container className="proflie-body">
       <Row>
@@ -45,7 +47,7 @@ function ProfileComponent() {
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title">ELO</span>
-                <span className="text-white">1000</span>
+                <span className="text-white">{state.userInfo.elo}</span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>

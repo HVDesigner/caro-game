@@ -53,15 +53,15 @@ function CreateRoom() {
     }
   };
 
+  const getTime = () => {
+    const arr = [tenSecond, twentySecond, thirtySecond];
+
+    const time = arr.filter((time) => time.status);
+
+    return time[0];
+  };
+
   const onCreate = () => {
-    const getTime = () => {
-      const arr = [tenSecond, twentySecond, thirtySecond];
-
-      const time = arr.filter((time) => time.status);
-
-      return time[0];
-    };
-
     const createRoom = firebase.functions().httpsCallable("createRoom");
 
     createRoom({
@@ -203,6 +203,26 @@ function CreateRoom() {
               </div>
             </div>
           </form>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <blockquote className="blockquote text-center mt-2">
+            <p className="mb-0">
+              {`Phòng của ${state.userInfo.name}, ${
+                password ? "có" : "không có"
+              } mật khẩu, ${
+                bet
+                  ? "cược " + bet + " xu mỗi ván."
+                  : "không cược xu."
+              }`}
+            </p>
+            <footer className="blockquote-footer text-warning">
+              {`Luật ${
+                gamePlay ? "Gomoku" : "chặn 2 đầu"
+              }, thời gian suy nghĩ ${getTime().type} giây`}
+            </footer>
+          </blockquote>
         </Col>
       </Row>
       <Row>

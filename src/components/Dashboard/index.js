@@ -19,6 +19,8 @@ import AddCoinSVG from "./../../assets/Dashboard/add_coin.svg";
 import TopTenSVG from "./../../assets/Dashboard/top10.svg";
 import UserSVG from "./../../assets/Dashboard/user.svg";
 
+import numeral from "numeral";
+
 // Contexts
 import AppContext from "./../../context/";
 
@@ -48,7 +50,7 @@ function Dashboard() {
               <li className="nav-item text-white pl-2 pr-2 pb-2 pt-2 coin_dashboard">
                 <img src={CoinSVG} alt="logo"></img>
                 <h5 className="ml-3 mr-3 mb-0">
-                  2.00<span className="text-warning">K</span>
+                  {numeral(21928).format("0.0 a")}
                 </h5>
                 <img src={AddCoinSVG} alt="logo" className="m-0 wood-btn"></img>
               </li>

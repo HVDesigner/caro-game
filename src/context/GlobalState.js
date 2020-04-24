@@ -17,6 +17,8 @@ function GlobalState(props) {
       path: "dashboard",
     },
     userInfo: {
+      coin: 0,
+      elo: 0,
       id: "",
       name: "",
       image_url: "",
@@ -80,6 +82,8 @@ function GlobalState(props) {
               name,
               image_url,
               locale,
+              coin: snapshot.val().coin,
+              elo: snapshot.val().elo,
             },
           });
         } else {
@@ -90,6 +94,8 @@ function GlobalState(props) {
               name: snapshot.val().name,
               image_url,
               locale,
+              coin: snapshot.val().coin,
+              elo: snapshot.val().elo,
             },
           });
         }
