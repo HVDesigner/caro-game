@@ -28,3 +28,8 @@ button:focus {
   color: #ffc107;
   text-align: center;
 }
+
+.text-stroke-carotv {
+  text-shadow: -1px -1px 0 #262626, 1px -1px 0 #262626, -1px 1px 0 #262626,
+    1px 1px 0 #262626;
+}

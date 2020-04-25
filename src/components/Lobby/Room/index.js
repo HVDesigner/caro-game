@@ -1,10 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUserClock,
-  faCoins,
-  faRuler,
-} from "@fortawesome/free-solid-svg-icons";
+import { faClock, faCoins, faRuler } from "@fortawesome/free-solid-svg-icons";
 import "./index.css";
 
 import MasterComponent from "./Master/";
@@ -15,9 +11,11 @@ import MoreSVG from "./../../../assets/Rooms/more.svg";
 import LeftSVG from "./../../../assets/chevron-left.svg";
 
 import { FirebaseContext } from "./../../../Firebase/";
+import AppContext from "./../../../context/";
 
 function Room({ roomId, data, type }) {
-  const firebase = React.useContext(FirebaseContext);
+  const [firebase] = React.useState(React.useContext(FirebaseContext));
+  const { changeRoute } = React.useContext(AppContext);
 
   const [masterUser, setMasterUser] = React.useState("");
   const [playerUser, setPlayerUser] = React.useState("");
@@ -43,6 +41,9 @@ function Room({ roomId, data, type }) {
 
       createRoom({ roomId, pass, type }).then(function (result) {
         console.log(result);
+        if (result.data.value) {
+          changeRoute("room", { id: result.data.value });
+        }
       });
     }
   };
@@ -51,23 +52,27 @@ function Room({ roomId, data, type }) {
 
   return (
     <div className="room-item d-flex flex-column shadow mt-2">
-      <div className="d-flex room-item-head pl-2 pr-2 text-white bg-success">
-        <span className="mr-auto">id: {roomId}</span>
-        <span className="mr-2">
-          <FontAwesomeIcon icon={faRuler} className="text-warning" />{" "}
-          {data.rule === "6-win" ? "6 Quân Thắng" : "Chỉ 5 Quân"}
+      <div className="d-flex room-item-head text-white bg-success">
+        <span className="text-stroke-carotv">
+          <p className="mb-0 ml-2 mr-2">id: {roomId}</p>
+        </span>
+        <span className="text-stroke-carotv d-flex align-items-center">
+          <FontAwesomeIcon icon={faRuler} className="text-warning ml-2" />
+          <p className="mb-0 ml-2 mr-2">
+            {data.rule === "6-win" ? "6 Quân Thắng" : "Chỉ 5 Quân"}
+          </p>
         </span>
         {data.type === "room" ? (
-          <span className="mr-2">
-            <FontAwesomeIcon icon={faCoins} className="text-warning" />{" "}
-            {data.bet}
+          <span className="text-stroke-carotv d-flex align-items-center">
+            <FontAwesomeIcon icon={faCoins} className="text-warning ml-2" />
+            <p className="mb-0 ml-2 mr-2">{data.bet}</p>
           </span>
         ) : (
-          <span></span>
+          ""
         )}
-        <span>
-          <FontAwesomeIcon icon={faUserClock} className="text-warning" />{" "}
-          {data.time}
+        <span className="text-stroke-carotv d-flex align-items-center">
+          <FontAwesomeIcon icon={faClock} className="text-warning ml-2" />
+          <p className="mb-0 ml-2 mr-2">{data.time}</p>
         </span>
       </div>
       <div className="d-flex room-item-body p-2">
@@ -90,6 +95,12 @@ function Room({ roomId, data, type }) {
         )}
         <PlayerComponent playerUser={playerUser} />
       </div>
+      <div className="d-flex room-item-footer pl-2 pr-2 text-white bg-success">
+        <span className="text-center d-block w-100 text-stroke-carotv">
+          {data.title}
+        </span>
+      </div>
+
       {showFooter ? (
         <div className="room-item-footer p-2 d-flex">
           <span className="text-white mr-2">Mật khẩu:</span>

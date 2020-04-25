@@ -10,7 +10,7 @@ import {
 import { FirebaseContext } from "./../Firebase/";
 
 function GlobalState(props) {
-  const firebase = React.useContext(FirebaseContext);
+  const [firebase] = React.useState(React.useContext(FirebaseContext));
 
   const InitialGlobalState = {
     route: {
@@ -32,11 +32,42 @@ function GlobalState(props) {
 
   const [state, dispatch] = React.useReducer(reducer, InitialGlobalState);
 
-  const changeRoute = (path) => {
-    return dispatch({
-      type: CHANGE_ROUTE,
-      payload: { path },
+  React.useEffect(() => {
+    const locationPathRef = firebase
+      .database()
+      .ref("users/" + state.userInfo.id + "/location/");
+
+    locationPathRef.once("value").then((snapshot) => {
+      if (snapshot.val()) {
+        dispatch({
+          type: CHANGE_ROUTE,
+          payload: { path: snapshot.val().path },
+        });
+      }
     });
+
+    locationPathRef.child("path").on("value", (snapshot) => {
+      if (snapshot.val()) {
+        dispatch({
+          type: CHANGE_ROUTE,
+          payload: { path: snapshot.val() },
+        });
+      }
+    });
+  }, [state.route.path, state.userInfo.id, firebase]);
+
+  const changeRoute = (path, { id = "" }) => {
+    if (state.userInfo.id && state.route.path !== path) {
+      const locationPathRef = firebase
+        .database()
+        .ref("users/" + state.userInfo.id + "/location/");
+
+      if (path === "room") {
+        locationPathRef.update({ path, param: { id } });
+      } else {
+        locationPathRef.update({ path });
+      }
+    }
   };
 
   // const updateRoomGomoku = () => {
@@ -69,8 +100,13 @@ function GlobalState(props) {
     return userRef.once("value").then((snapshot) => {
       if (snapshot.val()) {
         // update image
-        if (JSON.stringify(snapshot.val().image_url) !== JSON.stringify()) {
+        if (snapshot.val().image_url !== image_url) {
           userRef.update({ image_url });
+        }
+
+        // update location
+        if (snapshot.val().location.path !== "room") {
+          userRef.update({ location: { path: "dashboard" } });
         }
 
         // check name
@@ -115,6 +151,9 @@ function GlobalState(props) {
                 value: locale === "vi_VN" ? "vn" : "en",
               },
               matchingByElo: true,
+            },
+            location: {
+              path: "dashboard",
             },
             createdAt: Date.now(),
             updatedAt: Date.now(),

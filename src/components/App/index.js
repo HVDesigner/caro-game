@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { FirebaseContext } from "./../../Firebase/";
+// import { FirebaseContext } from "./../../Firebase/";
 
 import AppContext from "./../../context/";
 import LoadingComponent from "./../Loading/";
@@ -16,8 +16,7 @@ const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
 
 function App() {
   const { state, getUserInfo } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
-
+  // const [firebase] = React.useState(React.useContext(FirebaseContext));
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -28,8 +27,9 @@ function App() {
         const playerId = window.FBInstant.player.getID();
         const playerLocale = window.FBInstant.getLocale();
 
-        getUserInfo(playerId, playerName, playerPic, playerLocale);
-        setLoading(false);
+        getUserInfo(playerId, playerName, playerPic, playerLocale).then(() => {
+          setLoading(false);
+        });
       });
     });
 
@@ -63,13 +63,13 @@ function App() {
     case "lobby":
       return (
         <React.Suspense fallback={<LoadingComponent />}>
-          <Lobby firebase={firebase} />
+          <Lobby />
         </React.Suspense>
       );
     case "create-room":
       return (
         <React.Suspense fallback={<LoadingComponent />}>
-          <CreateRoom firebase={firebase} />
+          <CreateRoom />
         </React.Suspense>
       );
     case "profile":
@@ -90,7 +90,7 @@ function App() {
           <PlayNow />
         </React.Suspense>
       );
-    case "gameplay":
+    case "room":
       return (
         <React.Suspense fallback={<LoadingComponent />}>
           <GamePlay />

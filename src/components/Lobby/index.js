@@ -15,7 +15,7 @@ import { FirebaseContext } from "./../../Firebase/";
 function Lobby() {
   const { changeRoute } = React.useContext(AppContext);
 
-  const firebase = React.useContext(FirebaseContext);
+  const [firebase] = React.useState(React.useContext(FirebaseContext));
 
   // true: Gomoku
   // false: Block Two Head
@@ -25,8 +25,8 @@ function Lobby() {
   const [gomokuListRooms, setGomokuListRoom] = React.useState([]);
   const [blockHeadListRoom, setBlockHeadListRoom] = React.useState([]);
 
-  const [blockHeadQuantity, setBlockHeadQuantity] = React.useState(0);
-  const [gomokuQuantity, setGomokuQuantity] = React.useState(0);
+  const [blockHeadQuantity] = React.useState(0);
+  const [gomokuQuantity] = React.useState(0);
 
   const roomsRef = firebase.database().ref("rooms");
 
@@ -46,22 +46,19 @@ function Lobby() {
       return finalArr;
     }
 
-    roomsQuantityRef.on("value", function (snapshot) {
-      if (snapshot.val()) {
-        setGomokuQuantity(snapshot.val().gomoku.value);
-        setBlockHeadQuantity(snapshot.val()["block-head"].value);
-      }
-    });
-
     roomsRef.on("value", (snapshot) => {
       if (snapshot.val()) {
         if (gameType) {
-          setGomokuListRoom(converToArr(snapshot.val().gomoku));
+          if (snapshot.val().gomoku) {
+            setGomokuListRoom(converToArr(snapshot.val().gomoku));
+          }
         } else {
-          setBlockHeadListRoom(converToArr(snapshot.val()["block-head"]));
+          if (snapshot.val()["block-head"]) {
+            setBlockHeadListRoom(converToArr(snapshot.val()["block-head"]));
+          }
         }
-        setLoading(false);
       }
+      setLoading(false);
     });
 
     return () => {
@@ -78,8 +75,10 @@ function Lobby() {
     }
   };
 
+  // console.log(gameType);
+
   return (
-    <Container className="rooms-lobby">
+    <Container fluid className="rooms-lobby">
       <Row className="sticky-top room-menu shadow-sm">
         <div className="menu-top">
           <Nav>
@@ -99,7 +98,7 @@ function Lobby() {
             </Nav.Item>
             <Nav.Item className="text-white coin_lobby d-flex align-items-center pl-2">
               <img src={CoinSVG} alt="logo"></img>
-              <h5 className="ml-3 mr-3 mb-0 d-flex align-items-center">
+              <h5 className="ml-3 mr-3 mb-0 d-flex align-items-center text-stroke-carotv">
                 {numeral(21928).format("0.0 a")}
               </h5>
             </Nav.Item>
@@ -112,7 +111,7 @@ function Lobby() {
               changGameType(true);
             }}
           >
-            <h5 className="p-1 m-0">
+            <h5 className="p-1 m-0 text-stroke-carotv">
               Gomoku
               <span className="text-warning ml-1">({gomokuQuantity})</span>
             </h5>
@@ -123,7 +122,7 @@ function Lobby() {
               changGameType(false);
             }}
           >
-            <h5 className="p-1 m-0">
+            <h5 className="p-1 m-0 text-stroke-carotv">
               Chặn 2 đầu
               <span className="text-warning ml-1">({blockHeadQuantity})</span>
             </h5>
@@ -152,7 +151,7 @@ function Lobby() {
               changeRoute("create-room");
             }}
           >
-            <h5 className="m-0">TẠO PHÒNG</h5>
+            <h5 className="m-0 text-stroke-carotv">TẠO BÀN</h5>
           </Nav.Item>
         </Nav>
       </Row>
@@ -166,7 +165,7 @@ function GomokuRoomsComponent({ data }) {
     <Row>
       {data.map((value) => {
         return (
-          <Col className="room-item-col" key={value.id}>
+          <Col className="room-item-col" key={value.id} md="4">
             <Room roomId={value.id} data={value} type={"gomoku"} />
           </Col>
         );
@@ -180,7 +179,7 @@ function BlockHeadRoomsComponent({ data }) {
     <Row>
       {data.map((value) => {
         return (
-          <Col className="room-item-col" key={value.id}>
+          <Col className="room-item-col" key={value.id} md="2">
             <Room roomId={value.id} data={value} type={"block-head"} />
           </Col>
         );
