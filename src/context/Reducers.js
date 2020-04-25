@@ -3,6 +3,7 @@ import {
   SET_USER_INFO,
   GET_ROOMS_GOMOKU,
   GET_ROOMS_BLOCK_HEAD,
+  GET_ROOM_ID,
 } from "./ActionTypes";
 
 export function reducer(state, action) {
@@ -17,6 +18,11 @@ export function reducer(state, action) {
       return {
         ...state,
         rooms: { ...state.rooms, "block-head": action.payload },
+      };
+    case GET_ROOM_ID:
+      return {
+        ...state,
+        room: action.payload,
       };
 
     default:

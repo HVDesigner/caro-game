@@ -37,12 +37,12 @@ function Room({ roomId, data, type }) {
   const onPasswordSubmit = (e) => {
     e.preventDefault();
     if (pass) {
-      const createRoom = firebase.functions().httpsCallable("loginRoom");
+      const loginRoom = firebase.functions().httpsCallable("loginRoom");
 
-      createRoom({ roomId, pass, type }).then(function (result) {
-        console.log(result);
+      loginRoom({ roomId, pass, type }).then(function (result) {
         if (result.data.value) {
-          changeRoute("room", { id: result.data.value });
+          console.log(typeof result.data.id);
+          changeRoute("room", parseInt(result.data.id));
         }
       });
     }

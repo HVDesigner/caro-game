@@ -6,6 +6,7 @@ import {
   SET_USER_INFO,
   GET_ROOMS_BLOCK_HEAD,
   GET_ROOMS_GOMOKU,
+  GET_ROOM_ID,
 } from "./ActionTypes";
 import { FirebaseContext } from "./../Firebase/";
 
@@ -15,6 +16,9 @@ function GlobalState(props) {
   const InitialGlobalState = {
     route: {
       path: "dashboard",
+    },
+    room: {
+      id: 0,
     },
     userInfo: {
       coin: 0,
@@ -37,15 +41,6 @@ function GlobalState(props) {
       .database()
       .ref("users/" + state.userInfo.id + "/location/");
 
-    locationPathRef.once("value").then((snapshot) => {
-      if (snapshot.val()) {
-        dispatch({
-          type: CHANGE_ROUTE,
-          payload: { path: snapshot.val().path },
-        });
-      }
-    });
-
     locationPathRef.child("path").on("value", (snapshot) => {
       if (snapshot.val()) {
         dispatch({
@@ -56,16 +51,17 @@ function GlobalState(props) {
     });
   }, [state.route.path, state.userInfo.id, firebase]);
 
-  const changeRoute = (path, { id = "" }) => {
+  const changeRoute = (path, id = 0) => {
     if (state.userInfo.id && state.route.path !== path) {
       const locationPathRef = firebase
         .database()
-        .ref("users/" + state.userInfo.id + "/location/");
+        .ref(`users/${state.userInfo.id}`);
 
       if (path === "room") {
-        locationPathRef.update({ path, param: { id } });
+        locationPathRef.child("location").update({ path });
+        locationPathRef.child("room_id").update({ value: id });
       } else {
-        locationPathRef.update({ path });
+        locationPathRef.child("location").update({ path });
       }
     }
   };
@@ -99,6 +95,18 @@ function GlobalState(props) {
 
     return userRef.once("value").then((snapshot) => {
       if (snapshot.val()) {
+        dispatch({
+          type: CHANGE_ROUTE,
+          payload: { path: snapshot.val().location.path },
+        });
+
+        dispatch({
+          type: GET_ROOM_ID,
+          payload: {
+            id: snapshot.val().room_id.value,
+          },
+        });
+
         // update image
         if (snapshot.val().image_url !== image_url) {
           userRef.update({ image_url });
@@ -155,6 +163,7 @@ function GlobalState(props) {
             location: {
               path: "dashboard",
             },
+            room_id: { value: 0 },
             createdAt: Date.now(),
             updatedAt: Date.now(),
           })
