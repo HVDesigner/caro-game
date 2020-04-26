@@ -19,6 +19,7 @@ function GlobalState(props) {
     },
     room: {
       id: 0,
+      type: "",
     },
     userInfo: {
       coin: 0,
@@ -51,17 +52,15 @@ function GlobalState(props) {
     });
   }, [state.route.path, state.userInfo.id, firebase]);
 
-  const changeRoute = (path, id = 0) => {
+  const changeRoute = (path, id = 0, type = "") => {
     if (state.userInfo.id && state.route.path !== path) {
-      const locationPathRef = firebase
-        .database()
-        .ref(`users/${state.userInfo.id}`);
+      const userByIdRef = firebase.database().ref(`users/${state.userInfo.id}`);
 
       if (path === "room") {
-        locationPathRef.child("location").update({ path });
-        locationPathRef.child("room_id").update({ value: id });
+        userByIdRef.child("location").update({ path });
+        userByIdRef.child("room_id").update({ value: id, type });
       } else {
-        locationPathRef.child("location").update({ path });
+        userByIdRef.child("location").update({ path });
       }
     }
   };
@@ -104,6 +103,7 @@ function GlobalState(props) {
           type: GET_ROOM_ID,
           payload: {
             id: snapshot.val().room_id.value,
+            type: snapshot.val().room_id.type,
           },
         });
 
@@ -181,6 +181,8 @@ function GlobalState(props) {
       }
     });
   };
+
+  console.log(state);
 
   return (
     <AppContext.Provider

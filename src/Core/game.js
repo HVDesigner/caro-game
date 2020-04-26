@@ -1,13 +1,27 @@
-function GamePlay(caroTable) {
-
+function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
   const checkAround = (rowkey, colkey) => {
+    // console.log(`getNorthToSouth(colkey) ${getNorthToSouth(colkey)}`);
+    // console.log(`getWestToEast(rowkey) ${getWestToEast(rowkey)}`);
+    // console.log(
+    //   `getNorthwestToSoutheast(rowkey, colkey) ${getNorthwestToSoutheast(
+    //     rowkey,
+    //     colkey
+    //   )}`
+    // );
+    // console.log(
+    //   `getNortheastToSouthwest(rowkey, colkey) ${getNortheastToSouthwest(
+    //     rowkey,
+    //     colkey
+    //   )}`
+    // );
+
     if (
       countPoint(getNorthToSouth(colkey)).winner === 1 ||
       countPoint(getNorthToSouth(colkey)).winner === 2
     ) {
       return {
         isPlay: false,
-        winner: countPoint(getNorthToSouth(colkey)).winner
+        winner: countPoint(getNorthToSouth(colkey)).winner,
       };
     }
 
@@ -17,7 +31,7 @@ function GamePlay(caroTable) {
     ) {
       return {
         isPlay: false,
-        winner: countPoint(getWestToEast(rowkey)).winner
+        winner: countPoint(getWestToEast(rowkey)).winner,
       };
     }
 
@@ -27,7 +41,7 @@ function GamePlay(caroTable) {
     ) {
       return {
         isPlay: false,
-        winner: countPoint(getNorthwestToSoutheast(rowkey, colkey)).winner
+        winner: countPoint(getNorthwestToSoutheast(rowkey, colkey)).winner,
       };
     }
 
@@ -37,31 +51,83 @@ function GamePlay(caroTable) {
     ) {
       return {
         isPlay: false,
-        winner: countPoint(getNortheastToSouthwest(rowkey, colkey)).winner
+        winner: countPoint(getNortheastToSouthwest(rowkey, colkey)).winner,
       };
     }
 
     return {
       isPlay: true,
-      winner: ""
+      winner: "",
     };
   };
 
-  const countPoint = arr => {
+  const countPoint = (arr) => {
     const maxOnePoint = () => {
       let max = 0;
       let count = 0;
 
-      for (let index = 0; index < arr.length; index++) {
-        const element = arr[index];
-        if (element === 1) {
-          count++;
-          if (count > max) {
-            max = count;
+      if (type === "block-head") {
+        let indexArr = [];
+        let indexMaxArr = [];
+
+        for (let index = 0; index < arr.length; index++) {
+          const element = arr[index];
+          if (element === 1) {
+            indexArr.push(index);
+            count++;
+            if (count > max) {
+              indexMaxArr = indexArr;
+              max = count;
+            }
+          } else {
+            indexArr = [];
+            count = 0;
           }
-        } else {
-          count = 0;
         }
+
+        let headCheck = 0;
+
+        for (let index = indexMaxArr[0]; index > 0; index--) {
+          const element = arr[index];
+
+          if (element === 2) {
+            headCheck = headCheck + 1;
+            break;
+          }
+        }
+
+        for (
+          let index = indexMaxArr[indexMaxArr.length - 1];
+          index < arr.length;
+          index++
+        ) {
+          const element = arr[index];
+
+          if (element === 2) {
+            headCheck = headCheck + 1;
+            break;
+          }
+        }
+
+        console.log(`headCheck ${headCheck}`);
+        if (headCheck === 2) return 0;
+      } else {
+        for (let index = 0; index < arr.length; index++) {
+          const element = arr[index];
+          if (element === 1) {
+            count++;
+            if (count > max) {
+              max = count;
+            }
+          } else {
+            count = 0;
+          }
+        }
+      }
+
+      // Check Rule 6 Win
+      if (rule === "6-no-win" && max > 5) {
+        return 0;
       }
 
       return max;
@@ -71,27 +137,80 @@ function GamePlay(caroTable) {
       let max = 0;
       let count = 0;
 
-      for (let index = 0; index < arr.length; index++) {
-        const element = arr[index];
-        if (element === 2) {
-          count++;
-          if (count > max) {
-            max = count;
+      if (type === "block-head") {
+        let indexArr = [];
+        let indexMaxArr = [];
+
+        for (let index = 0; index < arr.length; index++) {
+          const element = arr[index];
+          if (element === 2) {
+            indexArr.push(index);
+            count++;
+            if (count > max) {
+              indexMaxArr = indexArr;
+              max = count;
+            }
+          } else {
+            indexArr = [];
+            count = 0;
           }
-        } else {
-          count = 0;
+        }
+
+        let headCheck = 0;
+
+        for (let index = indexMaxArr[0]; index > 0; index--) {
+          const element = arr[index];
+
+          if (element === 1) {
+            headCheck = headCheck + 1;
+            break;
+          }
+        }
+
+        for (
+          let index = indexMaxArr[indexMaxArr.length - 1];
+          index < arr.length;
+          index++
+        ) {
+          const element = arr[index];
+
+          if (element === 1) {
+            headCheck = headCheck + 1;
+            break;
+          }
+        }
+
+        console.log(`headCheck ${headCheck}`);
+
+        if (headCheck === 2) return 0;
+      } else {
+        for (let index = 0; index < arr.length; index++) {
+          const element = arr[index];
+          if (element === 2) {
+            count++;
+            if (count > max) {
+              max = count;
+            }
+          } else {
+            count = 0;
+          }
         }
       }
+
+      // Check Rule 6 Win
+      if (rule === "6-no-win" && max > 5) return 0;
 
       return max;
     };
 
     if (maxOnePoint() >= 5) return { winner: 1 };
+
     if (maxTwoPoint() >= 5) return { winner: 2 };
+
     return { winner: "" };
   };
 
-  const getNorthToSouth = colkey => {
+  const getNorthToSouth = (colkey) => {
     let arr = [];
     for (let index = 0; index < caroTable.length; index++) {
       const element = caroTable[index];
@@ -101,7 +220,7 @@ function GamePlay(caroTable) {
     return arr;
   };
 
-  const getWestToEast = rowkey => {
+  const getWestToEast = (rowkey) => {
     let arr = [];
     arr = caroTable[rowkey];
 
@@ -137,7 +256,10 @@ function GamePlay(caroTable) {
       let rowkeySoutheast = rowkey;
       let colkeySoutheast = colkey;
 
-      if (rowkey !== caroTable.length - 1 && colkey !== caroTable[0].length - 1) {
+      if (
+        rowkey !== caroTable.length - 1 &&
+        colkey !== caroTable[0].length - 1
+      ) {
         do {
           rowkeySoutheast = rowkeySoutheast + 1;
           colkeySoutheast = colkeySoutheast + 1;

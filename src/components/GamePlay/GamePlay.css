@@ -1,11 +1,13 @@
 .square-empty {
-  border: 0.1px solid #343a40;
+  border-top: 0.1px solid #343a40;
+  border-right: 0.1px solid #343a40;
   width: 100%;
   cursor: pointer;
 }
 
 .square {
-  border: 0.1px solid #343a40;
+  border-top: 0.1px solid #343a40;
+  border-right: 0.1px solid #343a40;
   width: 100%;
   cursor: pointer;
   display: flex;
@@ -29,6 +31,23 @@
 
 p {
   margin: 0px;
+}
+
+.square-empty:last-child {
+  border-right: none;
+}
+
+.square:last-child {
+  border-right: none;
+}
+
+
+.row_:first-child .square-empty {
+  border-top: none;
+}
+
+.row_:first-child .square {
+  border-top: none;
 }
 
 .row_ {
