@@ -41,8 +41,8 @@ function Room({ roomId, data, type }) {
 
       loginRoom({ roomId, pass, type }).then(function (result) {
         if (result.data.value) {
-          console.log(result);
-          // changeRoute("room", parseInt(result.data.id),);
+          // console.log(result);
+          changeRoute("room", parseInt(result.data.id), result.data.type);
         }
       });
     }

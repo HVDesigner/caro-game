@@ -74,7 +74,7 @@ function GamePlayComponent({ time, counter, setCounter }) {
       });
     }
     return () => clearInterval(timer);
-  }, [counter, turn, statusGame.isPlay, setStatusGame, setCounter]);
+  }, [counter, turn, statusGame.isPlay, setStatusGame, setCounter, time]);
 
   const changeTurn = () => {
     turn === 1 ? setTurn(2) : setTurn(1);

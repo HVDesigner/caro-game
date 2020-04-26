@@ -3,6 +3,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import "./GamePlay.css";
 
 // Components
+import Loading from "./../Loading/";
 import Gomoku from "./Gomoku/";
 import Original from "./Original/";
 
@@ -13,14 +14,33 @@ import UserIMG from "./../../assets/profile_pic.jpg";
 import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
 
-function GamePlayComponent({ type = "original", time = 10 }) {
+function GamePlayComponent({ type = "original" }) {
   const { state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
+
+  const [time, setTime] = React.useState(10);
   const [counter, setCounter] = React.useState(time);
 
+  const [loading, setLoading] = React.useState(true);
+
   React.useEffect(() => {
-    firebase.database().ref("rooms");
-  });
+    firebase
+      .database()
+      .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
+      .once("value")
+      .then((snapshot) => {
+        setTime(snapshot.val().time);
+        setCounter(snapshot.val().time);
+        console.log(snapshot.val());
+      })
+      .then(() => {
+        setLoading(false);
+      });
+  }, [firebase, state.room.type, state.room.id, time]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Container

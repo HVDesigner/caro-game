@@ -182,7 +182,7 @@ function GlobalState(props) {
     });
   };
 
-  console.log(state);
+  // console.log(state);
 
   return (
     <AppContext.Provider
