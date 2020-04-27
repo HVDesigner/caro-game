@@ -1,20 +1,5 @@
 function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
   const checkAround = (rowkey, colkey) => {
-    // console.log(`getNorthToSouth(colkey) ${getNorthToSouth(colkey)}`);
-    // console.log(`getWestToEast(rowkey) ${getWestToEast(rowkey)}`);
-    // console.log(
-    //   `getNorthwestToSoutheast(rowkey, colkey) ${getNorthwestToSoutheast(
-    //     rowkey,
-    //     colkey
-    //   )}`
-    // );
-    // console.log(
-    //   `getNortheastToSouthwest(rowkey, colkey) ${getNortheastToSouthwest(
-    //     rowkey,
-    //     colkey
-    //   )}`
-    // );
-
     if (
       countPoint(getNorthToSouth(colkey)).winner === 1 ||
       countPoint(getNorthToSouth(colkey)).winner === 2
@@ -109,7 +94,6 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
           }
         }
 
-        console.log(`headCheck ${headCheck}`);
         if (headCheck === 2) return 0;
       } else {
         for (let index = 0; index < arr.length; index++) {
@@ -179,8 +163,6 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
             break;
           }
         }
-
-        console.log(`headCheck ${headCheck}`);
 
         if (headCheck === 2) return 0;
       } else {
