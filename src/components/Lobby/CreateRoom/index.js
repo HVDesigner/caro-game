@@ -235,7 +235,7 @@ function CreateRoom() {
                 onCreate();
               }}
             >
-              <h5 className="m-0">TẠO PHÒNG</h5>
+              <h5 className="m-0 text-stroke-carotv">TẠO BÀN</h5>
             </Nav.Item>
           </Nav>
         </Col>

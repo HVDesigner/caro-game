@@ -1,13 +1,13 @@
 .square-empty {
-  border-top: 0.1px solid #343a40;
-  border-right: 0.1px solid #343a40;
+  border-top: 0.1px solid #9d8239;
+  border-right: 0.1px solid #9d8239;
   width: 100%;
   cursor: pointer;
 }
 
 .square {
-  border-top: 0.1px solid #343a40;
-  border-right: 0.1px solid #343a40;
+  border-top: 0.1px solid #9d8239;
+  border-right: 0.1px solid #9d8239;
   width: 100%;
   cursor: pointer;
   display: flex;
@@ -63,6 +63,7 @@ p {
 .game-play {
   background-image: url("./../../assets/matching_background.svg");
   background-size: 50%;
+  max-height: 100vh;
 }
 
 .number-bottom {

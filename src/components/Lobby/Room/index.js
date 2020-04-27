@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock, faCoins, faRuler } from "@fortawesome/free-solid-svg-icons";
+import { faClock, faCoins, faEye } from "@fortawesome/free-solid-svg-icons";
 import "./index.css";
 
 import MasterComponent from "./Master/";
@@ -57,7 +57,6 @@ function Room({ roomId, data, type }) {
           <p className="mb-0 ml-2 mr-2">id: {roomId}</p>
         </span>
         <span className="text-stroke-carotv d-flex align-items-center">
-          <FontAwesomeIcon icon={faRuler} className="text-warning ml-2" />
           <p className="mb-0 ml-2 mr-2">
             {data.rule === "6-win" ? "6 Quân Thắng" : "Chỉ 5 Quân"}
           </p>
@@ -96,8 +95,12 @@ function Room({ roomId, data, type }) {
         <PlayerComponent playerUser={playerUser} />
       </div>
       <div className="d-flex room-item-footer pl-2 pr-2 text-white bg-success">
-        <span className="text-center d-block w-100 text-stroke-carotv">
+        <span className="text-center mr-auto text-stroke-carotv">
           {data.title}
+        </span>
+        <span className="text-center text-stroke-carotv">
+          <FontAwesomeIcon icon={faEye} className="text-white mr-2" />
+          20
         </span>
       </div>
 

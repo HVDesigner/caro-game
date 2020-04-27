@@ -6,7 +6,6 @@ import numeral from "numeral";
 import Room from "./Room/";
 
 import CoinSVG from "./../../assets/Dashboard/Coin.svg";
-import LeftSVG from "./../../assets/chevron-left.svg";
 
 import AppContext from "./../../context/";
 
@@ -82,24 +81,21 @@ function Lobby() {
       <Row className="sticky-top room-menu shadow-sm">
         <div className="menu-top">
           <Nav>
-            <Nav.Item className="d-flex">
-              <Nav.Link
-                onClick={() => {
-                  changeRoute("dashboard");
-                }}
-                className="wood-btn-back"
-              >
-                <img
-                  src={LeftSVG}
-                  alt="back-btn"
-                  style={{ height: "1.5em" }}
-                ></img>
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item className="text-white coin_lobby d-flex align-items-center pl-2">
+            <Nav.Item className="text-white coin_lobby d-flex align-items-center p-2">
               <img src={CoinSVG} alt="logo"></img>
-              <h5 className="ml-3 mr-3 mb-0 d-flex align-items-center text-stroke-carotv">
+              <h5 className="ml-3 mr-2 mb-0 d-flex align-items-center text-stroke-carotv">
                 {numeral(21928).format("0.0 a")}
+              </h5>
+            </Nav.Item>
+            <Nav.Item className="text-white elo-lobby d-flex align-items-center p-2">
+              <h5 className="ml-2 mr-2 mb-0 d-flex align-items-center text-stroke-carotv">
+                <span className="text-warning mr-1">Elo:</span>
+                1000
+              </h5>
+            </Nav.Item>
+            <Nav.Item className="text-white d-flex align-items-center p-2">
+              <h5 className="ml-2 mr-2 mb-0 d-flex align-items-center text-stroke-carotv">
+                <span className="mr-1">PHÒNG CHƠI</span>
               </h5>
             </Nav.Item>
           </Nav>
@@ -128,6 +124,21 @@ function Lobby() {
             </h5>
           </Nav.Item>
         </Nav>
+
+        <Nav fill className="user-status">
+          <Nav.Item className="text-white" onClick={() => {}}>
+            <p className="p-1 m-0 text-stroke-carotv">
+              Đang chơi
+              <span className="text-warning ml-1">(0)</span>
+            </p>
+          </Nav.Item>
+          <Nav.Item className="text-white" onClick={() => {}}>
+            <p className="p-1 m-0 text-stroke-carotv">
+              Chưa chơi
+              <span className="text-warning ml-1">(0)</span>
+            </p>
+          </Nav.Item>
+        </Nav>
       </Row>
 
       {loading ? (
@@ -143,15 +154,32 @@ function Lobby() {
       )}
 
       <Row className="">
-        <Nav className="fixed-bottom footer-lobby justify-content-center">
+        <Nav className="fixed-bottom footer-lobby" fill>
           <Nav.Item
             className="text-white p-2 text-center wood-btn-back"
-            style={{ width: "100%" }}
+            onClick={() => {}}
+          >
+            <h5 className="m-0 text-stroke-carotv">MỜI CHƠI</h5>
+          </Nav.Item>
+          <Nav.Item
+            className="text-white p-2 text-center wood-btn-back"
+            style={{
+              borderLeft: "2px solid #4e311d",
+              borderRight: "2px solid #4e311d",
+            }}
             onClick={() => {
               changeRoute("create-room");
             }}
           >
             <h5 className="m-0 text-stroke-carotv">TẠO BÀN</h5>
+          </Nav.Item>
+          <Nav.Item
+            className="text-white p-2 text-center wood-btn-back"
+            onClick={() => {
+              changeRoute("dashboard");
+            }}
+          >
+            <h5 className="m-0 text-stroke-carotv">THOÁT</h5>
           </Nav.Item>
         </Nav>
       </Row>

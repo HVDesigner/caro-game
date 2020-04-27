@@ -64,14 +64,20 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Tỉ lệ thắng</span>
-                <span className="text-white">100%</span>
+                <span className="text-warning title">Trận thua</span>
+                <span className="text-white">0</span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Trận đã chơi</span>
+                <span className="text-warning title">Trận hòa</span>
                 <span className="text-white">0</span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-warning title">Tỉ lệ thắng</span>
+                <span className="text-white">100%</span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>

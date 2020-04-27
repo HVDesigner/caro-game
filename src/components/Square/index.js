@@ -9,7 +9,7 @@ function Square({ rowkey, colkey, onClickSquare, value }) {
   return (
     <span
       className={`${value === 0 ? "square-empty" : "square"} ${
-        value === 3 ? "bg-square-first-time" : "bg-white"
+        value === 3 ? "bg-square-first-time" : "bg-box-game"
       }`}
       onClick={() => {
         onClickSquare(rowkey, colkey);

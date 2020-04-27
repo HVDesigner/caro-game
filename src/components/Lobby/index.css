@@ -22,9 +22,13 @@
 }
 
 .room-menu {
-  background-image: url("./../../assets/matching_background.svg");
-  background-size: 40%;
+  background-image: url("./../../assets/backgroung_carotv_2.svg");
+  background-size: 50%;
   border-bottom: 2px solid #4e311d;
+}
+
+.elo-lobby {
+  border-right: 1px solid #4e311d;
 }
 
 .coin_lobby {
@@ -51,6 +55,15 @@
 
 .game-type {
   width: 100%;
+  border-bottom: 2px solid #4e311d;
+}
+
+.user-status {
+  width: 100%;
+}
+
+.user-status .nav-item:first-child {
+  border-right: 2px solid #4e311d;
 }
 
 .game-gomoku {
@@ -58,7 +71,7 @@
 }
 
 .footer-lobby {
-  background-image: url("./../../assets/matching_background.svg");
+  background-image: url("./../../assets/backgroung_carotv_2.svg");
   background-size: 40%;
   border-top: 2px solid #4e311d;
 }
