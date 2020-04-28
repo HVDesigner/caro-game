@@ -43,16 +43,21 @@ function Room({ roomId, data, type }) {
       setPassError({ status: false, text: "" });
       const loginRoom = firebase.functions().httpsCallable("loginRoom");
 
-      loginRoom({ roomId, pass, type }).then(function (result) {
-        console.log(result);
-        if (result.data.value) {
-          // console.log(result);
-          changeRoute("room", parseInt(result.data.id), result.data.type);
-        } else {
-          setPassError({ status: true, text: result.data.text });
-        }
-        setLoginInProcess(false);
-      });
+      loginRoom({ roomId, pass, type })
+        .then(function (result) {
+          console.log(result);
+          if (result.data.value) {
+            // console.log(result);
+            setLoginInProcess(false);
+            changeRoute("room", parseInt(result.data.id), result.data.type);
+          } else {
+            setLoginInProcess(false);
+            setPassError({ status: true, text: result.data.text });
+          }
+        })
+        .catch(() => {
+          setPassError({ status: true, text: "Không thể đăng nhập" });
+        });
     } else {
       setPassError({ status: true, text: "Chưa điền mật khẩu." });
     }

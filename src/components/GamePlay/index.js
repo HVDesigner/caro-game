@@ -36,8 +36,6 @@ function GamePlayComponent() {
             setTime(snapshot.val().time);
             setCounter(snapshot.val().time);
             setParticipants(snapshot.val().participants);
-
-            console.log(snapshot.val());
           }
         })
         .then(() => {
@@ -89,11 +87,13 @@ function GamePlayComponent() {
           </div>
         </Col>
       </Row>
+
       {state.room.type === "block-head" ? (
         <Original time={time} counter={counter} setCounter={setCounter} />
       ) : (
         <Gomoku time={time} counter={counter} setCounter={setCounter} />
       )}
+
       <Row>
         <Col></Col>
       </Row>

@@ -55,7 +55,6 @@ function Lobby() {
 
         let gomokuTotal = 0;
         let blockHeadTotal = 0;
-
         let playingUserTotal = 0;
 
         for (let index = 0; index < keys.length; index++) {

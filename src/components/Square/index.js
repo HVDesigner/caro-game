@@ -14,6 +14,9 @@ function Square({ rowkey, colkey, onClickSquare, value }) {
       onClick={() => {
         onClickSquare(rowkey, colkey);
       }}
+      onMouseEnter={() => {
+        // console.log({ rowkey, colkey });
+      }}
     >
       {value === 1 ? <img src={Times} alt="time" className="" /> : ""}
       {value === 2 ? <img src={Circle} alt="circle" className="" /> : ""}

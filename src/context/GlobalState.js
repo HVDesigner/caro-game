@@ -52,12 +52,10 @@ function GlobalState(props) {
     });
   }, [state.route.path, state.userInfo.id, firebase]);
 
-  const [userByIdRef] = React.useState(
-    firebase.database().ref(`users/${state.userInfo.id}`)
-  );
-
   const changeRoute = (path, id = 0, type = "") => {
     if (state.userInfo.id && state.route.path !== path) {
+      const userByIdRef = firebase.database().ref(`users/${state.userInfo.id}`);
+
       if (path === "room") {
         userByIdRef.child("location").update({ path });
         userByIdRef.child("room_id").update({ value: id, type });
