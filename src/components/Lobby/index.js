@@ -12,24 +12,20 @@ import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
 
 function Lobby() {
-  const { changeRoute } = React.useContext(AppContext);
-
+  const { changeRoute, state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
-
-  // true: Gomoku
-  // false: Block Two Head
-  const [gameType, setGameType] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
+
+  const [gameType, setGameType] = React.useState("gomoku");
 
   const [gomokuListRooms, setGomokuListRoom] = React.useState([]);
   const [blockHeadListRoom, setBlockHeadListRoom] = React.useState([]);
 
-  const [blockHeadQuantity] = React.useState(0);
-  const [gomokuQuantity] = React.useState(0);
+  const [userInGomoku, setUserInGomoku] = React.useState(0);
+  const [userInBlockHead, setUserInBlockHead] = React.useState(0);
 
   const roomsRef = firebase.database().ref("rooms");
-
-  const roomsQuantityRef = firebase.database().ref("rooms-quantity");
+  const userRef = firebase.database().ref("users");
 
   React.useEffect(() => {
     function converToArr(value) {
@@ -45,13 +41,44 @@ function Lobby() {
       return finalArr;
     }
 
+    // Count user in game type
+    userRef.on("value", (snapshot) => {
+      const keys = Object.keys(snapshot.val());
+
+      let gomokuTotal = 0;
+      let blockHeadTotal = 0;
+
+      for (let index = 0; index < keys.length; index++) {
+        const element = keys[index];
+
+        if (snapshot.val()[element]["game-type-select"].value === "gomoku") {
+          gomokuTotal = gomokuTotal + 1;
+        } else if (
+          snapshot.val()[element]["game-type-select"].value === "block-head"
+        ) {
+          blockHeadTotal = blockHeadTotal + 1;
+        }
+      }
+
+      setUserInGomoku(gomokuTotal);
+      setUserInBlockHead(blockHeadTotal);
+    });
+
+    // Get game type
+    userRef
+      .child(`${state.userInfo.id}/game-type-select`)
+      .on("value", (snapshot) => {
+        setGameType(snapshot.val().value);
+      });
+
+    // Get list tables
     roomsRef.on("value", (snapshot) => {
       if (snapshot.val()) {
-        if (gameType) {
+        if (gameType === "gomoku") {
           if (snapshot.val().gomoku) {
             setGomokuListRoom(converToArr(snapshot.val().gomoku));
           }
-        } else {
+        } else if (gameType === "block-head") {
           if (snapshot.val()["block-head"]) {
             setBlockHeadListRoom(converToArr(snapshot.val()["block-head"]));
           }
@@ -61,20 +88,27 @@ function Lobby() {
     });
 
     return () => {
-      return [roomsRef.off("value"), roomsQuantityRef.off("value")];
+      roomsRef.off("value");
+      userRef.child(`${state.userInfo.id}/game-type-select`).off("value");
+      userRef.off("value");
     };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameType]);
+  }, [gameType, roomsRef, userRef, state.userInfo.id]);
 
   const changGameType = (status) => {
-    if (gameType !== status) {
-      setGameType(status);
-      setLoading(true);
-    }
+    userRef
+      .child(`${state.userInfo.id}/game-type-select`)
+      .update({ value: status });
   };
 
-  // console.log(gameType);
+  const exitLooby = () => {
+    userRef
+      .child(`${state.userInfo.id}/game-type-select`)
+      .update({ value: "none" })
+      .then(() => {
+        changeRoute("dashboard");
+      });
+  };
 
   return (
     <Container fluid className="rooms-lobby">
@@ -102,25 +136,29 @@ function Lobby() {
         </div>
         <Nav fill className="game-type">
           <Nav.Item
-            className={`text-white game-gomoku ${gameType ? "bg-success" : ""}`}
+            className={`text-white game-gomoku ${
+              gameType === "gomoku" ? "bg-success" : ""
+            }`}
             onClick={() => {
-              changGameType(true);
+              changGameType("gomoku");
             }}
           >
             <h5 className="p-1 m-0 text-stroke-carotv">
               Gomoku
-              <span className="text-warning ml-1">({gomokuQuantity})</span>
+              <span className="text-warning ml-1">({userInGomoku})</span>
             </h5>
           </Nav.Item>
           <Nav.Item
-            className={`text-white ${!gameType ? "bg-success" : ""}`}
+            className={`text-white ${
+              gameType === "block-head" ? "bg-success" : ""
+            }`}
             onClick={() => {
-              changGameType(false);
+              changGameType("block-head");
             }}
           >
             <h5 className="p-1 m-0 text-stroke-carotv">
               Chặn 2 đầu
-              <span className="text-warning ml-1">({blockHeadQuantity})</span>
+              <span className="text-warning ml-1">({userInBlockHead})</span>
             </h5>
           </Nav.Item>
         </Nav>
@@ -147,10 +185,12 @@ function Lobby() {
             <p className="text-white text-center mt-3">Loading...</p>
           </Col>
         </Row>
-      ) : gameType ? (
+      ) : gameType === "gomoku" ? (
         <GomokuRoomsComponent data={gomokuListRooms} />
-      ) : (
+      ) : gameType === "block-head" ? (
         <BlockHeadRoomsComponent data={blockHeadListRoom} />
+      ) : (
+        <Row></Row>
       )}
 
       <Row className="">
@@ -176,7 +216,7 @@ function Lobby() {
           <Nav.Item
             className="text-white p-2 text-center wood-btn-back"
             onClick={() => {
-              changeRoute("dashboard");
+              exitLooby();
             }}
           >
             <h5 className="m-0 text-stroke-carotv">THOÁT</h5>

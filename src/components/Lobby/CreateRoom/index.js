@@ -80,6 +80,10 @@ function CreateRoom() {
     });
   };
 
+  const exitLobby = () => {
+    
+  };
+
   return (
     <Container className="create-room-body">
       <Row className="sticky-top create-room-menu shadow-sm">
@@ -212,9 +216,7 @@ function CreateRoom() {
               {`Phòng của ${state.userInfo.name}, ${
                 password ? "có" : "không có"
               } mật khẩu, ${
-                bet
-                  ? "cược " + bet + " xu mỗi ván."
-                  : "không cược xu."
+                bet ? "cược " + bet + " xu mỗi ván." : "không cược xu."
               }`}
             </p>
             <footer className="blockquote-footer text-warning">
@@ -227,15 +229,20 @@ function CreateRoom() {
       </Row>
       <Row>
         <Col>
-          <Nav className="fixed-bottom footer-create-room justify-content-center">
+          <Nav fill className="fixed-bottom footer-create-room">
             <Nav.Item
               className="text-white p-2 text-center wood-btn-back"
-              style={{ width: "100%" }}
               onClick={() => {
                 onCreate();
               }}
             >
               <h5 className="m-0 text-stroke-carotv">TẠO BÀN</h5>
+            </Nav.Item>
+            <Nav.Item
+              className="text-white p-2 text-center wood-btn-back"
+              onClick={() => {}}
+            >
+              <h5 className="m-0 text-stroke-carotv">THOÁT</h5>
             </Nav.Item>
           </Nav>
         </Col>

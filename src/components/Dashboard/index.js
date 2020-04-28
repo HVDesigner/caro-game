@@ -23,10 +23,14 @@ import numeral from "numeral";
 
 // Contexts
 import AppContext from "./../../context/";
+import { FirebaseContext } from "./../../Firebase/index";
 
 function Dashboard() {
   const GlobalState = React.useContext(AppContext);
+  const firebase = React.useContext(FirebaseContext);
   const { state, changeRoute } = GlobalState;
+
+  const userRef = firebase.database().ref("users");
 
   return (
     <div
@@ -102,7 +106,12 @@ function Dashboard() {
                 alt="rooms"
                 className="wood-btn"
                 onClick={() => {
-                  changeRoute("lobby");
+                  userRef
+                    .child(`${state.userInfo.id}/game-type-select`)
+                    .update({ value: "gomoku" })
+                    .then(() => {
+                      changeRoute("lobby");
+                    });
                 }}
               ></img>
             </div>

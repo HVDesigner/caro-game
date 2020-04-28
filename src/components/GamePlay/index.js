@@ -14,6 +14,7 @@ import UserSVG from "./../../assets/Dashboard/user.svg";
 import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
 
+// Table
 function GamePlayComponent() {
   const { state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
@@ -87,8 +88,8 @@ function GamePlayComponent() {
       {state.room.type === "block-head" ? (
         <Original time={time} counter={counter} setCounter={setCounter} />
       ) : (
-        <Gomoku time={time} counter={counter} setCounter={setCounter} />
-      )}
+          <Gomoku time={time} counter={counter} setCounter={setCounter} />
+        )}
       <Row>
         <Col></Col>
       </Row>
@@ -97,6 +98,7 @@ function GamePlayComponent() {
 }
 export default GamePlayComponent;
 
+// Counter
 function CounterConponent({ counter }) {
   return (
     <div
@@ -110,6 +112,7 @@ function CounterConponent({ counter }) {
   );
 }
 
+// Master User Left
 function MasterUser({ data, firebase }) {
   const { state } = React.useContext(AppContext);
   const [imageUrl, setImageUrl] = React.useState("");
@@ -134,7 +137,7 @@ function MasterUser({ data, firebase }) {
         });
     }
 
-    return () => {};
+    return () => { };
   }, [
     state.userInfo.id,
     state.userInfo.image_url,
@@ -160,6 +163,7 @@ function MasterUser({ data, firebase }) {
   );
 }
 
+// Player User Right
 function PlayerUser({ data, firebase }) {
   const { state } = React.useContext(AppContext);
   const [imageUrl, setImageUrl] = React.useState("");
@@ -183,7 +187,7 @@ function PlayerUser({ data, firebase }) {
       }
     }
 
-    return () => {};
+    return () => { };
   }, [
     state.userInfo.id,
     state.userInfo.image_url,

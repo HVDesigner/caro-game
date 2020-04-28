@@ -112,11 +112,6 @@ function GlobalState(props) {
           userRef.update({ image_url });
         }
 
-        // update location
-        if (snapshot.val().location.path !== "room") {
-          userRef.update({ location: { path: "dashboard" } });
-        }
-
         // check name
         if (snapshot.val().name.status === "original") {
           dispatch({
