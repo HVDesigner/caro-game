@@ -9,7 +9,17 @@ button:focus {
 .wood-btn-back:active {
   /* transition-delay: 1s; */
   /* filter: saturate(2); */
-  backdrop-filter: saturate(2);
+  backdrop-filter: saturate(2) !important;
+}
+
+.wood-btn-back:hover {
+  cursor: pointer;
+  backdrop-filter: saturate(10%);
+}
+
+.wood-btn:hover {
+  cursor: pointer;
+  filter: saturate(10%);
 }
 
 .wood-btn:active {
@@ -30,6 +40,7 @@ button:focus {
 }
 
 .text-stroke-carotv {
-  text-shadow: -1px -1px 0 #262626, 1px -1px 0 #262626, -1px 1px 0 #262626,
-    1px 1px 0 #262626;
+  text-shadow: -1.25px -1.25px 0 #262626, -1.25px 0px 0 #262626,
+    1.25px 0px 0 #262626, 0px 1.25px 0 #262626, 0px -1.25px 0 #262626,
+    1.25px 1.25px 0 #262626, -1.25px 1.25px 0 #262626, 1.25px -1.25px 0 #262626;
 }

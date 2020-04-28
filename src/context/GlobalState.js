@@ -52,10 +52,12 @@ function GlobalState(props) {
     });
   }, [state.route.path, state.userInfo.id, firebase]);
 
+  const [userByIdRef] = React.useState(
+    firebase.database().ref(`users/${state.userInfo.id}`)
+  );
+
   const changeRoute = (path, id = 0, type = "") => {
     if (state.userInfo.id && state.route.path !== path) {
-      const userByIdRef = firebase.database().ref(`users/${state.userInfo.id}`);
-
       if (path === "room") {
         userByIdRef.child("location").update({ path });
         userByIdRef.child("room_id").update({ value: id, type });
@@ -92,7 +94,7 @@ function GlobalState(props) {
   const getUserInfo = (id, name, image_url, locale) => {
     const userRef = firebase.database().ref("users/" + id);
 
-    return userRef.once("value").then((snapshot) => {
+    return userRef.on("value", (snapshot) => {
       if (snapshot.val()) {
         dispatch({
           type: CHANGE_ROUTE,
@@ -158,7 +160,7 @@ function GlobalState(props) {
             location: {
               path: "dashboard",
             },
-            room_id: { value: 0 },
+            room_id: { value: 0, type: "none" },
             createdAt: Date.now(),
             updatedAt: Date.now(),
           })
@@ -177,7 +179,7 @@ function GlobalState(props) {
     });
   };
 
-  // console.log(state);
+  console.log("context");
 
   return (
     <AppContext.Provider

@@ -14,18 +14,19 @@ import { FirebaseContext } from "./../../Firebase/";
 function Lobby() {
   const { changeRoute, state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
+  const [roomsRef] = React.useState(firebase.database().ref("rooms"));
   const [loading, setLoading] = React.useState(true);
 
-  const [gameType, setGameType] = React.useState("gomoku");
+  const [gameType, setGameType] = React.useState("");
 
   const [gomokuListRooms, setGomokuListRoom] = React.useState([]);
   const [blockHeadListRoom, setBlockHeadListRoom] = React.useState([]);
 
   const [userInGomoku, setUserInGomoku] = React.useState(0);
   const [userInBlockHead, setUserInBlockHead] = React.useState(0);
+  const [playingUser, setPlayingUser] = React.useState(0);
 
-  const roomsRef = firebase.database().ref("rooms");
-  const userRef = firebase.database().ref("users");
+  const [userRef] = React.useState(firebase.database().ref("users"));
 
   React.useEffect(() => {
     function converToArr(value) {
@@ -41,27 +42,62 @@ function Lobby() {
       return finalArr;
     }
 
-    // Count user in game type
+    async function getUserInRoom(type, value, uid) {
+      const snapshot = await roomsRef.child(`${type}/${value}`).once("value");
+
+      return snapshot.val().participants.uid;
+    }
+
+    // Count user in each game type
     userRef.on("value", (snapshot) => {
-      const keys = Object.keys(snapshot.val());
+      if (snapshot.val()) {
+        const keys = Object.keys(snapshot.val());
 
-      let gomokuTotal = 0;
-      let blockHeadTotal = 0;
+        let gomokuTotal = 0;
+        let blockHeadTotal = 0;
 
-      for (let index = 0; index < keys.length; index++) {
-        const element = keys[index];
+        let playingUserTotal = 0;
 
-        if (snapshot.val()[element]["game-type-select"].value === "gomoku") {
-          gomokuTotal = gomokuTotal + 1;
-        } else if (
-          snapshot.val()[element]["game-type-select"].value === "block-head"
-        ) {
-          blockHeadTotal = blockHeadTotal + 1;
+        for (let index = 0; index < keys.length; index++) {
+          const element = keys[index];
+
+          if (
+            snapshot.val()[element].room_id.value !== 0 &&
+            snapshot.val()[element].room_id.type !== "none"
+          ) {
+            if (
+              getUserInRoom(
+                snapshot.val()[element].room_id.type,
+                snapshot.val()[element].room_id.value,
+                element
+              ).status === "player" ||
+              getUserInRoom(
+                snapshot.val()[element].room_id.type,
+                snapshot.val()[element].room_id.value,
+                element
+              ).status === "master"
+            ) {
+              playingUserTotal = playingUserTotal + 1;
+            }
+          }
+
+          if (snapshot.val()[element].location.path === "lobby") {
+            if (
+              snapshot.val()[element]["game-type-select"].value === "gomoku"
+            ) {
+              gomokuTotal = gomokuTotal + 1;
+            } else if (
+              snapshot.val()[element]["game-type-select"].value === "block-head"
+            ) {
+              blockHeadTotal = blockHeadTotal + 1;
+            }
+          }
         }
-      }
 
-      setUserInGomoku(gomokuTotal);
-      setUserInBlockHead(blockHeadTotal);
+        setUserInGomoku(gomokuTotal);
+        setUserInBlockHead(blockHeadTotal);
+        setPlayingUser(playingUserTotal);
+      }
     });
 
     // Get game type
@@ -92,8 +128,7 @@ function Lobby() {
       userRef.child(`${state.userInfo.id}/game-type-select`).off("value");
       userRef.off("value");
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameType, roomsRef, userRef, state.userInfo.id]);
+  }, [gameType, state.userInfo.id, roomsRef, userRef]);
 
   const changGameType = (status) => {
     userRef
@@ -109,6 +144,8 @@ function Lobby() {
         changeRoute("dashboard");
       });
   };
+
+  console.log("Render");
 
   return (
     <Container fluid className="rooms-lobby">
@@ -136,7 +173,7 @@ function Lobby() {
         </div>
         <Nav fill className="game-type">
           <Nav.Item
-            className={`text-white game-gomoku ${
+            className={`text-white game-gomoku wood-btn-back ${
               gameType === "gomoku" ? "bg-success" : ""
             }`}
             onClick={() => {
@@ -149,7 +186,7 @@ function Lobby() {
             </h5>
           </Nav.Item>
           <Nav.Item
-            className={`text-white ${
+            className={`text-white wood-btn-back ${
               gameType === "block-head" ? "bg-success" : ""
             }`}
             onClick={() => {
@@ -164,17 +201,23 @@ function Lobby() {
         </Nav>
 
         <Nav fill className="user-status">
-          <Nav.Item className="text-white" onClick={() => {}}>
-            <p className="p-1 m-0 text-stroke-carotv">
+          <Nav.Item className="text-warning" onClick={() => {}}>
+            <h5 className="p-1 m-0 text-stroke-carotv">
               Đang chơi
-              <span className="text-warning ml-1">(0)</span>
-            </p>
+              <span className="text-warning ml-1">({playingUser})</span>
+            </h5>
           </Nav.Item>
-          <Nav.Item className="text-white" onClick={() => {}}>
-            <p className="p-1 m-0 text-stroke-carotv">
+          <Nav.Item className="text-warning" onClick={() => {}}>
+            <h5 className="p-1 m-0 text-stroke-carotv">
               Chưa chơi
-              <span className="text-warning ml-1">(0)</span>
-            </p>
+              <span className="text-warning ml-1">
+                (
+                {gameType === "gomoku"
+                  ? userInGomoku - playingUser
+                  : userInBlockHead - playingUser}
+                )
+              </span>
+            </h5>
           </Nav.Item>
         </Nav>
       </Row>

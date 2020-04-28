@@ -20,7 +20,9 @@ function Room({ roomId, data, type }) {
   const [masterUser, setMasterUser] = React.useState("");
   const [playerUser, setPlayerUser] = React.useState("");
 
+  const [loginInProcess, setLoginInProcess] = React.useState(false);
   const [pass, setPass] = React.useState("");
+  const [passError, setPassError] = React.useState({ status: false, text: "" });
 
   React.useEffect(() => {
     if (data.participants) {
@@ -37,14 +39,22 @@ function Room({ roomId, data, type }) {
   const onPasswordSubmit = (e) => {
     e.preventDefault();
     if (pass) {
+      setLoginInProcess(true);
+      setPassError({ status: false, text: "" });
       const loginRoom = firebase.functions().httpsCallable("loginRoom");
 
       loginRoom({ roomId, pass, type }).then(function (result) {
+        console.log(result);
         if (result.data.value) {
           // console.log(result);
           changeRoute("room", parseInt(result.data.id), result.data.type);
+        } else {
+          setPassError({ status: true, text: result.data.text });
         }
+        setLoginInProcess(false);
       });
+    } else {
+      setPassError({ status: true, text: "Chưa điền mật khẩu." });
     }
   };
 
@@ -62,10 +72,14 @@ function Room({ roomId, data, type }) {
           </p>
         </span>
         {data.type === "room" ? (
-          <span className="text-stroke-carotv d-flex align-items-center">
-            <FontAwesomeIcon icon={faCoins} className="text-warning ml-2" />
-            <p className="mb-0 ml-2 mr-2">{data.bet}</p>
-          </span>
+          data.bet ? (
+            <span className="text-stroke-carotv d-flex align-items-center">
+              <FontAwesomeIcon icon={faCoins} className="text-warning ml-2" />
+              <p className="mb-0 ml-2 mr-2">{data.bet}</p>
+            </span>
+          ) : (
+            ""
+          )
         ) : (
           ""
         )}
@@ -89,7 +103,15 @@ function Room({ roomId, data, type }) {
           </div>
         ) : (
           <div className="lock-room">
-            <img src={MoreSVG} alt="lock" className="wood-btn" />
+            <img
+              src={MoreSVG}
+              alt="moreSVG"
+              className="wood-btn"
+              onClick={() => {
+                console.log({ roomId: parseInt(roomId), type });
+                changeRoute("room", parseInt(roomId), type);
+              }}
+            />
           </div>
         )}
         <PlayerComponent playerUser={playerUser} />
@@ -105,29 +127,44 @@ function Room({ roomId, data, type }) {
       </div>
 
       {showFooter ? (
-        <div className="room-item-footer p-2 d-flex">
-          <span className="text-white mr-2">Mật khẩu:</span>
-          <form
-            onSubmit={onPasswordSubmit}
-            className="form-carotv d-flex flex-fill"
-          >
-            <input
-              type="password"
-              className="input-carotv text-white flex-fill"
-              placeholder="Nhập mật khẩu..."
-              value={pass}
-              onChange={(e) => {
-                setPass(e.target.value);
-              }}
-            />
-          </form>
-          <img
-            src={LeftSVG}
-            alt="back-btn"
-            className="ml-2"
-            style={{ height: "1.5em", transform: "rotate(180deg)" }}
-            onClick={onPasswordSubmit}
-          ></img>
+        <div>
+          {loginInProcess ? (
+            <p className="text-warning mb-1 text-center">Đang đăng nhập...</p>
+          ) : (
+            <div
+              className={`room-item-footer pt-2 pl-2 pr-2 ${
+                passError.status ? "" : "pb-2"
+              } d-flex`}
+            >
+              <span className="text-white mr-2">Mật khẩu:</span>
+              <form
+                onSubmit={onPasswordSubmit}
+                className="form-carotv d-flex flex-fill"
+              >
+                <input
+                  type="password"
+                  className="input-carotv text-white flex-fill"
+                  placeholder="Nhập mật khẩu..."
+                  value={pass}
+                  onChange={(e) => {
+                    setPass(e.target.value);
+                  }}
+                />
+              </form>
+              <img
+                src={LeftSVG}
+                alt="back-btn"
+                className="ml-2"
+                style={{ height: "1.5em", transform: "rotate(180deg)" }}
+                onClick={onPasswordSubmit}
+              ></img>
+            </div>
+          )}
+          {passError.status ? (
+            <p className="text-warning mb-1 text-center">{passError.text}</p>
+          ) : (
+            ""
+          )}
         </div>
       ) : (
         <div></div>

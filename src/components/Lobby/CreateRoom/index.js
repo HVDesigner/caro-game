@@ -2,17 +2,22 @@ import React from "react";
 import "./CreateRoom.css";
 import { Form, Container, Row, Col, Nav } from "react-bootstrap";
 import CheckButton from "./../../CheckButton/";
-import LeftSVG from "./../../../assets/chevron-left.svg";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
 function CreateRoom() {
   const { changeRoute, state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
+  const [creating, setCreating] = React.useState(false);
 
   const [name, setName] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [bet, setBet] = React.useState("");
+
+  const [showErrorBet, setShowErrorBet] = React.useState({
+    status: false,
+    text: "Chưa nhập số xu cược.",
+  });
 
   // true: Gomoku
   // false: Block head
@@ -62,50 +67,34 @@ function CreateRoom() {
   };
 
   const onCreate = () => {
+    setShowErrorBet({ ...showErrorBet, status: false });
     const createRoom = firebase.functions().httpsCallable("createRoom");
 
-    createRoom({
-      password,
-      bet,
-      rule,
-      time: getTime().type,
-      title: name,
-      gamePlay,
-      user: {
-        id: state.userInfo.id,
-        name: state.userInfo.name,
-      },
-    }).then(function (result) {
-      console.log(result);
-    });
+    if (bet) {
+      setCreating(true);
+      createRoom({
+        password,
+        bet,
+        rule,
+        time: getTime().type,
+        title: name,
+        gamePlay,
+        user: {
+          id: state.userInfo.id,
+          name: state.userInfo.name,
+        },
+      }).then(function (result) {
+        console.log(result);
+      });
+    } else {
+      setShowErrorBet({ ...showErrorBet, status: true });
+    }
   };
 
-  const exitLobby = () => {
-    
-  };
+  // const exitLobby = () => {};
 
   return (
     <Container className="create-room-body">
-      <Row className="sticky-top create-room-menu shadow-sm">
-        <div className="create-room-menu-top">
-          <Nav>
-            <Nav.Item className="d-flex">
-              <Nav.Link
-                onClick={() => {
-                  changeRoute("lobby");
-                }}
-                className="wood-btn-back exit-create-room"
-              >
-                <img
-                  src={LeftSVG}
-                  alt="back-btn"
-                  style={{ height: "1.5em" }}
-                ></img>
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </div>
-      </Row>
       <Row className="pt-2">
         <Col>
           <form className="d-flex flex-column">
@@ -134,15 +123,22 @@ function CreateRoom() {
             <Form.Label className="mr-2 mb-0">Xu cược:</Form.Label>
             <input
               type="text"
-              className="input-carotv text-white flex-fill mb-2"
+              className="input-carotv text-white flex-fill"
               placeholder="Nhập số xu..."
               value={bet}
               onChange={(e) => {
                 setBet(e.target.value);
               }}
             />
+            {showErrorBet.status ? (
+              <p className="form-text text-warning">
+                {showErrorBet.text}
+              </p>
+            ) : (
+              ""
+            )}
 
-            <div className="d-flex">
+            <div className="d-flex mt-2">
               <div className="flex-fill">
                 <Form.Label className="mr-2">Thể loại:</Form.Label>
                 <CheckButton
@@ -230,17 +226,28 @@ function CreateRoom() {
       <Row>
         <Col>
           <Nav fill className="fixed-bottom footer-create-room">
+            {creating ? (
+              <Nav.Item className="text-white p-2 text-center wood-btn-back">
+                <h5 className="m-0 text-stroke-carotv">
+                  ĐANG TẠO BÀN
+                  <CountLoading run={creating} />
+                </h5>
+              </Nav.Item>
+            ) : (
+              <Nav.Item
+                className="text-white p-2 text-center wood-btn-back"
+                onClick={() => {
+                  onCreate();
+                }}
+              >
+                <h5 className="m-0 text-stroke-carotv">TẠO BÀN</h5>
+              </Nav.Item>
+            )}
             <Nav.Item
               className="text-white p-2 text-center wood-btn-back"
               onClick={() => {
-                onCreate();
+                changeRoute("lobby");
               }}
-            >
-              <h5 className="m-0 text-stroke-carotv">TẠO BÀN</h5>
-            </Nav.Item>
-            <Nav.Item
-              className="text-white p-2 text-center wood-btn-back"
-              onClick={() => {}}
             >
               <h5 className="m-0 text-stroke-carotv">THOÁT</h5>
             </Nav.Item>
@@ -252,3 +259,30 @@ function CreateRoom() {
 }
 
 export default CreateRoom;
+
+function CountLoading({ run }) {
+  const [dot, setDot] = React.useState([]);
+
+  React.useEffect(() => {
+    const dotInterval = setInterval(() => {
+      if (dot.length === 3) {
+        setDot([]);
+      } else {
+        setDot([...dot, "."]);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(dotInterval);
+    };
+  }, [dot]);
+
+  console.log(run);
+  return (
+    <React.Fragment>
+      {dot.map((value, key) => (
+        <span key={key}>{value}</span>
+      ))}
+    </React.Fragment>
+  );
+}

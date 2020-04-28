@@ -33,7 +33,7 @@
 
 .coin_lobby {
   display: flex;
-  border-left: 1px solid #4e311d;
+  /* border-left: 1px solid #4e311d; */
   border-right: 1px solid #4e311d;
 }
 
@@ -58,8 +58,14 @@
   border-bottom: 2px solid #4e311d;
 }
 
+.game-type h5 {
+  cursor: pointer;
+}
+
 .user-status {
   width: 100%;
+  /* background-image: url("./../../assets/matching_background.svg"); */
+  /* background-size: 50%; */
 }
 
 .user-status .nav-item:first-child {

@@ -26,20 +26,24 @@ function GamePlayComponent() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    firebase
-      .database()
-      .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
-      .once("value")
-      .then((snapshot) => {
-        setTime(snapshot.val().time);
-        setCounter(snapshot.val().time);
-        setParticipants(snapshot.val().participants);
+    if (state.room.type !== "none" && state.room.id !== 0) {
+      firebase
+        .database()
+        .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
+        .once("value")
+        .then((snapshot) => {
+          if (snapshot.val()) {
+            setTime(snapshot.val().time);
+            setCounter(snapshot.val().time);
+            setParticipants(snapshot.val().participants);
 
-        console.log(snapshot.val());
-      })
-      .then(() => {
-        setLoading(false);
-      });
+            console.log(snapshot.val());
+          }
+        })
+        .then(() => {
+          setLoading(false);
+        });
+    }
   }, [firebase, state.room.type, state.room.id]);
 
   const getMaster = (partObj) => {
@@ -88,8 +92,8 @@ function GamePlayComponent() {
       {state.room.type === "block-head" ? (
         <Original time={time} counter={counter} setCounter={setCounter} />
       ) : (
-          <Gomoku time={time} counter={counter} setCounter={setCounter} />
-        )}
+        <Gomoku time={time} counter={counter} setCounter={setCounter} />
+      )}
       <Row>
         <Col></Col>
       </Row>
@@ -137,7 +141,7 @@ function MasterUser({ data, firebase }) {
         });
     }
 
-    return () => { };
+    return () => {};
   }, [
     state.userInfo.id,
     state.userInfo.image_url,
@@ -187,7 +191,7 @@ function PlayerUser({ data, firebase }) {
       }
     }
 
-    return () => { };
+    return () => {};
   }, [
     state.userInfo.id,
     state.userInfo.image_url,

@@ -26,6 +26,10 @@
   border-top: 2px solid #4e311d;
 }
 
+.footer-create-room .nav-item {
+  width: 50%;
+}
+
 .footer-create-room .nav-item:first-child {
   border-right: 2px solid #4e311d;
 }
