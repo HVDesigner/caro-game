@@ -4,6 +4,7 @@ import {
   GET_ROOMS_GOMOKU,
   GET_ROOMS_BLOCK_HEAD,
   GET_ROOM_ID,
+  GET_SQUARE_POSITION,
 } from "./ActionTypes";
 
 export function reducer(state, action) {
@@ -23,6 +24,11 @@ export function reducer(state, action) {
       return {
         ...state,
         room: action.payload,
+      };
+    case GET_SQUARE_POSITION:
+      return {
+        ...state,
+        "square-position": action.payload,
       };
 
     default:

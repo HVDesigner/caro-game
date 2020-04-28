@@ -7,6 +7,7 @@ import {
   GET_ROOMS_BLOCK_HEAD,
   GET_ROOMS_GOMOKU,
   GET_ROOM_ID,
+  GET_SQUARE_POSITION,
 } from "./ActionTypes";
 import { FirebaseContext } from "./../Firebase/";
 
@@ -28,10 +29,16 @@ function GlobalState(props) {
       name: "",
       image_url: "",
       locale: "",
+      platform: "",
     },
     rooms: {
       gomoku: [],
       "block-head": [],
+    },
+    "square-position": {
+      status: false,
+      row: 0,
+      col: 0,
     },
   };
 
@@ -75,6 +82,13 @@ function GlobalState(props) {
   //   return childChangeRef;
   // };
 
+  const getPositonSquare = (status, row, col) => {
+    return dispatch({
+      type: GET_SQUARE_POSITION,
+      payload: { status, row, col },
+    });
+  };
+
   const getRoomsGomoku = (finalArr) => {
     return dispatch({
       type: GET_ROOMS_GOMOKU,
@@ -89,10 +103,10 @@ function GlobalState(props) {
     });
   };
 
-  const getUserInfo = (id, name, image_url, locale) => {
+  const getUserInfo = (id, name, image_url, locale, platform) => {
     const userRef = firebase.database().ref("users/" + id);
 
-    return userRef.on("value", (snapshot) => {
+    userRef.on("value", (snapshot) => {
       if (snapshot.val()) {
         dispatch({
           type: CHANGE_ROUTE,
@@ -123,6 +137,7 @@ function GlobalState(props) {
               locale,
               coin: snapshot.val().coin,
               elo: snapshot.val().elo,
+              platform,
             },
           });
         } else {
@@ -135,12 +150,13 @@ function GlobalState(props) {
               locale,
               coin: snapshot.val().coin,
               elo: snapshot.val().elo,
+              platform,
             },
           });
         }
       } else {
         // add new user
-        userRef
+        return userRef
           .set({
             coin: 1000,
             elo: 1000,
@@ -163,21 +179,20 @@ function GlobalState(props) {
             updatedAt: Date.now(),
           })
           .then(() => {
-            return dispatch({
+            dispatch({
               type: SET_USER_INFO,
               payload: {
                 id,
                 name,
                 image_url,
                 locale,
+                platform,
               },
             });
           });
       }
     });
   };
-
-  console.log("context");
 
   return (
     <AppContext.Provider
@@ -186,7 +201,7 @@ function GlobalState(props) {
         changeRoute,
         getUserInfo,
         getRoomsGomoku,
-        // updateRoomGomoku,
+        getPositonSquare,
         getRoomsBlockHead,
       }}
     >

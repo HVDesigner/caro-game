@@ -11,7 +11,7 @@ function Login() {
 
   const submitForm = (e) => {
     e.preventDefault();
-    getUserInfo(id, name, "", "vi_VN");
+    getUserInfo(id, name, "", "vi_VN", "web");
   };
 
   return (

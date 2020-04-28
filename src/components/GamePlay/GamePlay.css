@@ -41,7 +41,6 @@ p {
   border-right: none;
 }
 
-
 .row_:first-child .square-empty {
   border-top: none;
 }
@@ -64,6 +63,7 @@ p {
   background-image: url("./../../assets/matching_background.svg");
   background-size: 50%;
   max-height: 100vh;
+  overflow: hidden;
 }
 
 .number-bottom {
@@ -71,4 +71,11 @@ p {
   display: block;
   text-align: center;
   font-size: 4vw;
+}
+
+.position-label {
+  z-index: 999 !important;
+  transition: 0.1s;
+  opacity: 0.5;
+  font-family: "Roboto", sans-serif;
 }

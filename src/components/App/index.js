@@ -21,16 +21,25 @@ function App() {
 
   React.useEffect(() => {
     window.FBInstant.initializeAsync().then(function () {
-      window.FBInstant.startGameAsync().then(() => {
-        const playerName = window.FBInstant.player.getName();
-        const playerPic = window.FBInstant.player.getPhoto();
-        const playerId = window.FBInstant.player.getID();
-        const playerLocale = window.FBInstant.getLocale();
+      window.FBInstant.startGameAsync()
+        .then(() => {
+          const playerName = window.FBInstant.player.getName();
+          const playerPic = window.FBInstant.player.getPhoto();
+          const playerId = window.FBInstant.player.getID();
+          const playerLocale = window.FBInstant.getLocale();
+          const platform = window.FBInstant.getPlatform();
 
-        getUserInfo(playerId, playerName, playerPic, playerLocale).then(() => {
+          getUserInfo(
+            playerId,
+            playerName,
+            playerPic,
+            playerLocale,
+            platform.toLowerCase()
+          );
+        })
+        .then(() => {
           setLoading(false);
         });
-      });
     });
 
     if (process.env.NODE_ENV === "development") {
