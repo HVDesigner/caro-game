@@ -11,74 +11,17 @@ import { FirebaseContext } from "./../../../Firebase/";
 
 function MenuComponent({ gameType }) {
   const [firebase] = React.useState(React.useContext(FirebaseContext));
-  const { state } = React.useContext(AppContext);
+  const { state, countUserStatus } = React.useContext(AppContext);
 
-  const [userInGomoku, setUserInGomoku] = React.useState(0);
-  const [userInBlockHead, setUserInBlockHead] = React.useState(0);
-  const [playingUser, setPlayingUser] = React.useState(0);
+  const countUserStatus_ = React.useCallback(() => {
+    countUserStatus();
+  }, [countUserStatus]);
 
   React.useEffect(() => {
-    const userRef = firebase.database().ref("users");
-    const roomsRef = firebase.database().ref("rooms");
+    countUserStatus_();
 
-    // Count user in each game type
-    userRef.on("value", async (snapshot) => {
-      if (snapshot && snapshot.val()) {
-        const keys = Object.keys(snapshot.val());
-
-        let gomokuTotal = 0;
-        let blockHeadTotal = 0;
-
-        let playingUserTotal = 0;
-
-        for (let index = 0; index < keys.length; index++) {
-          const element = keys[index];
-          const userData = snapshot.val()[element];
-
-          if (
-            userData.room_id.value !== 0 &&
-            userData.room_id.type !== "none"
-          ) {
-            const snapshotChild = await roomsRef
-              .child(`${userData.room_id.type}/${userData.room_id.value}`)
-              .once("value");
-
-            if (
-              (snapshotChild.val().participants[element].type === "player" &&
-                snapshotChild.val().participants[element].status) ||
-              (snapshotChild.val().participants[element].type === "master" &&
-                snapshotChild.val().participants[element].status)
-            ) {
-              playingUserTotal = playingUserTotal + 1;
-            }
-          }
-
-          // get quantity user playing in each game type
-          if (userData.location.path === "lobby") {
-            if (userData["game-type-select"].value === "gomoku") {
-              gomokuTotal = gomokuTotal + 1;
-            } else if (userData["game-type-select"].value === "block-head") {
-              blockHeadTotal = blockHeadTotal + 1;
-            }
-          } else if (userData.location.path === "room") {
-            if (userData.room_id.type === "gomoku") {
-              gomokuTotal = gomokuTotal + 1;
-            } else if (userData.room_id.type === "block-head") {
-              blockHeadTotal = blockHeadTotal + 1;
-            }
-          }
-        }
-
-        setUserInGomoku(gomokuTotal);
-        setUserInBlockHead(blockHeadTotal);
-        setPlayingUser(playingUserTotal);
-      }
-    });
-
-    return () => {
-      userRef.off("value");
-    };
-  }, [firebase, state.userInfo.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const changGameType = (status) => {
     firebase
@@ -122,7 +65,9 @@ function MenuComponent({ gameType }) {
         >
           <h5 className="p-1 m-0 text-stroke-carotv">
             Gomoku
-            <span className="text-warning ml-1">({userInGomoku})</span>
+            <span className="text-warning ml-1">
+              ({state.rooms.gomoku.total})
+            </span>
           </h5>
         </Nav.Item>
         <Nav.Item
@@ -135,7 +80,9 @@ function MenuComponent({ gameType }) {
         >
           <h5 className="p-1 m-0 text-stroke-carotv">
             Chặn 2 đầu
-            <span className="text-warning ml-1">({userInBlockHead})</span>
+            <span className="text-warning ml-1">
+              ({state.rooms["block-head"].total})
+            </span>
           </h5>
         </Nav.Item>
       </Nav>
@@ -144,7 +91,13 @@ function MenuComponent({ gameType }) {
         <Nav.Item className="text-warning" onClick={() => {}}>
           <h5 className="p-1 m-0 text-stroke-carotv">
             Đang chơi
-            <span className="text-warning ml-1">({playingUser})</span>
+            <span className="text-warning ml-1">
+              (
+              {gameType === "gomoku"
+                ? state.rooms.gomoku.playing
+                : state.rooms["block-head"].playing}
+              )
+            </span>
           </h5>
         </Nav.Item>
         <Nav.Item className="text-warning" onClick={() => {}}>
@@ -153,8 +106,8 @@ function MenuComponent({ gameType }) {
             <span className="text-warning ml-1">
               (
               {gameType === "gomoku"
-                ? userInGomoku - playingUser
-                : userInBlockHead - playingUser}
+                ? state.rooms.gomoku.free
+                : state.rooms["block-head"].free}
               )
             </span>
           </h5>

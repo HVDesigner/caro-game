@@ -17,18 +17,19 @@ function Room({ roomId, data, type }) {
   const [playerUser, setPlayerUser] = React.useState("");
 
   React.useEffect(() => {
-    if (data.participants) {
-      Object.keys(data.participants).forEach((element) => {
-        if (data.participants[element].type === "master") {
-          setMasterUser(element);
-          setLoading(false);
-        } else if (data.participants[element].type === "player") {
-          setPlayerUser(element);
-          setLoading(false);
-        }
-      });
-    }
-  }, [data.participants]);
+    const { participants } = data;
+
+    Object.keys(participants).forEach((element) => {
+      const userType = participants[element].type;
+
+      if (userType === "master") {
+        setMasterUser(element);
+      } else if (userType === "player") {
+        setPlayerUser(element);
+      }
+      setLoading(false);
+    });
+  });
 
   if (loading) return <LoadingComponent />;
 

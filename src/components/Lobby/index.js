@@ -22,9 +22,6 @@ function Lobby() {
   const [blockHeadListRoom, setBlockHeadListRoom] = React.useState([]);
 
   React.useEffect(() => {
-    const userRef = firebase.database().ref("users");
-    const roomsRef = firebase.database().ref("rooms");
-
     function converToArr(value) {
       const keysArr = Object.keys(value);
       const finalArr = [];
@@ -39,8 +36,9 @@ function Lobby() {
     }
 
     // Get game type
-    userRef
-      .child(`${state.userInfo.id}/game-type-select`)
+    firebase
+      .database()
+      .ref(`users/${state.userInfo.id}/game-type-select`)
       .on("value", (snapshot) => {
         if (snapshot && snapshot.val()) {
           setGameType(snapshot.val().value);
@@ -48,24 +46,30 @@ function Lobby() {
       });
 
     // Get list tables
-    roomsRef.on("value", (snapshot) => {
-      if (snapshot && snapshot.val()) {
-        if (gameType === "gomoku") {
-          if (snapshot.val().gomoku) {
-            setGomokuListRoom(converToArr(snapshot.val().gomoku));
-          }
-        } else if (gameType === "block-head") {
-          if (snapshot.val()["block-head"]) {
-            setBlockHeadListRoom(converToArr(snapshot.val()["block-head"]));
+    firebase
+      .database()
+      .ref("rooms")
+      .on("value", (snapshot) => {
+        if (snapshot && snapshot.val()) {
+          if (gameType === "gomoku") {
+            if (snapshot.val().gomoku) {
+              setGomokuListRoom(converToArr(snapshot.val().gomoku));
+            }
+          } else if (gameType === "block-head") {
+            if (snapshot.val()["block-head"]) {
+              setBlockHeadListRoom(converToArr(snapshot.val()["block-head"]));
+            }
           }
         }
-      }
-      setLoading(false);
-    });
+        setLoading(false);
+      });
 
     return () => {
-      roomsRef.off("value");
-      userRef.child(`${state.userInfo.id}/game-type-select`).off("value");
+      firebase.database().ref("rooms").off("value");
+      firebase
+        .database()
+        .ref(`users/${state.userInfo.id}/game-type-select`)
+        .off("value");
     };
   }, [firebase, gameType, state.userInfo.id]);
 
