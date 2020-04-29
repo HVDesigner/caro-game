@@ -1,9 +1,9 @@
 import React from "react";
 import "./App.css";
-// import { FirebaseContext } from "./../../Firebase/";
-
-import AppContext from "./../../context/";
 import LoadingComponent from "./../Loading/";
+
+// Contexts
+import AppContext from "./../../context/";
 
 const Dashboard = React.lazy(() => import("./../Dashboard/"));
 const Setting = React.lazy(() => import("./../Setting/"));

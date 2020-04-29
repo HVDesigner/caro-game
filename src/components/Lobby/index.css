@@ -17,6 +17,14 @@
   height: 2em;
 }
 
+.unlock-room {
+  margin: auto;
+}
+
+.unlock-room img {
+  height: 2em;
+}
+
 .room-item-col:last-child {
   margin-bottom: 4em;
 }

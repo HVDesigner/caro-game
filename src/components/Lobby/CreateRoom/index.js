@@ -131,9 +131,7 @@ function CreateRoom() {
               }}
             />
             {showErrorBet.status ? (
-              <p className="form-text text-warning">
-                {showErrorBet.text}
-              </p>
+              <p className="form-text text-warning">{showErrorBet.text}</p>
             ) : (
               ""
             )}
@@ -230,7 +228,7 @@ function CreateRoom() {
               <Nav.Item className="text-white p-2 text-center wood-btn-back">
                 <h5 className="m-0 text-stroke-carotv">
                   ĐANG TẠO BÀN
-                  <CountLoading run={creating} />
+                  <CountLoading />
                 </h5>
               </Nav.Item>
             ) : (
@@ -260,7 +258,7 @@ function CreateRoom() {
 
 export default CreateRoom;
 
-function CountLoading({ run }) {
+function CountLoading() {
   const [dot, setDot] = React.useState([]);
 
   React.useEffect(() => {
@@ -277,7 +275,6 @@ function CountLoading({ run }) {
     };
   }, [dot]);
 
-  console.log(run);
   return (
     <React.Fragment>
       {dot.map((value, key) => (

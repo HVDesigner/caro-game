@@ -106,12 +106,14 @@ function Dashboard() {
                 alt="rooms"
                 className="wood-btn"
                 onClick={() => {
-                  userRef
-                    .child(`${state.userInfo.id}/game-type-select`)
-                    .update({ value: "gomoku" })
-                    .then(() => {
-                      changeRoute("lobby");
-                    });
+                  if (state.userInfo.id) {
+                    userRef
+                      .child(`${state.userInfo.id}/game-type-select`)
+                      .update({ value: "gomoku" })
+                      .then(() => {
+                        changeRoute("lobby");
+                      });
+                  }
                 }}
               ></img>
             </div>

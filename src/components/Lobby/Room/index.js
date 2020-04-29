@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faCoins, faEye } from "@fortawesome/free-solid-svg-icons";
 import "./index.css";
 
+import LoadingComponent from "./../../Loading/";
 import MasterComponent from "./Master/";
 import PlayerComponent from "./Player/";
 
@@ -15,7 +16,8 @@ import AppContext from "./../../../context/";
 
 function Room({ roomId, data, type }) {
   const [firebase] = React.useState(React.useContext(FirebaseContext));
-  const { changeRoute } = React.useContext(AppContext);
+  const { state } = React.useContext(AppContext);
+  const [loading, setLoading] = React.useState(true);
 
   const [masterUser, setMasterUser] = React.useState("");
   const [playerUser, setPlayerUser] = React.useState("");
@@ -29,12 +31,14 @@ function Room({ roomId, data, type }) {
       Object.keys(data.participants).forEach((element) => {
         if (data.participants[element].type === "master") {
           setMasterUser(element);
+          setLoading(false);
         } else if (data.participants[element].type === "player") {
           setPlayerUser(element);
+          setLoading(false);
         }
       });
     }
-  }, [data]);
+  }, [data.participants]);
 
   const onPasswordSubmit = (e) => {
     e.preventDefault();
@@ -43,13 +47,11 @@ function Room({ roomId, data, type }) {
       setPassError({ status: false, text: "" });
       const loginRoom = firebase.functions().httpsCallable("loginRoom");
 
-      loginRoom({ roomId, pass, type })
+      loginRoom({ roomId, pass, type, userId: state.userInfo.id })
         .then(function (result) {
           console.log(result);
           if (result.data.value) {
-            // console.log(result);
             setLoginInProcess(false);
-            changeRoute("room", parseInt(result.data.id), result.data.type);
           } else {
             setLoginInProcess(false);
             setPassError({ status: true, text: result.data.text });
@@ -63,7 +65,11 @@ function Room({ roomId, data, type }) {
     }
   };
 
+  const onJoinRoomSubmit = () => {};
+
   const [showFooter, setShowFooter] = React.useState(false);
+
+  if (loading) return <LoadingComponent />;
 
   return (
     <div className="room-item d-flex flex-column shadow mt-2">
@@ -107,14 +113,13 @@ function Room({ roomId, data, type }) {
             />
           </div>
         ) : (
-          <div className="lock-room">
+          <div className="unlock-room">
             <img
               src={MoreSVG}
               alt="moreSVG"
               className="wood-btn"
               onClick={() => {
-                console.log({ roomId: parseInt(roomId), type });
-                changeRoute("room", parseInt(roomId), type);
+                onJoinRoomSubmit();
               }}
             />
           </div>

@@ -57,6 +57,10 @@ function GlobalState(props) {
         });
       }
     });
+
+    return () => {
+      locationPathRef.child("path").off();
+    };
   }, [state.route.path, state.userInfo.id, firebase]);
 
   const changeRoute = (path, id = 0, type = "") => {

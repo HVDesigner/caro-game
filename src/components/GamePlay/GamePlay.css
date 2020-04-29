@@ -63,7 +63,7 @@ p {
   background-image: url("./../../assets/matching_background.svg");
   background-size: 50%;
   max-height: 100vh;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .number-bottom {
@@ -78,4 +78,22 @@ p {
   transition: 0.1s;
   opacity: 0.5;
   font-family: "Roboto", sans-serif;
+}
+
+.menu-more {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  z-index: 9999;
+  background-color: #48484891;
+}
+
+.menu-more .wood-btn {
+  background-image: url("./../../assets/matching_background.svg");
+}
+
+.menu-more .menu-more-content {
+  width: 50vw;
+  background-image: url("./../../assets/backgroung_carotv_2.svg");
+  background-size: 150%;
 }

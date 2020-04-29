@@ -1,9 +1,8 @@
 import React from "react";
-import "./square.css";
-
 // SVGs
 import Circle from "./../../assets/circle-regular.svg";
 import Times from "./../../assets/times-solid.svg";
+import "./square.css";
 
 import AppContext from "./../../context/";
 

@@ -1,26 +1,42 @@
 import React from "react";
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
-// import AppContext from "./../../../../context/";
+import AppContext from "./../../../../context/";
 import { FirebaseContext } from "./../../../../Firebase/";
 
 function PlayerInRoom({ playerUser }) {
-  // const {} = React.useContext(AppContext);
+  const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
-  const [name /*setName*/] = React.useState("");
-  const [elo /*setElo*/] = React.useState(0);
-  // const [imageUrl, setImageUrl] = React.useState("");
+  const [name, setName] = React.useState("");
+  const [elo, setElo] = React.useState(0);
+  const [imageUrl, setImageUrl] = React.useState("");
 
   React.useEffect(() => {
     if (playerUser) {
-      firebase
-        .database()
-        .ref("users/" + playerUser)
-        .once("value", function (snapshot) {
-          console.log(snapshot.val());
-        });
+      if (playerUser === state.userInfo.id) {
+        setName(state.userInfo.name);
+        setElo("1000");
+        setImageUrl(state.userInfo.image_url);
+      } else {
+        firebase
+          .database()
+          .ref("users/" + playerUser)
+          .once("value", function (snapshot) {
+            if (snapshot.val()) {
+              setName(snapshot.val().name.value);
+              setElo(snapshot.val().elo);
+              setImageUrl(snapshot.val().image_url);
+            }
+          });
+      }
     }
-  });
+  }, [
+    playerUser,
+    state.userInfo.id,
+    state.userInfo.name,
+    state.userInfo.image_url,
+    firebase,
+  ]);
 
   return (
     <div className="d-flex justify-content-end align-items-center">
@@ -29,9 +45,11 @@ function PlayerInRoom({ playerUser }) {
         <span>Elo: {elo ? elo : "..."}</span>
       </div>
       <img
-        src={UserSVG}
+        src={imageUrl ? imageUrl : UserSVG}
         alt="user-playing"
-        className="player-inroom-img ml-2"
+        className={`player-inroom-img ml-2 ${
+          imageUrl ? "rounded-circle circle-avartar" : ""
+        }`}
       />
     </div>
   );

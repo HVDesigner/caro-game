@@ -44,7 +44,9 @@ function MasterInRoom({ masterUser }) {
       <img
         src={imageUrl ? imageUrl : UserSVG}
         alt="user-playing"
-        className="player-inroom-img mr-2"
+        className={`player-inroom-img mr-2 ${
+          imageUrl ? "rounded-circle circle-avartar" : ""
+        }`}
       />
       <div className="d-flex flex-column text-white">
         <span>{name}</span>
