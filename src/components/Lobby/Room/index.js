@@ -1,30 +1,20 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock, faCoins, faEye } from "@fortawesome/free-solid-svg-icons";
 import "./index.css";
 
+// Components
 import LoadingComponent from "./../../Loading/";
-import MasterComponent from "./Master/";
-import PlayerComponent from "./Player/";
-
-import LockSVG from "./../../../assets/Rooms/lock.svg";
-import MoreSVG from "./../../../assets/Rooms/more.svg";
-import LeftSVG from "./../../../assets/chevron-left.svg";
-
-import { FirebaseContext } from "./../../../Firebase/";
-import AppContext from "./../../../context/";
+import Header from "./Header/";
+import Footer from "./Footer/";
+import Body from "./Body/";
+import PasswordInput from "./PasswordInput/";
 
 function Room({ roomId, data, type }) {
-  const [firebase] = React.useState(React.useContext(FirebaseContext));
-  const { state } = React.useContext(AppContext);
   const [loading, setLoading] = React.useState(true);
+
+  const [showFooter, setShowFooter] = React.useState(false);
 
   const [masterUser, setMasterUser] = React.useState("");
   const [playerUser, setPlayerUser] = React.useState("");
-
-  const [loginInProcess, setLoginInProcess] = React.useState(false);
-  const [pass, setPass] = React.useState("");
-  const [passError, setPassError] = React.useState({ status: false, text: "" });
 
   React.useEffect(() => {
     if (data.participants) {
@@ -40,145 +30,29 @@ function Room({ roomId, data, type }) {
     }
   }, [data.participants]);
 
-  const onPasswordSubmit = (e) => {
-    e.preventDefault();
-    if (pass) {
-      setLoginInProcess(true);
-      setPassError({ status: false, text: "" });
-      const loginRoom = firebase.functions().httpsCallable("loginRoom");
-
-      loginRoom({ roomId, pass, type, userId: state.userInfo.id })
-        .then(function (result) {
-          console.log(result);
-          if (result.data.value) {
-            setLoginInProcess(false);
-          } else {
-            setLoginInProcess(false);
-            setPassError({ status: true, text: result.data.text });
-          }
-        })
-        .catch(() => {
-          setPassError({ status: true, text: "Không thể đăng nhập" });
-        });
-    } else {
-      setPassError({ status: true, text: "Chưa điền mật khẩu." });
-    }
-  };
-
-  const onJoinRoomSubmit = () => {};
-
-  const [showFooter, setShowFooter] = React.useState(false);
-
   if (loading) return <LoadingComponent />;
 
   return (
     <div className="room-item d-flex flex-column shadow mt-2">
-      <div className="d-flex room-item-head text-white bg-success">
-        <span className="text-stroke-carotv">
-          <p className="mb-0 ml-2 mr-2">id: {roomId}</p>
-        </span>
-        <span className="text-stroke-carotv d-flex align-items-center">
-          <p className="mb-0 ml-2 mr-2">
-            {data.rule === "6-win" ? "6 Quân Thắng" : "Chỉ 5 Quân"}
-          </p>
-        </span>
-        {data.type === "room" ? (
-          data.bet ? (
-            <span className="text-stroke-carotv d-flex align-items-center">
-              <FontAwesomeIcon icon={faCoins} className="text-warning ml-2" />
-              <p className="mb-0 ml-2 mr-2">{data.bet}</p>
-            </span>
-          ) : (
-            ""
-          )
-        ) : (
-          ""
-        )}
-        <span className="text-stroke-carotv d-flex align-items-center">
-          <FontAwesomeIcon icon={faClock} className="text-warning ml-2" />
-          <p className="mb-0 ml-2 mr-2">{data.time}</p>
-        </span>
-      </div>
-      <div className="d-flex room-item-body p-2">
-        <MasterComponent masterUser={masterUser} />
-        {data && data.password.status ? (
-          <div className="lock-room">
-            <img
-              src={LockSVG}
-              alt="lock"
-              className="wood-btn"
-              onClick={() => {
-                setShowFooter(!showFooter);
-              }}
-            />
-          </div>
-        ) : (
-          <div className="unlock-room">
-            <img
-              src={MoreSVG}
-              alt="moreSVG"
-              className="wood-btn"
-              onClick={() => {
-                onJoinRoomSubmit();
-              }}
-            />
-          </div>
-        )}
-        <PlayerComponent playerUser={playerUser} />
-      </div>
-      <div className="d-flex room-item-footer pl-2 pr-2 text-white bg-success">
-        <span className="text-center mr-auto text-stroke-carotv">
-          {data.title}
-        </span>
-        <span className="text-center text-stroke-carotv">
-          <FontAwesomeIcon icon={faEye} className="text-white mr-2" />
-          20
-        </span>
-      </div>
+      <Header
+        roomId={roomId}
+        rule={data.rule}
+        type={data.type}
+        bet={data.bet}
+        time={data.time}
+      />
 
-      {showFooter ? (
-        <div>
-          {loginInProcess ? (
-            <p className="text-warning mb-1 text-center">Đang đăng nhập...</p>
-          ) : (
-            <div
-              className={`room-item-footer pt-2 pl-2 pr-2 ${
-                passError.status ? "" : "pb-2"
-              } d-flex`}
-            >
-              <span className="text-white mr-2">Mật khẩu:</span>
-              <form
-                onSubmit={onPasswordSubmit}
-                className="form-carotv d-flex flex-fill"
-              >
-                <input
-                  type="password"
-                  className="input-carotv text-white flex-fill"
-                  placeholder="Nhập mật khẩu..."
-                  value={pass}
-                  onChange={(e) => {
-                    setPass(e.target.value);
-                  }}
-                />
-              </form>
-              <img
-                src={LeftSVG}
-                alt="back-btn"
-                className="ml-2"
-                style={{ height: "1.5em", transform: "rotate(180deg)" }}
-                onClick={onPasswordSubmit}
-              ></img>
-            </div>
-          )}
-          {passError.status ? (
-            <p className="text-warning mb-1 text-center">{passError.text}</p>
-          ) : (
-            ""
-          )}
-        </div>
-      ) : (
-        <div></div>
-      )}
+      <Body
+        setShowFooter={setShowFooter}
+        showFooter={showFooter}
+        masterUser={masterUser}
+        playerUser={playerUser}
+        password={data.password}
+      />
+
+      <Footer title={data.title} />
+
+      {showFooter ? <PasswordInput roomId={roomId} type={type} /> : ""}
     </div>
   );
 }

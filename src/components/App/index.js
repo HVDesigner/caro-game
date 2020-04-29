@@ -29,6 +29,12 @@ function App() {
           const playerLocale = window.FBInstant.getLocale();
           const platform = window.FBInstant.getPlatform();
 
+          console.log(window.FBInstant);
+
+          window.FBInstant.onPause(() => {
+            console.log("pause");
+          });
+
           getUserInfo(
             playerId,
             playerName,
