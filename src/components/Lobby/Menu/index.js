@@ -10,8 +10,8 @@ import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
 function MenuComponent({ gameType }) {
-  const [firebase] = React.useState(React.useContext(FirebaseContext));
   const { state, countUserStatus } = React.useContext(AppContext);
+  const [firebase] = React.useState(React.useContext(FirebaseContext));
 
   const countUserStatus_ = React.useCallback(() => {
     countUserStatus();
