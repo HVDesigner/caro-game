@@ -10,18 +10,8 @@ import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
 function MenuComponent({ gameType }) {
-  const { state, countUserStatus } = React.useContext(AppContext);
+  const { state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
-
-  const countUserStatus_ = React.useCallback(() => {
-    countUserStatus();
-  }, [countUserStatus]);
-
-  React.useEffect(() => {
-    countUserStatus_();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const changGameType = (status) => {
     firebase

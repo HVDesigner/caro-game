@@ -7,7 +7,7 @@ import GamePlay from "./../../../Core/game";
 
 import { Row, Col } from "react-bootstrap";
 
-function GamePlayComponent({ time, counter, setCounter }) {
+function GamePlayComponent({ time, setCounter }) {
   const alphabet = [
     "A",
     "B",
@@ -57,24 +57,6 @@ function GamePlayComponent({ time, counter, setCounter }) {
     colkey: "",
     clickCount: 0,
   });
-
-  React.useEffect(() => {
-    let timer = setInterval(() => {}, 1000);
-
-    if (counter > 0) {
-      timer = setInterval(() => setCounter(counter - 1), 1000);
-    }
-
-    if (counter === 0) {
-      let winner_ = turn === 1 ? 2 : 1;
-      setCounter(0);
-      setStatusGame({
-        isPlay: false,
-        winner: winner_,
-      });
-    }
-    return () => clearInterval(timer);
-  }, [counter, turn, statusGame.isPlay, setStatusGame, setCounter, time]);
 
   const changeTurn = () => {
     turn === 1 ? setTurn(2) : setTurn(1);

@@ -13,14 +13,14 @@ function MasterInRoom({ masterUser }) {
 
   React.useEffect(() => {
     if (masterUser) {
-      if (masterUser === state.userInfo.id) {
+      if (masterUser.id === state.userInfo.id) {
         setName(state.userInfo.name);
         setElo("1000");
         setImageUrl(state.userInfo.image_url);
       } else {
         firebase
           .database()
-          .ref(`users/${masterUser}`)
+          .ref(`users/${masterUser.id}`)
           .once("value")
           .then((snapshot) => {
             if (snapshot.val()) {

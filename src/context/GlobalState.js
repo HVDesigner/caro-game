@@ -8,15 +8,13 @@ import {
   GET_ROOMS_GOMOKU,
   GET_ROOM_ID,
   GET_SQUARE_POSITION,
-  COUNT_BLOCK_HEAD_USER_PLAYING,
-  COUNT_GOMOKU_USER_PLAYING,
 } from "./ActionTypes";
 import { FirebaseContext } from "./../Firebase/";
 
 function GlobalState(props) {
   const [firebase] = React.useState(React.useContext(FirebaseContext));
 
-  const InitialGlobalState = {
+  const [state, dispatch] = React.useReducer(reducer, {
     route: {
       path: "dashboard",
     },
@@ -50,28 +48,35 @@ function GlobalState(props) {
       row: 0,
       col: 0,
     },
-  };
-
-  const [state, dispatch] = React.useReducer(reducer, InitialGlobalState);
+  });
 
   React.useEffect(() => {
     const locationPathRef = firebase
       .database()
       .ref("users/" + state.userInfo.id + "/location/");
 
-    locationPathRef.child("path").on("value", (snapshot) => {
+    function dispatchRoute(snapshot) {
       if (snapshot.val()) {
         dispatch({
           type: CHANGE_ROUTE,
           payload: { path: snapshot.val() },
         });
       }
-    });
+    }
+
+    locationPathRef.child("path").on("value", dispatchRoute);
 
     return () => {
-      locationPathRef.child("path").off();
+      locationPathRef.child("path").off("value", dispatchRoute);
     };
   }, [state.route.path, state.userInfo.id, firebase]);
+
+  const getRoute = (path) => {
+    dispatch({
+      type: CHANGE_ROUTE,
+      payload: { path },
+    });
+  };
 
   const changeRoute = (path, id = 0, type = "") => {
     if (state.userInfo.id && state.route.path !== path) {
@@ -85,102 +90,6 @@ function GlobalState(props) {
       }
     }
   };
-
-  const countUserStatus = () => {
-    firebase
-      .database()
-      .ref("users")
-      .on("value", async (snapshot) => {
-        if (snapshot && snapshot.val()) {
-          const keys = Object.keys(snapshot.val());
-
-          let gomokuTotal = 0;
-          let blockHeadTotal = 0;
-
-          let playingGomokuUserTotal = 0;
-          let playingBlockHeadUserTotal = 0;
-
-          for (let index = 0; index < keys.length; index++) {
-            const element = keys[index];
-            const userData = snapshot.val()[element];
-
-            if (
-              userData.room_id.value !== 0 &&
-              userData.room_id.type !== "none"
-            ) {
-              const snapshotChild = await firebase
-                .database()
-                .ref(
-                  `rooms/${userData.room_id.type}/${userData.room_id.value}/participants`
-                )
-                .once("value");
-
-              if (userData.room_id.type === "gomoku") {
-                if (
-                  (snapshotChild.val()[element].type === "player" &&
-                    snapshotChild.val()[element].status) ||
-                  (snapshotChild.val()[element].type === "master" &&
-                    snapshotChild.val()[element].status)
-                ) {
-                  playingGomokuUserTotal = playingGomokuUserTotal + 1;
-                }
-              } else {
-                if (
-                  (snapshotChild.val()[element].type === "player" &&
-                    snapshotChild.val()[element].status) ||
-                  (snapshotChild.val()[element].type === "master" &&
-                    snapshotChild.val()[element].status)
-                ) {
-                  playingBlockHeadUserTotal = playingBlockHeadUserTotal + 1;
-                }
-              }
-            }
-
-            // get quantity user playing in each game type
-            if (userData.location.path === "lobby") {
-              if (userData["game-type-select"].value === "gomoku") {
-                gomokuTotal = gomokuTotal + 1;
-              } else if (userData["game-type-select"].value === "block-head") {
-                blockHeadTotal = blockHeadTotal + 1;
-              }
-            } else if (userData.location.path === "room") {
-              if (userData.room_id.type === "gomoku") {
-                gomokuTotal = gomokuTotal + 1;
-              } else if (userData.room_id.type === "block-head") {
-                blockHeadTotal = blockHeadTotal + 1;
-              }
-            }
-          }
-
-          dispatch({
-            type: COUNT_BLOCK_HEAD_USER_PLAYING,
-            payload: {
-              total: blockHeadTotal,
-              playing: playingBlockHeadUserTotal,
-              free: blockHeadTotal - playingBlockHeadUserTotal,
-            },
-          });
-          dispatch({
-            type: COUNT_GOMOKU_USER_PLAYING,
-            payload: {
-              total: gomokuTotal,
-              playing: playingGomokuUserTotal,
-              free: gomokuTotal - playingGomokuUserTotal,
-            },
-          });
-        }
-      });
-  };
-
-  // const updateRoomGomoku = () => {
-  //   const childChangeRef = firebase().database.ref("rooms/gomoku");
-
-  //   childChangeRef.on("child_changed", (snapshot) => {
-  //     console.log({ id: snapshot.key, ...snapshot.val() });
-  //   });
-
-  //   return childChangeRef;
-  // };
 
   const getPositonSquare = (status, row, col) => {
     return dispatch({
@@ -256,7 +165,7 @@ function GlobalState(props) {
         }
       } else {
         // add new user
-        return userRef
+        userRef
           .set({
             coin: 1000,
             elo: 1000,
@@ -292,18 +201,21 @@ function GlobalState(props) {
           });
       }
     });
+
+    return userRef;
   };
 
   return (
     <AppContext.Provider
       value={{
         state,
+        dispatch,
         changeRoute,
         getUserInfo,
         getRoomsGomoku,
         getPositonSquare,
         getRoomsBlockHead,
-        countUserStatus,
+        getRoute,
       }}
     >
       {props.children}

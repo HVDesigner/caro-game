@@ -16,7 +16,6 @@ const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
 
 function App() {
   const { state, getUserInfo } = React.useContext(AppContext);
-  // const [firebase] = React.useState(React.useContext(FirebaseContext));
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -30,10 +29,6 @@ function App() {
           const platform = window.FBInstant.getPlatform();
 
           console.log(window.FBInstant);
-
-          window.FBInstant.onPause(() => {
-            console.log("pause");
-          });
 
           getUserInfo(
             playerId,

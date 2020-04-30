@@ -61,3 +61,7 @@ button:focus {
 .brown-border {
   border: 1.5px solid #5c3c25 !important;
 }
+
+.brown-color {
+  color: #5c3c25 !important;
+}

@@ -12,14 +12,54 @@ import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
 
 function Lobby() {
+  const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
-  const [firebase] = React.useState(React.useContext(FirebaseContext));
-  const [loading, setLoading] = React.useState(true);
 
   const [gameType, setGameType] = React.useState("");
+  const [gameTypeLoading, setGameTypeLoading] = React.useState(true);
 
-  const [gomokuListRooms, setGomokuListRoom] = React.useState([]);
-  const [blockHeadListRoom, setBlockHeadListRoom] = React.useState([]);
+  React.useEffect(() => {
+    function setGameTypeState(snapshot) {
+      if (snapshot.val()) {
+        setGameType(snapshot.val().value);
+        setGameTypeLoading(false);
+      }
+    }
+
+    // Get game type
+    firebase
+      .database()
+      .ref(`users/${state.userInfo.id}/game-type-select`)
+      .on("value", setGameTypeState);
+
+    return () => {
+      return firebase
+        .database()
+        .ref(`users/${state.userInfo.id}/game-type-select`)
+        .off("value", setGameTypeState);
+    };
+  }, [firebase, state.userInfo.id]);
+
+  return (
+    <Container fluid className="rooms-lobby">
+      {gameTypeLoading ? "" : <Menu gameType={gameType} />}
+
+      {gameType === "gomoku" ? (
+        <GomokuRoomsComponent />
+      ) : (
+        <BlockHeadRoomsComponent />
+      )}
+
+      <Footer />
+    </Container>
+  );
+}
+export default Lobby;
+
+function GomokuRoomsComponent() {
+  const firebase = React.useContext(FirebaseContext);
+  const [loading, setLoading] = React.useState(true);
+  const [listRoom, setListRoom] = React.useState([]);
 
   React.useEffect(() => {
     function converToArr(value) {
@@ -35,72 +75,33 @@ function Lobby() {
       return finalArr;
     }
 
-    // Get game type
-    firebase
-      .database()
-      .ref(`users/${state.userInfo.id}/game-type-select`)
-      .on("value", (snapshot) => {
-        if (snapshot && snapshot.val()) {
-          setGameType(snapshot.val().value);
+    function getListRoomState(snapshot) {
+      if (snapshot && snapshot.val()) {
+        if (snapshot.val()) {
+          setListRoom(converToArr(snapshot.val()));
         }
-      });
+      }
+      setLoading(false);
+    }
 
-    // Get list tables
-    firebase
-      .database()
-      .ref("rooms")
-      .on("value", (snapshot) => {
-        if (snapshot && snapshot.val()) {
-          if (gameType === "gomoku") {
-            if (snapshot.val().gomoku) {
-              setGomokuListRoom(converToArr(snapshot.val().gomoku));
-            }
-          } else if (gameType === "block-head") {
-            if (snapshot.val()["block-head"]) {
-              setBlockHeadListRoom(converToArr(snapshot.val()["block-head"]));
-            }
-          }
-        }
-        setLoading(false);
-      });
+    firebase.database().ref("rooms/gomoku").on("value", getListRoomState);
 
-    return () => {
-      firebase.database().ref("rooms").off("value");
-      firebase
-        .database()
-        .ref(`users/${state.userInfo.id}/game-type-select`)
-        .off("value");
-    };
-  }, [firebase, gameType, state.userInfo.id]);
+    return () =>
+      firebase.database().ref("rooms/gomoku").off("value", getListRoomState);
+  }, [firebase]);
 
-  return (
-    <Container fluid className="rooms-lobby">
-      <Menu gameType={gameType} />
+  if (loading)
+    return (
+      <Row>
+        <Col>
+          <p className="text-white text-center mt-3">Loading...</p>
+        </Col>
+      </Row>
+    );
 
-      {loading ? (
-        <Row>
-          <Col>
-            <p className="text-white text-center mt-3">Loading...</p>
-          </Col>
-        </Row>
-      ) : gameType === "gomoku" ? (
-        <GomokuRoomsComponent data={gomokuListRooms} />
-      ) : gameType === "block-head" ? (
-        <BlockHeadRoomsComponent data={blockHeadListRoom} />
-      ) : (
-        <Row></Row>
-      )}
-
-      <Footer />
-    </Container>
-  );
-}
-export default Lobby;
-
-function GomokuRoomsComponent({ data }) {
   return (
     <Row>
-      {data.map((value) => {
+      {listRoom.map((value) => {
         return (
           <Col className="room-item-col" key={value.id} md="4">
             <Room roomId={value.id} data={value} type={"gomoku"} />
@@ -111,10 +112,55 @@ function GomokuRoomsComponent({ data }) {
   );
 }
 
-function BlockHeadRoomsComponent({ data }) {
+function BlockHeadRoomsComponent() {
+  const firebase = React.useContext(FirebaseContext);
+  const [loading, setLoading] = React.useState(true);
+  const [listRoom, setListRoom] = React.useState([]);
+
+  React.useEffect(() => {
+    function converToArr(value) {
+      const keysArr = Object.keys(value);
+      const finalArr = [];
+
+      for (let index = 0; index < keysArr.length; index++) {
+        const element = keysArr[index];
+
+        finalArr.push({ id: element, ...value[element] });
+      }
+
+      return finalArr;
+    }
+
+    function getListRoomState(snapshot) {
+      if (snapshot && snapshot.val()) {
+        if (snapshot.val()) {
+          setListRoom(converToArr(snapshot.val()));
+        }
+      }
+      setLoading(false);
+    }
+
+    firebase.database().ref("rooms/block-head").on("value", getListRoomState);
+
+    return () =>
+      firebase
+        .database()
+        .ref("rooms/block-head")
+        .off("value", getListRoomState);
+  }, [firebase]);
+
+  if (loading)
+    return (
+      <Row>
+        <Col>
+          <p className="text-white text-center mt-3">Loading...</p>
+        </Col>
+      </Row>
+    );
+
   return (
     <Row>
-      {data.map((value) => {
+      {listRoom.map((value) => {
         return (
           <Col className="room-item-col" key={value.id} md="2">
             <Room roomId={value.id} data={value} type={"block-head"} />

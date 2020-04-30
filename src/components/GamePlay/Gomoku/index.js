@@ -63,22 +63,22 @@ function GamePlayComponent({ time, counter, setCounter }) {
     clickCount: 0,
   });
 
-  React.useEffect(() => {
-    let timer = setInterval(() => {}, 1000);
-    if (counter > 0) {
-      timer = setInterval(() => setCounter(counter - 1), 1000);
-    }
+  // React.useEffect(() => {
+  //   let timer = setInterval(() => {}, 1000);
+  //   if (counter > 0) {
+  //     timer = setInterval(() => setCounter(counter - 1), 1000);
+  //   }
 
-    if (counter === 0) {
-      let winner_ = turn === 1 ? "TWO_WIN" : "ONE_WIN";
-      setCounter(0);
-      setStatusGame({
-        isPlay: false,
-        winner: winner_,
-      });
-    }
-    return () => clearInterval(timer);
-  }, [counter, turn, statusGame.isPlay, setStatusGame, setCounter, time]);
+  //   if (counter === 0) {
+  //     let winner_ = turn === 1 ? "TWO_WIN" : "ONE_WIN";
+  //     setCounter(0);
+  //     setStatusGame({
+  //       isPlay: false,
+  //       winner: winner_,
+  //     });
+  //   }
+  //   return () => clearInterval(timer);
+  // }, [counter, turn, statusGame.isPlay, setStatusGame, setCounter, time]);
 
   const changeTurn = () => {
     turn === 1 ? setTurn(2) : setTurn(1);

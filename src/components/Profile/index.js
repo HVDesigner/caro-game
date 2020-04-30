@@ -12,8 +12,6 @@ function ProfileComponent() {
 
   const { state, changeRoute } = StateGlobal;
 
-  console.log(state);
-
   return (
     <Container className="proflie-body">
       <Row>

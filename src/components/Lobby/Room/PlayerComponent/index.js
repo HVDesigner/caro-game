@@ -13,14 +13,14 @@ function PlayerInRoom({ playerUser }) {
 
   React.useEffect(() => {
     if (playerUser) {
-      if (playerUser === state.userInfo.id) {
+      if (playerUser.id === state.userInfo.id) {
         setName(state.userInfo.name);
         setElo("1000");
         setImageUrl(state.userInfo.image_url);
       } else {
         firebase
           .database()
-          .ref("users/" + playerUser)
+          .ref("users/" + playerUser.id)
           .once("value", function (snapshot) {
             if (snapshot.val()) {
               setName(snapshot.val().name.value);

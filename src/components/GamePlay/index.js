@@ -10,6 +10,8 @@ import MoreSVG from "./../../assets/Rooms/more.svg";
 import Loading from "./../Loading/";
 import Gomoku from "./Gomoku/";
 import Original from "./Original/";
+import Chat from "./Chat/";
+import ReadyComponent from "./ReadyComponent/";
 
 // Contexts
 import AppContext from "./../../context/";
@@ -18,7 +20,8 @@ import { FirebaseContext } from "./../../Firebase/";
 // Table
 function GamePlayComponent() {
   const { state, getPositonSquare } = React.useContext(AppContext);
-  const [firebase] = React.useState(React.useContext(FirebaseContext));
+  const firebase = React.useContext(FirebaseContext);
+
   const [loading, setLoading] = React.useState(true);
 
   // menu modal
@@ -28,59 +31,39 @@ function GamePlayComponent() {
   const [counter, setCounter] = React.useState(time);
   const [participants, setParticipants] = React.useState([]);
   const [bet, setBet] = React.useState(0);
+  const [gameStatus, setGameStatus] = React.useState("waiting");
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
   React.useEffect(() => {
-    firebase
-      .database()
-      .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
-      .on("value", (snapshot) => {
-        if (state.room.type && state.room.id) {
-          if (snapshot.val()) {
-            console.log(snapshot.val());
-            setTime(snapshot.val().time);
-            setCounter(snapshot.val().time);
-            setParticipants(snapshot.val().participants);
-            setBet(snapshot.val().bet);
-          }
-        }
-        setLoading(false);
-      });
+    function setUserInfoState(snapshot) {
+      if (snapshot.val()) {
+        setTime(snapshot.val().time);
+        setCounter(snapshot.val().time);
+        setBet(snapshot.val().bet);
+        setGameStatus(snapshot.val().game.status.type);
 
-    return () =>
+        setParticipants(snapshot.val().participants);
+      }
+      setLoading(false);
+    }
+
+    if (state.room.type && state.room.id) {
       firebase
         .database()
-        .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`);
+        .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
+        .on("value", setUserInfoState);
+    }
+
+    return () => {
+      if (state.room.type && state.room.id) {
+        return firebase
+          .database()
+          .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
+          .off("value", setUserInfoState);
+      }
+    };
   }, [firebase, state.room.type, state.room.id]);
-
-  const getMaster = (partObj) => {
-    const finalArr = [];
-
-    for (let index = 0; index < Object.keys(partObj).length; index++) {
-      const element = Object.keys(partObj)[index];
-
-      finalArr.push({ id: element, ...partObj[element] });
-    }
-
-    return finalArr.filter(
-      (master) => master.type === "master" && master.status
-    )[0];
-  };
-
-  const getPlayer = (partObj) => {
-    const finalArr = [];
-
-    for (let index = 0; index < Object.keys(partObj).length; index++) {
-      const element = Object.keys(partObj)[index];
-
-      finalArr.push({ id: element, ...partObj[element] });
-    }
-
-    return finalArr.filter(
-      (player) => player.type === "player" && player.status
-    )[0];
-  };
 
   if (loading) {
     return <Loading />;
@@ -138,13 +121,14 @@ function GamePlayComponent() {
             <div style={{ width: "100vw" }} className="d-flex flex-fill">
               {participants ? (
                 <MasterUser
-                  data={getMaster(participants)}
+                  data={participants.master}
                   firebase={firebase}
-                  counter={counter}
+                  time={time}
                 />
               ) : (
                 ""
               )}
+
               <div
                 style={{ width: "100%" }}
                 className="d-flex flex-fill flex-column align-items-center"
@@ -152,25 +136,32 @@ function GamePlayComponent() {
                 <p className="text-white mb-0">
                   {state.room.type === "gomoku" ? "GOMOKU" : "CHẶN 2 ĐẦU"}
                 </p>
+
                 <small className="text-white">
                   <span className="text-warning mr-1">Cược:</span>
                   {bet}
                 </small>
-                <img
-                  src={MoreSVG}
-                  alt="more"
-                  style={{ width: "1.5em" }}
-                  className="shadow wood-btn"
-                  onClick={() => {
-                    setShowMenu(true);
-                  }}
-                />
+
+                {gameStatus === "playing" ? (
+                  <img
+                    src={MoreSVG}
+                    alt="more"
+                    style={{ width: "1.5em" }}
+                    className="shadow wood-btn"
+                    onClick={() => {
+                      setShowMenu(true);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
               </div>
+
               {participants ? (
                 <PlayerUser
-                  data={getPlayer(participants)}
+                  data={participants.player}
                   firebase={firebase}
-                  counter={counter}
+                  time={time}
                 />
               ) : (
                 ""
@@ -179,45 +170,29 @@ function GamePlayComponent() {
           </Col>
         </Row>
 
-        <div
-          onMouseOut={() => {
-            if (state.userInfo.platform === "web") {
-              getPositonSquare(false, 0, 0);
-            }
-          }}
-        >
-          {state.room.type === "block-head" ? (
-            <Original time={time} counter={counter} setCounter={setCounter} />
-          ) : (
-            <Gomoku time={time} counter={counter} setCounter={setCounter} />
-          )}
-        </div>
-
-        <div
-          className="flex-fill overflow-auto h-100 bg-white pl-2 pr-2 rounded brown-border"
-          style={{ minHeight: "48px" }}
-        >
-          <div style={{ height: "100%" }}>
-            <div className="d-flex flex-column">
-              <p>
-                <strong className="mr-2 ">Hoang:</strong>123a33
-              </p>
-              <p>
-                <strong className="mr-2 ">Linh:</strong>123a33
-              </p>
-              <p>
-                <strong className="mr-2 ">Linh:</strong>123a33
-              </p>
-            </div>
+        {gameStatus === "playing" ? (
+          <div
+            onMouseOut={() => {
+              if (state.userInfo.platform === "web") {
+                getPositonSquare(false, 0, 0);
+              }
+            }}
+          >
+            {state.room.type === "block-head" ? (
+              <Original time={time} counter={counter} setCounter={setCounter} />
+            ) : (
+              <Gomoku time={time} counter={counter} setCounter={setCounter} />
+            )}
           </div>
-        </div>
-        <div className="p-1 rounded">
-          <input
-            className="input-carotv-2 text-white text-left w-100"
-            placeholder="Nhập tin nhắn..."
-            type="text"
+        ) : (
+          <ReadyComponent
+            master={participants.master}
+            player={participants.player}
+            watcher={participants.watcher}
           />
-        </div>
+        )}
+
+        <Chat />
       </Container>
     </React.Fragment>
   );
@@ -225,7 +200,24 @@ function GamePlayComponent() {
 export default GamePlayComponent;
 
 // Counter
-function CounterConponent({ counter }) {
+function CounterConponent({ time }) {
+  const [counter, setCounter] = React.useState(time);
+
+  React.useEffect(() => {
+    let timer = setInterval(() => {}, 1000);
+
+    if (counter > 0) {
+      timer = setInterval(() => setCounter(counter - 1), 1000);
+    }
+
+    if (counter === 0) {
+      setCounter(0);
+      clearInterval(timer);
+    }
+
+    return () => clearInterval(timer);
+  }, [time, counter]);
+
   return (
     <div
       style={{ width: "100%" }}
@@ -241,74 +233,7 @@ function CounterConponent({ counter }) {
 }
 
 // Master User Left
-function MasterUser({ data, firebase, counter }) {
-  const { state } = React.useContext(AppContext);
-  const [imageUrl, setImageUrl] = React.useState("");
-  const [name, setName] = React.useState("");
-  const [elo, setElo] = React.useState("");
-
-  React.useEffect(() => {
-    function setUserData(image_url, name, elo) {
-      setImageUrl(image_url);
-      setName(name);
-      setElo(elo);
-    }
-
-    if (state.userInfo.id === data.id) {
-      setUserData(
-        state.userInfo.image_url,
-        state.userInfo.name,
-        state.userInfo.elo
-      );
-    } else {
-      firebase
-        .database()
-        .ref(`users/${data.id}`)
-        .once("value")
-        .then((snapshot) => {
-          setUserData(
-            snapshot.val().image_url,
-            snapshot.val().name.value,
-            snapshot.val().elo
-          );
-        });
-    }
-  }, [
-    state.userInfo.id,
-    state.userInfo.image_url,
-    state.userInfo.name,
-    state.userInfo.elo,
-    data.id,
-    firebase,
-  ]);
-
-  return (
-    <div className="d-flex flex-column pl-2">
-      <div
-        style={{ width: "100%" }}
-        className="d-flex justify-content-center align-items-center"
-      >
-        <img
-          src={imageUrl ? imageUrl : UserSVG}
-          alt="user"
-          className={imageUrl ? `rounded-circle` : ""}
-          style={{ width: "40px", height: "40px" }}
-        ></img>
-        <div className="ml-2">
-          <p className="text-white">{name ? name : "..."}</p>
-          <small className="text-white">
-            <span className="text-warning mr-1">ELO:</span>
-            {elo ? elo : "..."}
-          </small>
-        </div>
-      </div>
-      <CounterConponent counter={counter} />
-    </div>
-  );
-}
-
-// Player User Right
-function PlayerUser({ data, firebase, counter }) {
+function MasterUser({ data, firebase, time, gameStatus }) {
   const { state } = React.useContext(AppContext);
   const [imageUrl, setImageUrl] = React.useState("");
   const [name, setName] = React.useState("");
@@ -341,6 +266,80 @@ function PlayerUser({ data, firebase, counter }) {
             );
           });
       }
+    } else {
+      setUserData("", "", "");
+    }
+  }, [
+    state.userInfo.id,
+    state.userInfo.image_url,
+    state.userInfo.name,
+    state.userInfo.elo,
+    data.id,
+    firebase,
+    data,
+  ]);
+
+  return (
+    <div className="d-flex flex-column pl-2">
+      <div
+        style={{ width: "100%" }}
+        className="d-flex justify-content-center align-items-center"
+      >
+        <img
+          src={imageUrl ? imageUrl : UserSVG}
+          alt="user"
+          className={imageUrl ? `rounded-circle` : ""}
+          style={{ width: "40px", height: "40px" }}
+        ></img>
+        <div className="ml-2">
+          <p className="text-white">{name ? name : "..."}</p>
+          <small className="text-white">
+            <span className="text-warning mr-1">ELO:</span>
+            {elo ? elo : "..."}
+          </small>
+        </div>
+      </div>
+      {gameStatus === "playing" ? <CounterConponent time={time} /> : ""}
+    </div>
+  );
+}
+
+// Player User Right
+function PlayerUser({ data, firebase, time, gameStatus }) {
+  const { state } = React.useContext(AppContext);
+  const [imageUrl, setImageUrl] = React.useState("");
+  const [name, setName] = React.useState("");
+  const [elo, setElo] = React.useState("");
+
+  React.useEffect(() => {
+    function setUserData(image_url, name, elo) {
+      setImageUrl(image_url);
+      setName(name);
+      setElo(elo);
+    }
+
+    if (data) {
+      if (state.userInfo.id === data.id) {
+        setUserData(
+          state.userInfo.image_url,
+          state.userInfo.name,
+          state.userInfo.elo
+        );
+      } else {
+        firebase
+          .database()
+          .ref(`users/${data.id}`)
+          .once("value")
+          .then((snapshot) => {
+            setUserData(
+              snapshot.val().image_url,
+              snapshot.val().name.value,
+              snapshot.val().elo
+            );
+          });
+      }
+    } else {
+      setUserData("", "", "");
     }
   }, [
     state.userInfo.id,
@@ -353,25 +352,30 @@ function PlayerUser({ data, firebase, counter }) {
 
   return (
     <div className="d-flex flex-column pr-2">
-      <div
-        style={{ width: "100%" }}
-        className="d-flex flex-fill justify-content-center align-items-center"
-      >
+      <div style={{ width: "100%" }} className="d-flex justify-content-center ">
         <div className="mr-2">
-          <p className="text-white">{name ? name : "..."}</p>
-          <small className="text-white">
-            <span className="text-warning mr-1">ELO:</span>
-            {elo ? elo : "..."}
-          </small>
+          {name ? (
+            <p className="text-white">{name}</p>
+          ) : (
+            <p className="text-white">Trống</p>
+          )}
+          {elo ? (
+            <small className="text-white">
+              <span className="text-warning mr-1">ELO:</span>
+              {elo}
+            </small>
+          ) : (
+            ""
+          )}
         </div>
         <img
           src={imageUrl ? imageUrl : UserSVG}
           alt="user"
-          className={imageUrl ? `rounded-circle` : ""}
+          className={imageUrl ? `rounded-circle align-items-center` : "mt-1"}
           style={{ width: "40px", height: "40px" }}
         ></img>
       </div>
-      <CounterConponent counter={counter} />
+      {gameStatus === "playing" ? <CounterConponent time={time} /> : ""}
     </div>
   );
 }

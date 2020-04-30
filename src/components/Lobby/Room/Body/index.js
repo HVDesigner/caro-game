@@ -16,7 +16,7 @@ function BodyComponent({
   return (
     <div className="d-flex room-item-body p-2">
       <MasterComponent masterUser={masterUser} />
-      {password.status ? (
+      {password && password.status ? (
         <div className="lock-room">
           <img
             src={LockSVG}

@@ -1,0 +1,12 @@
+.ready-btn {
+  background-image: url("./../../../assets/backgroung_carotv_2.svg");
+  min-width: 50vw;
+}
+
+.others-btn {
+  background-image: url("./../../../assets/backgroung_carotv_2.svg");
+}
+
+.others-btn div {
+  width: 50%;
+}

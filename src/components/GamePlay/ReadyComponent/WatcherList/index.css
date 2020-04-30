@@ -1,0 +1,8 @@
+.watcher-detail img {
+  height: 2.5rem;
+}
+
+.watcher-list-box {
+  max-height: 40vh;
+  min-height: 20vh;
+}

@@ -4,7 +4,7 @@ import { FirebaseContext } from "./../../../../Firebase/";
 import AppContext from "./../../../../context/";
 
 function PasswordInput({ roomId, type }) {
-  const [firebase] = React.useState(React.useContext(FirebaseContext));
+  const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
 
   const [pass, setPass] = React.useState("");
@@ -12,7 +12,10 @@ function PasswordInput({ roomId, type }) {
   const [passError, setPassError] = React.useState({ status: false, text: "" });
 
   const onPasswordSubmit = (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
+
     if (pass) {
       setLoginInProcess(true);
       setPassError({ status: false, text: "" });
@@ -20,7 +23,6 @@ function PasswordInput({ roomId, type }) {
 
       loginRoom({ roomId, pass, type, userId: state.userInfo.id })
         .then(function (result) {
-          console.log(result);
           if (result.data.value) {
             setLoginInProcess(false);
           } else {
@@ -29,6 +31,7 @@ function PasswordInput({ roomId, type }) {
           }
         })
         .catch(() => {
+          setLoginInProcess(false);
           setPassError({ status: true, text: "Không thể đăng nhập" });
         });
     } else {
@@ -66,7 +69,7 @@ function PasswordInput({ roomId, type }) {
             alt="back-btn"
             className="ml-2"
             style={{ height: "1.5em", transform: "rotate(180deg)" }}
-            onClick={onPasswordSubmit}
+            onClick={() => onPasswordSubmit()}
           ></img>
         </div>
       )}
