@@ -8,7 +8,22 @@ import GamePlay from "./../../../Core/game";
 // Components
 import Square from "./../../Square/";
 
-function GamePlayComponent({ time, counter, setCounter }) {
+// Contexts
+import { FirebaseContext } from "./../../../Firebase/";
+import AppContext from "./../../../context/";
+
+function GamePlayComponent({
+  time,
+  counter,
+  setCounter,
+  turn,
+  master,
+  player,
+  round,
+}) {
+  const firebase = React.useContext(FirebaseContext);
+  const { state } = React.useContext(AppContext);
+
   const alphabet = [
     "A",
     "B",
@@ -50,7 +65,7 @@ function GamePlayComponent({ time, counter, setCounter }) {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ]);
 
-  const [turn, setTurn] = React.useState(Math.floor(Math.random() * 2) + 1);
+  const [turnInRound, setTurnInRound] = React.useState({ uid: "", value: "" });
 
   const [statusGame, setStatusGame] = React.useState({
     isPlay: true,
@@ -63,29 +78,100 @@ function GamePlayComponent({ time, counter, setCounter }) {
     clickCount: 0,
   });
 
-  // React.useEffect(() => {
-  //   let timer = setInterval(() => {}, 1000);
-  //   if (counter > 0) {
-  //     timer = setInterval(() => setCounter(counter - 1), 1000);
-  //   }
+  React.useEffect(() => {
+    const roomRef = firebase
+      .database()
+      .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`);
 
-  //   if (counter === 0) {
-  //     let winner_ = turn === 1 ? "TWO_WIN" : "ONE_WIN";
-  //     setCounter(0);
-  //     setStatusGame({
-  //       isPlay: false,
-  //       winner: winner_,
-  //     });
-  //   }
-  //   return () => clearInterval(timer);
-  // }, [counter, turn, statusGame.isPlay, setStatusGame, setCounter, time]);
+    function onSnapShot(snapshot) {
+      if (snapshot.val()) {
+        setTurnInRound({ uid: turn.uid, value: snapshot.val().value });
+      }
+    }
+
+    roomRef.child(`game/player/${turn.uid}`).on("value", onSnapShot);
+
+    return () => roomRef.child(`game/${turn.uid}`).off("value", onSnapShot);
+  }, [firebase, state.room.type, state.room.id, turn.uid]);
+
+  React.useEffect(() => {
+    const updatePositionWithValue = (rowkey, colkey, value) => {
+      let _caroTableLocal = caroTable;
+
+      let _changeCol = _caroTableLocal[rowkey];
+
+      _changeCol.splice(colkey, 1, value);
+
+      _caroTableLocal.splice(rowkey, 1, _changeCol);
+
+      return _caroTableLocal;
+    };
+
+    const roomRef = firebase
+      .database()
+      .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`);
+
+    function onSnapShot(snapshot) {
+      if (snapshot.exists()) {
+        const keys = Object.keys(snapshot.val());
+
+        for (let index = 0; index < keys.length; index++) {
+          const element = keys[index];
+
+          updatePositionWithValue(
+            snapshot.val()[element].row,
+            snapshot.val()[element].col,
+            snapshot.val()[element].value
+          );
+
+          const gameNewStatus_ = GamePlay(caroTable, "gomoku").checkAround(
+            snapshot.val()[element].row,
+            snapshot.val()[element].col
+          );
+
+          if (gameNewStatus_.isPlay === false) {
+            setCounter(0);
+          }
+
+          setStatusGame(gameNewStatus_);
+        }
+      }
+    }
+
+    roomRef.child(`game/history/${round}`).on("value", onSnapShot);
+
+    return () =>
+      roomRef.child(`game/history/${round}`).off("value", onSnapShot);
+  }, [firebase, state.room.type, state.room.id, round, caroTable, setCounter]);
 
   const changeTurn = () => {
-    turn === 1 ? setTurn(2) : setTurn(1);
+    const roomRef = firebase
+      .database()
+      .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`);
+
+    roomRef
+      .child(`game/player`)
+      .once("value")
+      .then((snapshot) => {
+        if (snapshot.val()) {
+          const keys = Object.keys(snapshot.val());
+
+          for (let index = 0; index < keys.length; index++) {
+            const element = keys[index];
+
+            if (element !== turn.uid) {
+              roomRef.child("game/round/turn").update({ uid: element });
+            }
+          }
+        }
+      });
   };
 
   const onClickSquare = (rowkey, colkey) => {
-    if (statusGame.isPlay) {
+    if (
+      statusGame.isPlay &&
+      (master.id === state.userInfo.id || player.id === state.userInfo.id)
+    ) {
       if (caroTable[rowkey][colkey] === 0 || caroTable[rowkey][colkey] === 3) {
         if (
           choicePosition.rowkey === "" &&
@@ -112,11 +198,25 @@ function GamePlayComponent({ time, counter, setCounter }) {
         if (
           choicePosition.rowkey === rowkey &&
           choicePosition.colkey === colkey &&
-          choicePosition.clickCount === 1
+          choicePosition.clickCount === 1 &&
+          turn.uid === state.userInfo.id
         ) {
+          firebase
+            .database()
+            .ref(
+              `/rooms/${state.room.type}/${state.room.id}/game/history/${round}`
+            )
+            .push()
+            .set({
+              row: rowkey,
+              col: colkey,
+              value: turnInRound.value,
+              createAt: Date.now(),
+            });
+
           changeTurn();
 
-          setCaroTable(updatePosition(rowkey, colkey));
+          // setCaroTable(updatePosition(rowkey, colkey));
 
           setCounter(time);
 
@@ -136,17 +236,17 @@ function GamePlayComponent({ time, counter, setCounter }) {
     }
   };
 
-  const updatePosition = (rowkey, colkey) => {
-    let _caroTableLocal = caroTable;
+  // const updatePosition = (rowkey, colkey) => {
+  //   let _caroTableLocal = caroTable;
 
-    let _changeCol = _caroTableLocal[rowkey];
+  //   let _changeCol = _caroTableLocal[rowkey];
 
-    _changeCol.splice(colkey, 1, turn);
+  //   _changeCol.splice(colkey, 1, turnInRound.value);
 
-    _caroTableLocal.splice(rowkey, 1, _changeCol);
+  //   _caroTableLocal.splice(rowkey, 1, _changeCol);
 
-    return _caroTableLocal;
-  };
+  //   return _caroTableLocal;
+  // };
 
   const choicePositionShow = (rowkey, colkey) => {
     let _caroTableLocal = caroTable;

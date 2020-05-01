@@ -33,6 +33,7 @@ function GamePlayComponent() {
   const [bet, setBet] = React.useState(0);
   const [gameStatus, setGameStatus] = React.useState("waiting");
   const [turn, setTurn] = React.useState({ uid: "" });
+  const [round, setRound] = React.useState(0);
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
@@ -44,6 +45,7 @@ function GamePlayComponent() {
         setBet(snapshot.val().bet);
         setGameStatus(snapshot.val().game.status.type);
         setTurn(snapshot.val().game.round.turn);
+        setRound(snapshot.val().game.round.value);
 
         setParticipants(snapshot.val().participants);
       }
@@ -202,6 +204,9 @@ function GamePlayComponent() {
                 counter={counter}
                 setCounter={setCounter}
                 turn={turn}
+                master={participants.master}
+                player={participants.player}
+                round={round}
               />
             )}
           </div>
@@ -321,7 +326,26 @@ function MasterUser({ data, firebase, time, gameStatus, turn }) {
         </div>
       </div>
       {gameStatus === "playing" && turn && turn.uid === data.id ? (
-        <CounterConponent time={time} />
+        <div className="d-flex">
+          <CounterConponent time={time} />
+          {turn.uid === state.userInfo.id ? (
+            <div
+              style={{ width: "100%" }}
+              className="d-flex justify-content-center align-items-center p-1"
+            >
+              <Badge pill variant="success">
+                <p
+                  className="text-white roboto-font"
+                  style={{ fontSize: "13px" }}
+                >
+                  Lượt bạn
+                </p>
+              </Badge>
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
       ) : (
         ""
       )}
@@ -401,7 +425,26 @@ function PlayerUser({ data, firebase, time, gameStatus, turn }) {
         ></img>
       </div>
       {gameStatus === "playing" && turn && turn.uid === data.id ? (
-        <CounterConponent time={time} />
+        <div className="d-flex">
+          <CounterConponent time={time} />
+          {turn.uid === state.userInfo.id ? (
+            <div
+              style={{ width: "100%" }}
+              className="d-flex justify-content-center align-items-center p-1"
+            >
+              <Badge pill variant="success">
+                <p
+                  className="text-white roboto-font"
+                  style={{ fontSize: "13px" }}
+                >
+                  Lượt bạn
+                </p>
+              </Badge>
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
       ) : (
         ""
       )}

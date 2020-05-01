@@ -9,7 +9,6 @@ import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
 function ReadyComponent({ master, player, watcher }) {
-  console.log(master);
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
@@ -18,6 +17,37 @@ function ReadyComponent({ master, player, watcher }) {
   const [showReadyBtn, setShowReadyBtn] = React.useState(true);
   const [showCancelBtn, setShowCancelBtn] = React.useState(false);
   const [noExitOrInvite, setNoExitOrInvite] = React.useState(false);
+
+  React.useEffect(() => {
+    function doSnapShot(snapshot) {
+      if (snapshot.exists()) {
+        setShowReadyBtn(false);
+        setShowCancelBtn(true);
+        setNoExitOrInvite(true);
+      }
+    }
+
+    if (state.room.type && state.room.id) {
+      firebase
+        .database()
+        .ref(
+          `/rooms/${state.room.type}/${state.room.id.toString()}/game/player/${
+            state.userInfo.id
+          }`
+        )
+        .on("value", doSnapShot);
+    }
+
+    return () =>
+      firebase
+        .database()
+        .ref(
+          `/rooms/${state.room.type}/${state.room.id.toString()}/game/player/${
+            state.userInfo.id
+          }`
+        )
+        .off("value", doSnapShot);
+  }, [firebase, state.room.id, state.room.type, state.userInfo.id]);
 
   const onLeaveRoom = () => {
     setShowExitBtn(false);
@@ -78,7 +108,10 @@ function ReadyComponent({ master, player, watcher }) {
   return (
     <div>
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
-        {master && player && showReadyBtn ? (
+        {master &&
+        player &&
+        showReadyBtn &&
+        (master.id === state.userInfo.id || player.id === state.userInfo.id) ? (
           <div
             className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
             onClick={() => {
