@@ -80,6 +80,8 @@ function GomokuRoomsComponent() {
         if (snapshot.val()) {
           setListRoom(converToArr(snapshot.val()));
         }
+      } else {
+        setListRoom([]);
       }
       setLoading(false);
     }
@@ -136,6 +138,8 @@ function BlockHeadRoomsComponent() {
         if (snapshot.val()) {
           setListRoom(converToArr(snapshot.val()));
         }
+      } else {
+        setListRoom([]);
       }
       setLoading(false);
     }

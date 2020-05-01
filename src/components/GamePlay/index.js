@@ -32,6 +32,7 @@ function GamePlayComponent() {
   const [participants, setParticipants] = React.useState([]);
   const [bet, setBet] = React.useState(0);
   const [gameStatus, setGameStatus] = React.useState("waiting");
+  const [turn, setTurn] = React.useState({ uid: "" });
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
@@ -42,6 +43,7 @@ function GamePlayComponent() {
         setCounter(snapshot.val().time);
         setBet(snapshot.val().bet);
         setGameStatus(snapshot.val().game.status.type);
+        setTurn(snapshot.val().game.round.turn);
 
         setParticipants(snapshot.val().participants);
       }
@@ -95,7 +97,7 @@ function GamePlayComponent() {
         fluid
         className="game-play position-relative d-flex flex-column"
         style={{ maxHeight: "100vh", minHeight: "100vh", width: "100vw" }}
-        onMouseMoveCapture={(e) => {
+        onMouseMove={(e) => {
           if (state.userInfo.platform === "web") {
             setMousePosition({ x: e.clientX, y: e.clientY });
           }
@@ -124,6 +126,8 @@ function GamePlayComponent() {
                   data={participants.master}
                   firebase={firebase}
                   time={time}
+                  gameStatus={gameStatus}
+                  turn={turn}
                 />
               ) : (
                 ""
@@ -136,6 +140,11 @@ function GamePlayComponent() {
                 <p className="text-white mb-0">
                   {state.room.type === "gomoku" ? "GOMOKU" : "CHẶN 2 ĐẦU"}
                 </p>
+
+                <small className="text-white">
+                  <span className="text-warning mr-1">id:</span>
+                  {state.room.id}
+                </small>
 
                 <small className="text-white">
                   <span className="text-warning mr-1">Cược:</span>
@@ -162,6 +171,8 @@ function GamePlayComponent() {
                   data={participants.player}
                   firebase={firebase}
                   time={time}
+                  gameStatus={gameStatus}
+                  turn={turn}
                 />
               ) : (
                 ""
@@ -179,9 +190,19 @@ function GamePlayComponent() {
             }}
           >
             {state.room.type === "block-head" ? (
-              <Original time={time} counter={counter} setCounter={setCounter} />
+              <Original
+                time={time}
+                counter={counter}
+                setCounter={setCounter}
+                turn={turn}
+              />
             ) : (
-              <Gomoku time={time} counter={counter} setCounter={setCounter} />
+              <Gomoku
+                time={time}
+                counter={counter}
+                setCounter={setCounter}
+                turn={turn}
+              />
             )}
           </div>
         ) : (
@@ -233,7 +254,7 @@ function CounterConponent({ time }) {
 }
 
 // Master User Left
-function MasterUser({ data, firebase, time, gameStatus }) {
+function MasterUser({ data, firebase, time, gameStatus, turn }) {
   const { state } = React.useContext(AppContext);
   const [imageUrl, setImageUrl] = React.useState("");
   const [name, setName] = React.useState("");
@@ -299,13 +320,17 @@ function MasterUser({ data, firebase, time, gameStatus }) {
           </small>
         </div>
       </div>
-      {gameStatus === "playing" ? <CounterConponent time={time} /> : ""}
+      {gameStatus === "playing" && turn && turn.uid === data.id ? (
+        <CounterConponent time={time} />
+      ) : (
+        ""
+      )}
     </div>
   );
 }
 
 // Player User Right
-function PlayerUser({ data, firebase, time, gameStatus }) {
+function PlayerUser({ data, firebase, time, gameStatus, turn }) {
   const { state } = React.useContext(AppContext);
   const [imageUrl, setImageUrl] = React.useState("");
   const [name, setName] = React.useState("");
@@ -375,7 +400,11 @@ function PlayerUser({ data, firebase, time, gameStatus }) {
           style={{ width: "40px", height: "40px" }}
         ></img>
       </div>
-      {gameStatus === "playing" ? <CounterConponent time={time} /> : ""}
+      {gameStatus === "playing" && turn && turn.uid === data.id ? (
+        <CounterConponent time={time} />
+      ) : (
+        ""
+      )}
     </div>
   );
 }

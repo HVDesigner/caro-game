@@ -9,11 +9,15 @@ import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
 function ReadyComponent({ master, player, watcher }) {
-  console.log({ master, player });
+  console.log(master);
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
   const [showExitBtn, setShowExitBtn] = React.useState(true);
+
+  const [showReadyBtn, setShowReadyBtn] = React.useState(true);
+  const [showCancelBtn, setShowCancelBtn] = React.useState(false);
+  const [noExitOrInvite, setNoExitOrInvite] = React.useState(false);
 
   const onLeaveRoom = () => {
     setShowExitBtn(false);
@@ -40,37 +44,90 @@ function ReadyComponent({ master, player, watcher }) {
       });
   };
 
+  const onReadyPlay = () => {
+    const readyAction = firebase.functions().httpsCallable("readyAction");
+
+    setShowReadyBtn(false);
+    setNoExitOrInvite(true);
+
+    readyAction({
+      roomType: state.room.type,
+      roomId: state.room.id,
+      uid: state.userInfo.id,
+    }).then((result) => {
+      setShowCancelBtn(true);
+      console.log(result);
+    });
+  };
+
+  const onCancelPlay = () => {
+    const cancelAction = firebase.functions().httpsCallable("cancelAction");
+
+    setShowCancelBtn(false);
+    setNoExitOrInvite(false);
+
+    cancelAction({
+      roomType: state.room.type,
+      roomId: state.room.id,
+    }).then((result) => {
+      setShowReadyBtn(true);
+      console.log(result);
+    });
+  };
+
   return (
     <div>
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
-        {master && player ? (
-          <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
+        {master && player && showReadyBtn ? (
+          <div
+            className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+            onClick={() => {
+              onReadyPlay();
+            }}
+          >
             <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
           </div>
         ) : (
           ""
         )}
-        <div className="d-flex">
-          {master.id === state.userInfo.id ? (
-            <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
-              <h3 className="mb-0 text-center brown-color p-2">Mời chơi</h3>
-            </div>
-          ) : (
-            ""
-          )}
-          <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
-            <h3
-              className="mb-0 text-center brown-color p-2"
-              onClick={() => {
-                if (showExitBtn) {
-                  onLeaveRoom();
-                }
-              }}
-            >
-              {showExitBtn ? "Thoát" : "Đang thoát..."}
-            </h3>
+        {master && player && showCancelBtn ? (
+          <div
+            className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+            onClick={() => {
+              onCancelPlay();
+            }}
+          >
+            <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
           </div>
-        </div>
+        ) : (
+          ""
+        )}
+        {noExitOrInvite ? (
+          ""
+        ) : (
+          <div className="d-flex">
+            {master.id === state.userInfo.id ? (
+              <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
+                <h3 className="mb-0 text-center brown-color p-2">Mời chơi</h3>
+              </div>
+            ) : (
+              ""
+            )}
+
+            <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
+              <h3
+                className="mb-0 text-center brown-color p-2"
+                onClick={() => {
+                  if (showExitBtn) {
+                    onLeaveRoom();
+                  }
+                }}
+              >
+                {showExitBtn ? "Thoát" : "Đang thoát..."}
+              </h3>
+            </div>
+          </div>
+        )}
       </div>
       <WatcherList watcher={watcher ? watcher : ""} />
     </div>
