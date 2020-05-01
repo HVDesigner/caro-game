@@ -21,7 +21,13 @@ function Lobby() {
   React.useEffect(() => {
     function setGameTypeState(snapshot) {
       if (snapshot.val()) {
-        setGameType(snapshot.val().value);
+        if (snapshot.key === "game-type-select") {
+          setGameType(snapshot.val().value);
+        }
+
+        if (snapshot.key === "value") {
+          setGameType(snapshot.val());
+        }
         setGameTypeLoading(false);
       }
     }
@@ -30,14 +36,28 @@ function Lobby() {
     firebase
       .database()
       .ref(`users/${state.userInfo.id}/game-type-select`)
-      .on("value", setGameTypeState);
+      .once("value")
+      .then(setGameTypeState);
+  }, [firebase, state.userInfo.id]);
 
-    return () => {
-      return firebase
+  React.useEffect(() => {
+    function setGameTypeState(snapshot) {
+      if (snapshot.val()) {
+        setGameType(snapshot.val());
+        setGameTypeLoading(false);
+      }
+    }
+
+    firebase
+      .database()
+      .ref(`users/${state.userInfo.id}/game-type-select`)
+      .on("child_changed", setGameTypeState);
+
+    return () =>
+      firebase
         .database()
         .ref(`users/${state.userInfo.id}/game-type-select`)
-        .off("value", setGameTypeState);
-    };
+        .off("child_changed", setGameTypeState);
   }, [firebase, state.userInfo.id]);
 
   return (
@@ -151,7 +171,7 @@ function BlockHeadRoomsComponent() {
         .database()
         .ref("rooms/block-head")
         .off("value", getListRoomState);
-  }, [firebase]);
+  });
 
   if (loading)
     return (

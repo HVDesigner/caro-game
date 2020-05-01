@@ -35,7 +35,8 @@ function ReadyComponent({ master, player, watcher }) {
             state.userInfo.id
           }`
         )
-        .on("value", doSnapShot);
+        .once("value")
+        .then(doSnapShot);
     }
 
     return () =>
@@ -66,7 +67,6 @@ function ReadyComponent({ master, player, watcher }) {
     })
       .then((result) => {
         console.log(result);
-        setShowExitBtn(true);
       })
       .catch((error) => {
         console.log(error);

@@ -89,9 +89,7 @@ function GamePlayComponent({
       }
     }
 
-    roomRef.child(`game/player/${turn.uid}`).on("value", onSnapShot);
-
-    return () => roomRef.child(`game/${turn.uid}`).off("value", onSnapShot);
+    roomRef.child(`game/player/${turn.uid}`).once("value").then(onSnapShot);
   }, [firebase, state.room.type, state.room.id, turn.uid]);
 
   React.useEffect(() => {
@@ -138,11 +136,17 @@ function GamePlayComponent({
       }
     }
 
-    roomRef.child(`game/history/${round}`).on("value", onSnapShot);
-
-    return () =>
-      roomRef.child(`game/history/${round}`).off("value", onSnapShot);
-  }, [firebase, state.room.type, state.room.id, round, caroTable, setCounter]);
+    roomRef.child(`game/history/${round}`).once("value").then(onSnapShot);
+  }, [
+    firebase,
+    state.room.type,
+    state.room.id,
+    round,
+    caroTable,
+    setCounter,
+    turn.uid,
+    state.userInfo.id,
+  ]);
 
   const changeTurn = () => {
     const roomRef = firebase
@@ -216,7 +220,7 @@ function GamePlayComponent({
 
           changeTurn();
 
-          // setCaroTable(updatePosition(rowkey, colkey));
+          setCaroTable(updatePosition(rowkey, colkey));
 
           setCounter(time);
 
@@ -236,17 +240,17 @@ function GamePlayComponent({
     }
   };
 
-  // const updatePosition = (rowkey, colkey) => {
-  //   let _caroTableLocal = caroTable;
+  const updatePosition = (rowkey, colkey) => {
+    let _caroTableLocal = caroTable;
 
-  //   let _changeCol = _caroTableLocal[rowkey];
+    let _changeCol = _caroTableLocal[rowkey];
 
-  //   _changeCol.splice(colkey, 1, turnInRound.value);
+    _changeCol.splice(colkey, 1, turnInRound.value);
 
-  //   _caroTableLocal.splice(rowkey, 1, _changeCol);
+    _caroTableLocal.splice(rowkey, 1, _changeCol);
 
-  //   return _caroTableLocal;
-  // };
+    return _caroTableLocal;
+  };
 
   const choicePositionShow = (rowkey, colkey) => {
     let _caroTableLocal = caroTable;

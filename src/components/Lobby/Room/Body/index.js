@@ -4,6 +4,8 @@ import MoreSVG from "./../../../../assets/Rooms/more.svg";
 import MasterComponent from "./../MasterComponent/";
 import PlayerComponent from "./../PlayerComponent/";
 
+import UserSVG from "./../../../../assets/Dashboard/user.svg";
+
 function BodyComponent({
   password,
   masterUser,
@@ -39,7 +41,20 @@ function BodyComponent({
           />
         </div>
       )}
-      <PlayerComponent playerUser={playerUser} />
+      {playerUser ? (
+        <PlayerComponent playerUser={playerUser} />
+      ) : (
+        <div className="d-flex justify-content-end align-items-center">
+          <div className="d-flex flex-column text-white text-right">
+            <span>Trống</span>
+          </div>
+          <img
+            src={UserSVG}
+            alt="user-playing"
+            className="player-inroom-img ml-2"
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -24,7 +24,6 @@ function PasswordInput({ roomId, type }) {
       loginRoom({ roomId, pass, type, userId: state.userInfo.id })
         .then(function (result) {
           if (result.data.value) {
-            setLoginInProcess(false);
           } else {
             setLoginInProcess(false);
             setPassError({ status: true, text: result.data.text });

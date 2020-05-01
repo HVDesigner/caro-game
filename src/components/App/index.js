@@ -2,8 +2,16 @@ import React from "react";
 import "./App.css";
 import LoadingComponent from "./../Loading/";
 
+// Constants
+import {
+  CHANGE_ROUTE,
+  GET_ROOM_ID,
+  SET_USER_INFO,
+} from "./../../context/ActionTypes";
+
 // Contexts
 import AppContext from "./../../context/";
+import { FirebaseContext } from "./../../Firebase/";
 
 const Dashboard = React.lazy(() => import("./../Dashboard/"));
 const Setting = React.lazy(() => import("./../Setting/"));
@@ -15,8 +23,17 @@ const Login = React.lazy(() => import("./../login/"));
 const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
 
 function App() {
-  const { state, getUserInfo } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
+  const firebase = React.useContext(FirebaseContext);
   const [loading, setLoading] = React.useState(true);
+
+  const [userInfo, setUserInfo] = React.useState({
+    playerId: "",
+    playerName: "",
+    playerPic: "",
+    playerLocale: "",
+    platform: "",
+  });
 
   React.useEffect(() => {
     window.FBInstant.initializeAsync().then(function () {
@@ -30,13 +47,13 @@ function App() {
 
           console.log(window.FBInstant);
 
-          getUserInfo(
+          setUserInfo({
             playerId,
             playerName,
             playerPic,
             playerLocale,
-            platform.toLowerCase()
-          );
+            platform: platform.toLowerCase(),
+          });
         })
         .then(() => {
           setLoading(false);
@@ -46,7 +63,145 @@ function App() {
     if (process.env.NODE_ENV === "development") {
       setLoading(false);
     }
-  }, [getUserInfo]);
+  }, []);
+
+  React.useEffect(() => {
+    const userRef = firebase
+      .database()
+      .ref(
+        `users/${
+          process.env.NODE_ENV === "development"
+            ? state.userInfo.id
+            : userInfo.playerId
+        }`
+      );
+
+    function doSnapShot(snapshot) {
+      if (snapshot.exists()) {
+        dispatch({
+          type: GET_ROOM_ID,
+          payload: {
+            id: snapshot.val().room_id.value,
+            type: snapshot.val().room_id.type,
+          },
+        });
+
+        // update image
+        if (snapshot.val().image_url !== userInfo.playerPic) {
+          userRef.update({ image_url: userInfo.playerPic });
+        }
+
+        // check name
+        dispatch({
+          type: SET_USER_INFO,
+          payload: {
+            id:
+              process.env.NODE_ENV === "development"
+                ? snapshot.key
+                : userInfo.playerId,
+            name:
+              snapshot.val().name.status === "original"
+                ? process.env.NODE_ENV === "development"
+                  ? snapshot.val().name.value
+                  : userInfo.playerName
+                : snapshot.val().name.value,
+            image_url:
+              process.env.NODE_ENV === "development"
+                ? snapshot.val().image_url
+                : userInfo.playerPic,
+            locale:
+              process.env.NODE_ENV === "development"
+                ? snapshot.val().locale
+                : userInfo.playerLocale,
+            coin: snapshot.val().coin,
+            elo: snapshot.val().elo,
+            platform:
+              process.env.NODE_ENV === "development"
+                ? snapshot.val().locale
+                : userInfo.platform,
+          },
+        });
+      } else {
+        // add new user
+        userRef
+          .set({
+            coin: 1000,
+            elo: 1000,
+            image_url: userInfo.playerPic,
+            name: { status: "original", value: userInfo.playerName },
+            locale: userInfo.playerLocale,
+            setting: {
+              sound: true,
+              language: {
+                status: "original",
+                value: userInfo.playerLocale === "vi_VN" ? "vn" : "en",
+              },
+              matchingByElo: true,
+            },
+            location: {
+              path: "dashboard",
+            },
+            room_id: { value: 0, type: "none" },
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          })
+          .then(() => {
+            dispatch({
+              type: SET_USER_INFO,
+              payload: {
+                id: userInfo.playerId,
+                name: userInfo.playerName,
+                image_url: userInfo.playerPic,
+                locale: userInfo.playerLocale,
+                platform: userInfo.platform,
+              },
+            });
+          });
+      }
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      if (state.userInfo.id) userRef.on("value", doSnapShot);
+    } else {
+      if (userInfo.playerId) userRef.on("value", doSnapShot);
+    }
+
+    return () => userRef.off("value", doSnapShot);
+  }, [
+    dispatch,
+    firebase,
+    userInfo.platform,
+    userInfo.playerId,
+    userInfo.playerLocale,
+    userInfo.playerName,
+    userInfo.playerPic,
+    state.userInfo.id,
+  ]);
+
+  React.useEffect(() => {
+    const userRef = firebase
+      .database()
+      .ref(
+        `users/${
+          process.env.NODE_ENV === "development"
+            ? state.userInfo.id
+            : userInfo.playerId
+        }/location`
+      );
+
+    function doSnapShot(snapshot) {
+      if (snapshot.val()) {
+        dispatch({
+          type: CHANGE_ROUTE,
+          payload: { path: snapshot.val() },
+        });
+      }
+    }
+
+    userRef.on("child_changed", doSnapShot);
+
+    return () => userRef.off("child_changed", doSnapShot);
+  }, [dispatch, firebase, state.userInfo.id, userInfo.playerId]);
 
   if (loading) {
     return <LoadingComponent />;

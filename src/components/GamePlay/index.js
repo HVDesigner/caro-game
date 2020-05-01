@@ -38,13 +38,15 @@ function GamePlayComponent() {
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
   React.useEffect(() => {
-    function setUserInfoState(snapshot) {
+    function doSnapShot(snapshot) {
       if (snapshot.val()) {
         setTime(snapshot.val().time);
         setCounter(snapshot.val().time);
         setBet(snapshot.val().bet);
         setGameStatus(snapshot.val().game.status.type);
-        setTurn(snapshot.val().game.round.turn);
+        if (snapshot.val().game.round.turn) {
+          setTurn(snapshot.val().game.round.turn);
+        }
         setRound(snapshot.val().game.round.value);
 
         setParticipants(snapshot.val().participants);
@@ -56,17 +58,14 @@ function GamePlayComponent() {
       firebase
         .database()
         .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
-        .on("value", setUserInfoState);
+        .on("value", doSnapShot);
     }
 
-    return () => {
-      if (state.room.type && state.room.id) {
-        return firebase
-          .database()
-          .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
-          .off("value", setUserInfoState);
-      }
-    };
+    return () =>
+      firebase
+        .database()
+        .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
+        .off("value", doSnapShot);
   }, [firebase, state.room.type, state.room.id]);
 
   if (loading) {
@@ -125,7 +124,7 @@ function GamePlayComponent() {
             <div style={{ width: "100vw" }} className="d-flex flex-fill">
               {participants ? (
                 <MasterUser
-                  data={participants.master}
+                  data={participants.master ? participants.master : ""}
                   firebase={firebase}
                   time={time}
                   gameStatus={gameStatus}
@@ -168,7 +167,7 @@ function GamePlayComponent() {
                 )}
               </div>
 
-              {participants ? (
+              {participants && participants.player ? (
                 <PlayerUser
                   data={participants.player}
                   firebase={firebase}
@@ -177,7 +176,22 @@ function GamePlayComponent() {
                   turn={turn}
                 />
               ) : (
-                ""
+                <div className="d-flex flex-column pr-2">
+                  <div
+                    style={{ width: "100%" }}
+                    className="d-flex justify-content-center "
+                  >
+                    <div className="mr-2">
+                      <p className="text-white text-right">Trống</p>
+                    </div>
+                    <img
+                      src={UserSVG}
+                      alt="user"
+                      className="mt-1"
+                      style={{ width: "40px", height: "40px" }}
+                    ></img>
+                  </div>
+                </div>
               )}
             </div>
           </Col>
@@ -242,7 +256,7 @@ function CounterConponent({ time }) {
     }
 
     return () => clearInterval(timer);
-  }, [time, counter]);
+  }, [counter]);
 
   return (
     <div
@@ -272,38 +286,22 @@ function MasterUser({ data, firebase, time, gameStatus, turn }) {
       setElo(elo);
     }
 
-    if (data) {
-      if (state.userInfo.id === data.id) {
-        setUserData(
-          state.userInfo.image_url,
-          state.userInfo.name,
-          state.userInfo.elo
-        );
-      } else {
-        firebase
-          .database()
-          .ref(`users/${data.id}`)
-          .once("value")
-          .then((snapshot) => {
-            setUserData(
-              snapshot.val().image_url,
-              snapshot.val().name.value,
-              snapshot.val().elo
-            );
-          });
-      }
-    } else {
-      setUserData("", "", "");
-    }
-  }, [
-    state.userInfo.id,
-    state.userInfo.image_url,
-    state.userInfo.name,
-    state.userInfo.elo,
-    data.id,
-    firebase,
-    data,
-  ]);
+    firebase
+      .database()
+      .ref(`users/${data.id}`)
+      .once("value")
+      .then((snapshot) => {
+        if (snapshot.val()) {
+          setUserData(
+            snapshot.val().image_url,
+            snapshot.val().name.value,
+            snapshot.val().elo
+          );
+        } else {
+          setUserData("", "", "");
+        }
+      });
+  }, [firebase, data.id]);
 
   return (
     <div className="d-flex flex-column pl-2">
@@ -327,7 +325,6 @@ function MasterUser({ data, firebase, time, gameStatus, turn }) {
       </div>
       {gameStatus === "playing" && turn && turn.uid === data.id ? (
         <div className="d-flex">
-          <CounterConponent time={time} />
           {turn.uid === state.userInfo.id ? (
             <div
               style={{ width: "100%" }}
@@ -345,6 +342,7 @@ function MasterUser({ data, firebase, time, gameStatus, turn }) {
           ) : (
             ""
           )}
+          <CounterConponent time={time} />
         </div>
       ) : (
         ""
@@ -367,46 +365,31 @@ function PlayerUser({ data, firebase, time, gameStatus, turn }) {
       setElo(elo);
     }
 
-    if (data) {
-      if (state.userInfo.id === data.id) {
-        setUserData(
-          state.userInfo.image_url,
-          state.userInfo.name,
-          state.userInfo.elo
-        );
-      } else {
-        firebase
-          .database()
-          .ref(`users/${data.id}`)
-          .once("value")
-          .then((snapshot) => {
-            setUserData(
-              snapshot.val().image_url,
-              snapshot.val().name.value,
-              snapshot.val().elo
-            );
-          });
-      }
-    } else {
-      setUserData("", "", "");
-    }
-  }, [
-    state.userInfo.id,
-    state.userInfo.image_url,
-    state.userInfo.name,
-    state.userInfo.elo,
-    firebase,
-    data,
-  ]);
+    firebase
+      .database()
+      .ref(`users/${data.id}`)
+      .once("value")
+      .then((snapshot) => {
+        if (snapshot.val()) {
+          setUserData(
+            snapshot.val().image_url,
+            snapshot.val().name.value,
+            snapshot.val().elo
+          );
+        } else {
+          setUserData("", "", "");
+        }
+      });
+  }, [firebase, data.id]);
 
   return (
     <div className="d-flex flex-column pr-2">
       <div style={{ width: "100%" }} className="d-flex justify-content-center ">
         <div className="mr-2">
           {name ? (
-            <p className="text-white">{name}</p>
+            <p className="text-white text-right">{name}</p>
           ) : (
-            <p className="text-white">Trống</p>
+            <p className="text-white text-right">Trống</p>
           )}
           {elo ? (
             <small className="text-white">
