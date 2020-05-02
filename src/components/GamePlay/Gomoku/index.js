@@ -13,13 +13,11 @@ import { FirebaseContext } from "./../../../Firebase/";
 import AppContext from "./../../../context/";
 
 function GamePlayComponent({
-  time,
-  counter,
-  setCounter,
   turn,
   master,
   player,
   round,
+  gamePlayer,
 }) {
   const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
@@ -115,20 +113,38 @@ function GamePlayComponent({
 
         for (let index = 0; index < keys.length; index++) {
           const element = keys[index];
+          const historyData = snapshot.val()[element];
 
           updatePositionWithValue(
-            snapshot.val()[element].row,
-            snapshot.val()[element].col,
-            snapshot.val()[element].value
+            historyData.row,
+            historyData.col,
+            historyData.value
           );
 
           const gameNewStatus_ = GamePlay(caroTable, "gomoku").checkAround(
-            snapshot.val()[element].row,
-            snapshot.val()[element].col
+            historyData.row,
+            historyData.col
           );
 
           if (gameNewStatus_.isPlay === false) {
-            setCounter(0);
+            roomRef.child(`game/status`).update({ type: "winner" });
+
+            const keysUser = Object.keys(gamePlayer);
+
+            for (let index = 0; index < keysUser.length; index++) {
+              const element = keysUser[index];
+              const dataUser = gamePlayer[element];
+
+              if (dataUser.value === gameNewStatus_.winner) {
+                roomRef
+                  .child(`game/player/${element}`)
+                  .update({ winner: true });
+              } else {
+                roomRef
+                  .child(`game/player/${element}`)
+                  .update({ winner: false });
+              }
+            }
           }
 
           setStatusGame(gameNewStatus_);
@@ -137,16 +153,7 @@ function GamePlayComponent({
     }
 
     roomRef.child(`game/history/${round}`).once("value").then(onSnapShot);
-  }, [
-    firebase,
-    state.room.type,
-    state.room.id,
-    round,
-    caroTable,
-    setCounter,
-    turn.uid,
-    state.userInfo.id,
-  ]);
+  }, [caroTable, firebase, gamePlayer, round, state.room.id, state.room.type]);
 
   const changeTurn = () => {
     const roomRef = firebase
@@ -222,15 +229,13 @@ function GamePlayComponent({
 
           setCaroTable(updatePosition(rowkey, colkey));
 
-          setCounter(time);
-
           const gameNewStatus_ = GamePlay(caroTable, "gomoku").checkAround(
             rowkey,
             colkey
           );
-          if (gameNewStatus_.isPlay === false) {
-            setCounter(0);
-          }
+          // if (gameNewStatus_.isPlay === false) {
+          //   setCounter(0);
+          // }
 
           setStatusGame(gameNewStatus_);
 

@@ -85,7 +85,7 @@ function ReadyComponent({ master, player, watcher }) {
       roomId: state.room.id,
       uid: state.userInfo.id,
     }).then((result) => {
-      setShowCancelBtn(true);
+      // setShowCancelBtn(true);
       console.log(result);
     });
   };

@@ -191,13 +191,27 @@ function App() {
 
     function doSnapShot(snapshot) {
       if (snapshot.val()) {
-        dispatch({
-          type: CHANGE_ROUTE,
-          payload: { path: snapshot.val() },
-        });
+        switch (snapshot.key) {
+          case "location":
+            dispatch({
+              type: CHANGE_ROUTE,
+              payload: { path: snapshot.val().path },
+            });
+            break;
+          case "path":
+            dispatch({
+              type: CHANGE_ROUTE,
+              payload: { path: snapshot.val() },
+            });
+            break;
+
+          default:
+            break;
+        }
       }
     }
 
+    userRef.once("value", doSnapShot);
     userRef.on("child_changed", doSnapShot);
 
     return () => userRef.off("child_changed", doSnapShot);
@@ -263,7 +277,11 @@ function App() {
       );
 
     default:
-      return <Dashboard />;
+      return (
+        <React.Suspense fallback={<LoadingComponent />}>
+          <Dashboard />
+        </React.Suspense>
+      );
   }
 }
 

@@ -24,18 +24,6 @@ function GlobalState(props) {
       locale: "",
       platform: "",
     },
-    rooms: {
-      gomoku: {
-        total: 0,
-        playing: 0,
-        free: 0,
-      },
-      "block-head": {
-        total: 0,
-        playing: 0,
-        free: 0,
-      },
-    },
     "square-position": {
       status: false,
       row: 0,

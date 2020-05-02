@@ -1,0 +1,15 @@
+.winner-modal {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  z-index: 9999;
+  background-color: #48484891;
+}
+
+.winner-modal-content {
+  background-image: url("./../../../assets/backgroung_carotv_2.svg");
+}
+
+.winner-modal-content .next-btn {
+  background-image: url("./../../../assets/matching_background.svg");
+}

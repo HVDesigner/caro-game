@@ -13,6 +13,66 @@ function MenuComponent({ gameType }) {
   const { state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
 
+  const [count, setCount] = React.useState({
+    countTotalUserInGomoku: 0,
+    countTotalUserInBlockHead: 0,
+    countUserPlayingGomoku: 0,
+    countUserPlayingBlockHead: 0,
+  });
+
+  React.useEffect(() => {
+    function doSnapShot(snapshot) {
+      if (snapshot.val()) {
+        const keys = Object.keys(snapshot.val());
+
+        let countTotalUserInGomoku = 0;
+        let countTotalUserInBlockHead = 0;
+        let countUserPlayingGomoku = 0;
+        let countUserPlayingBlockHead = 0;
+
+        for (let index = 0; index < keys.length; index++) {
+          const element = keys[index];
+          const data = snapshot.val()[element];
+
+          switch (data.location.path) {
+            case "lobby":
+              if (data["game-type-select"].value === "gomoku") {
+                countTotalUserInGomoku = countTotalUserInGomoku + 1;
+              }
+              if (data["game-type-select"].value === "block-head") {
+                countTotalUserInBlockHead = countTotalUserInBlockHead + 1;
+              }
+              break;
+            case "room":
+              if (data.room_id.type === "gomoku") {
+                countTotalUserInGomoku = countTotalUserInGomoku + 1;
+                countUserPlayingGomoku = countUserPlayingGomoku + 1;
+              }
+
+              if (data.room_id.type === "block-head") {
+                countTotalUserInBlockHead = countTotalUserInBlockHead + 1;
+                countUserPlayingBlockHead = countUserPlayingBlockHead + 1;
+              }
+              break;
+            default:
+              break;
+          }
+        }
+
+        setCount({
+          countTotalUserInGomoku,
+          countTotalUserInBlockHead,
+          countUserPlayingGomoku,
+          countUserPlayingBlockHead,
+        });
+      }
+    }
+
+    firebase.database().ref("users").on("value", doSnapShot);
+
+    return () => firebase.database().ref("users").off("value", doSnapShot);
+  }, [firebase]);
+
   const changGameType = (status) => {
     firebase
       .database()
@@ -56,7 +116,7 @@ function MenuComponent({ gameType }) {
           <h5 className="p-1 m-0 text-stroke-carotv">
             Gomoku
             <span className="text-warning ml-1">
-              ({state.rooms.gomoku.total})
+              ({count.countTotalUserInGomoku})
             </span>
           </h5>
         </Nav.Item>
@@ -71,33 +131,34 @@ function MenuComponent({ gameType }) {
           <h5 className="p-1 m-0 text-stroke-carotv">
             Chặn 2 đầu
             <span className="text-warning ml-1">
-              ({state.rooms["block-head"].total})
+              ({count.countTotalUserInBlockHead})
             </span>
           </h5>
         </Nav.Item>
       </Nav>
 
       <Nav fill className="user-status">
-        <Nav.Item className="text-warning" onClick={() => {}}>
+        <Nav.Item className="text-warning">
           <h5 className="p-1 m-0 text-stroke-carotv">
             Đang chơi
             <span className="text-warning ml-1">
               (
               {gameType === "gomoku"
-                ? state.rooms.gomoku.playing
-                : state.rooms["block-head"].playing}
+                ? count.countUserPlayingGomoku
+                : count.countUserPlayingBlockHead}
               )
             </span>
           </h5>
         </Nav.Item>
-        <Nav.Item className="text-warning" onClick={() => {}}>
+        <Nav.Item className="text-warning">
           <h5 className="p-1 m-0 text-stroke-carotv">
             Chưa chơi
             <span className="text-warning ml-1">
               (
               {gameType === "gomoku"
-                ? state.rooms.gomoku.free
-                : state.rooms["block-head"].free}
+                ? count.countTotalUserInGomoku - count.countUserPlayingGomoku
+                : count.countTotalUserInBlockHead -
+                  count.countUserPlayingBlockHead}
               )
             </span>
           </h5>

@@ -23,16 +23,6 @@ function FooterComponent() {
       <Nav className="fixed-bottom footer-lobby" fill>
         <Nav.Item
           className="text-white p-2 text-center wood-btn-back"
-          onClick={() => {}}
-        >
-          <h5 className="m-0 text-stroke-carotv">MỜI CHƠI</h5>
-        </Nav.Item>
-        <Nav.Item
-          className="text-white p-2 text-center wood-btn-back"
-          style={{
-            borderLeft: "2px solid #4e311d",
-            borderRight: "2px solid #4e311d",
-          }}
           onClick={() => {
             changeRoute("create-room");
           }}
@@ -43,6 +33,9 @@ function FooterComponent() {
           className="text-white p-2 text-center wood-btn-back"
           onClick={() => {
             exitLooby();
+          }}
+          style={{
+            borderLeft: "2px solid #4e311d",
           }}
         >
           <h5 className="m-0 text-stroke-carotv">THOÁT</h5>

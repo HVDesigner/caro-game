@@ -1,13 +1,14 @@
 import React from "react";
+import MoreSVG from "./../../../assets/Rooms/more.svg";
 
-function ChatComponent() {
+function ChatComponent({ gameStatus, setShowMenu }) {
   return (
-    <React.Fragment>
-      <div
-        className="flex-fill overflow-auto h-100 bg-white pl-2 pr-2 rounded brown-border"
-        style={{ minHeight: "48px" }}
-      >
-        <div style={{ height: "100%" }}>
+    <div className="d-flex flex-column h-100 position-absolute w-100">
+      <div className="d-flex h-100">
+        <div
+          className="overflow-auto bg-white pl-2 pr-2 rounded brown-border flex-fill"
+          style={{ minHeight: "48px" }}
+        >
           <div className="d-flex flex-column">
             <p>
               <strong className="mr-2 ">Hoang:</strong>123a33
@@ -18,17 +19,37 @@ function ChatComponent() {
             <p>
               <strong className="mr-2 ">Linh:</strong>123a33
             </p>
+            <p>
+              <strong className="mr-2 ">Linh:</strong>123a33
+            </p>
+            <p>
+              <strong className="mr-2 ">Linh:</strong>123a33
+            </p>
+            <p>
+              <strong className="mr-2 ">Linh:</strong>123a33
+            </p>
+            <p>
+              <strong className="mr-2 ">Linh:</strong>123a33
+            </p>
           </div>
         </div>
+        {gameStatus === "playing" ? (
+          <div>
+            <img
+              src={MoreSVG}
+              alt="more"
+              style={{ width: "1.5em" }}
+              className="shadow wood-btn ml-2"
+              onClick={() => {
+                setShowMenu(true);
+              }}
+            />
+          </div>
+        ) : (
+          ""
+        )}
       </div>
-      <div className="p-1 rounded">
-        <input
-          className="input-carotv-2 text-white text-left w-100"
-          placeholder="Nhập tin nhắn..."
-          type="text"
-        />
-      </div>
-    </React.Fragment>
+    </div>
   );
 }
 

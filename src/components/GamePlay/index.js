@@ -4,7 +4,6 @@ import "./GamePlay.css";
 
 // SVGs
 import UserSVG from "./../../assets/Dashboard/user.svg";
-import MoreSVG from "./../../assets/Rooms/more.svg";
 
 // Components
 import Loading from "./../Loading/";
@@ -12,6 +11,7 @@ import Gomoku from "./Gomoku/";
 import Original from "./Original/";
 import Chat from "./Chat/";
 import ReadyComponent from "./ReadyComponent/";
+import WinnerModal from "./WinnerModal/";
 
 // Contexts
 import AppContext from "./../../context/";
@@ -27,29 +27,32 @@ function GamePlayComponent() {
   // menu modal
   const [showMenu, setShowMenu] = React.useState(false);
 
-  const [time, setTime] = React.useState(10);
-  const [counter, setCounter] = React.useState(time);
-  const [participants, setParticipants] = React.useState([]);
-  const [bet, setBet] = React.useState(0);
-  const [gameStatus, setGameStatus] = React.useState("waiting");
-  const [turn, setTurn] = React.useState({ uid: "" });
-  const [round, setRound] = React.useState(0);
+  const [gameInfo, setGameInfo] = React.useState({
+    time: 0,
+    bet: 0,
+    gameStatus: "",
+    turn: { uid: "" },
+    player: {},
+    round: 1,
+    participants: {},
+  });
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
   React.useEffect(() => {
     function doSnapShot(snapshot) {
       if (snapshot.val()) {
-        setTime(snapshot.val().time);
-        setCounter(snapshot.val().time);
-        setBet(snapshot.val().bet);
-        setGameStatus(snapshot.val().game.status.type);
-        if (snapshot.val().game.round.turn) {
-          setTurn(snapshot.val().game.round.turn);
-        }
-        setRound(snapshot.val().game.round.value);
+        console.log(snapshot.val());
 
-        setParticipants(snapshot.val().participants);
+        setGameInfo({
+          time: snapshot.val().time,
+          bet: snapshot.val().bet,
+          gameStatus: snapshot.val().game.status.type,
+          turn: snapshot.val().game.round.turn,
+          player: snapshot.val().game.player,
+          round: snapshot.val().game.round.value,
+          participants: snapshot.val().participants,
+        });
       }
       setLoading(false);
     }
@@ -72,6 +75,8 @@ function GamePlayComponent() {
     return <Loading />;
   }
 
+  console.log(gameInfo);
+
   return (
     <React.Fragment>
       {showMenu ? (
@@ -91,6 +96,13 @@ function GamePlayComponent() {
             </span>
           </div>
         </div>
+      ) : (
+        ""
+      )}
+      {gameInfo.gameStatus === "winner" &&
+      (gameInfo.participants.master.id === state.userInfo.id ||
+        gameInfo.participants.player.id === state.userInfo.id) ? (
+        <WinnerModal gamePlayer={gameInfo.player} />
       ) : (
         ""
       )}
@@ -119,16 +131,21 @@ function GamePlayComponent() {
         ) : (
           ""
         )}
+
         <Row>
           <Col className="p-0">
             <div style={{ width: "100vw" }} className="d-flex flex-fill">
-              {participants ? (
+              {gameInfo.participants ? (
                 <MasterUser
-                  data={participants.master ? participants.master : ""}
+                  data={
+                    gameInfo.participants.master
+                      ? gameInfo.participants.master
+                      : ""
+                  }
                   firebase={firebase}
-                  time={time}
-                  gameStatus={gameStatus}
-                  turn={turn}
+                  time={gameInfo.time}
+                  gameStatus={gameInfo.gameStatus}
+                  turn={gameInfo.turn}
                 />
               ) : (
                 ""
@@ -149,31 +166,17 @@ function GamePlayComponent() {
 
                 <small className="text-white">
                   <span className="text-warning mr-1">Cược:</span>
-                  {bet}
+                  {gameInfo.bet}
                 </small>
-
-                {gameStatus === "playing" ? (
-                  <img
-                    src={MoreSVG}
-                    alt="more"
-                    style={{ width: "1.5em" }}
-                    className="shadow wood-btn"
-                    onClick={() => {
-                      setShowMenu(true);
-                    }}
-                  />
-                ) : (
-                  ""
-                )}
               </div>
 
-              {participants && participants.player ? (
+              {gameInfo.participants && gameInfo.participants.player ? (
                 <PlayerUser
-                  data={participants.player}
+                  data={gameInfo.participants.player}
                   firebase={firebase}
-                  time={time}
-                  gameStatus={gameStatus}
-                  turn={turn}
+                  time={gameInfo.time}
+                  gameStatus={gameInfo.gameStatus}
+                  turn={gameInfo.turn}
                 />
               ) : (
                 <div className="d-flex flex-column pr-2">
@@ -197,7 +200,8 @@ function GamePlayComponent() {
           </Col>
         </Row>
 
-        {gameStatus === "playing" ? (
+        {gameInfo.gameStatus === "playing" ||
+        gameInfo.gameStatus === "winner" ? (
           <div
             onMouseOut={() => {
               if (state.userInfo.platform === "web") {
@@ -206,33 +210,40 @@ function GamePlayComponent() {
             }}
           >
             {state.room.type === "block-head" ? (
-              <Original
-                time={time}
-                counter={counter}
-                setCounter={setCounter}
-                turn={turn}
-              />
+              <Original time={gameInfo.time} turn={gameInfo.turn} />
             ) : (
               <Gomoku
-                time={time}
-                counter={counter}
-                setCounter={setCounter}
-                turn={turn}
-                master={participants.master}
-                player={participants.player}
-                round={round}
+                gamePlayer={gameInfo.player}
+                time={gameInfo.time}
+                turn={gameInfo.turn}
+                master={gameInfo.participants.master}
+                player={gameInfo.participants.player}
+                round={gameInfo.round}
               />
             )}
           </div>
         ) : (
           <ReadyComponent
-            master={participants.master}
-            player={participants.player}
-            watcher={participants.watcher}
+            master={gameInfo.participants.master}
+            player={gameInfo.participants.player}
+            watcher={gameInfo.participants.watcher}
           />
         )}
 
-        <Chat />
+        <div className="flex-fill position-relative">
+          <Chat gameStatus={gameInfo.gameStatus} setShowMenu={setShowMenu} />
+        </div>
+        <Row>
+          <Col>
+            <div className="p-1 rounded">
+              <input
+                className="input-carotv-2 text-white text-left w-100"
+                placeholder="Nhập tin nhắn..."
+                type="text"
+              />
+            </div>
+          </Col>
+        </Row>
       </Container>
     </React.Fragment>
   );
@@ -407,7 +418,7 @@ function PlayerUser({ data, firebase, time, gameStatus, turn }) {
           style={{ width: "40px", height: "40px" }}
         ></img>
       </div>
-      {gameStatus === "playing" && turn && turn.uid === data.id ? (
+      {gameStatus === "playing" && turn.uid === data.id ? (
         <div className="d-flex">
           <CounterConponent time={time} />
           {turn.uid === state.userInfo.id ? (
