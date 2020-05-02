@@ -8,7 +8,7 @@ import WatcherList from "./WatcherList/";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
-function ReadyComponent({ master, player, watcher }) {
+function ReadyComponent({ master, player, watcher, gameData }) {
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
@@ -19,6 +19,9 @@ function ReadyComponent({ master, player, watcher }) {
   const [noExitOrInvite, setNoExitOrInvite] = React.useState(false);
 
   React.useEffect(() => {
+    setShowReadyBtn(true);
+    setShowCancelBtn(false);
+
     function doSnapShot(snapshot) {
       if (snapshot.exists()) {
         setShowReadyBtn(false);
@@ -77,16 +80,19 @@ function ReadyComponent({ master, player, watcher }) {
   const onReadyPlay = () => {
     const readyAction = firebase.functions().httpsCallable("readyAction");
 
-    setShowReadyBtn(false);
-    setNoExitOrInvite(true);
+    if (gameData.status.ready === 0) {
+      setNoExitOrInvite(true);
+      setShowReadyBtn(false);
+    }
 
     readyAction({
       roomType: state.room.type,
       roomId: state.room.id,
       uid: state.userInfo.id,
     }).then((result) => {
-      // setShowCancelBtn(true);
-      console.log(result);
+      if (gameData.status.ready === 0) {
+        setShowCancelBtn(true);
+      }
     });
   };
 

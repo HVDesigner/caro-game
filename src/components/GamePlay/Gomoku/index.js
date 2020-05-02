@@ -12,13 +12,7 @@ import Square from "./../../Square/";
 import { FirebaseContext } from "./../../../Firebase/";
 import AppContext from "./../../../context/";
 
-function GamePlayComponent({
-  turn,
-  master,
-  player,
-  round,
-  gamePlayer,
-}) {
+function GamePlayComponent({ master, player, gameData }) {
   const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
 
@@ -83,12 +77,18 @@ function GamePlayComponent({
 
     function onSnapShot(snapshot) {
       if (snapshot.val()) {
-        setTurnInRound({ uid: turn.uid, value: snapshot.val().value });
+        setTurnInRound({
+          uid: gameData.round.turn.uid,
+          value: snapshot.val().value,
+        });
       }
     }
 
-    roomRef.child(`game/player/${turn.uid}`).once("value").then(onSnapShot);
-  }, [firebase, state.room.type, state.room.id, turn.uid]);
+    roomRef
+      .child(`game/player/${gameData.round.turn.uid}`)
+      .once("value")
+      .then(onSnapShot);
+  }, [firebase, state.room.id, state.room.type, gameData.round.turn.uid]);
 
   React.useEffect(() => {
     const updatePositionWithValue = (rowkey, colkey, value) => {
@@ -129,11 +129,11 @@ function GamePlayComponent({
           if (gameNewStatus_.isPlay === false) {
             roomRef.child(`game/status`).update({ type: "winner" });
 
-            const keysUser = Object.keys(gamePlayer);
+            const keysUser = Object.keys(gameData.player);
 
             for (let index = 0; index < keysUser.length; index++) {
               const element = keysUser[index];
-              const dataUser = gamePlayer[element];
+              const dataUser = gameData.player[element];
 
               if (dataUser.value === gameNewStatus_.winner) {
                 roomRef
@@ -152,8 +152,8 @@ function GamePlayComponent({
       }
     }
 
-    roomRef.child(`game/history/${round}`).once("value").then(onSnapShot);
-  }, [caroTable, firebase, gamePlayer, round, state.room.id, state.room.type]);
+    roomRef.child(`game/history`).once("value").then(onSnapShot);
+  }, [caroTable, firebase, gameData.player, state.room.id, state.room.type]);
 
   const changeTurn = () => {
     const roomRef = firebase
@@ -170,7 +170,7 @@ function GamePlayComponent({
           for (let index = 0; index < keys.length; index++) {
             const element = keys[index];
 
-            if (element !== turn.uid) {
+            if (element !== gameData.round.turn.uid) {
               roomRef.child("game/round/turn").update({ uid: element });
             }
           }
@@ -210,13 +210,11 @@ function GamePlayComponent({
           choicePosition.rowkey === rowkey &&
           choicePosition.colkey === colkey &&
           choicePosition.clickCount === 1 &&
-          turn.uid === state.userInfo.id
+          gameData.round.turn.uid === state.userInfo.id
         ) {
           firebase
             .database()
-            .ref(
-              `/rooms/${state.room.type}/${state.room.id}/game/history/${round}`
-            )
+            .ref(`/rooms/${state.room.type}/${state.room.id}/game/history`)
             .push()
             .set({
               row: rowkey,
