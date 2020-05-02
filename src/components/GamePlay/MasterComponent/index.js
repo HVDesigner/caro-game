@@ -57,10 +57,9 @@ function MasterComponent({ data, firebase, time, gameData }) {
           </small>
         </div>
       </div>
-      {gameData.status.type === "playing" &&
-      gameData.round.turn.uid === data.id ? (
+      {gameData.status.type === "playing" && gameData.turn.uid === data.id ? (
         <div className="d-flex">
-          {gameData.round.turn.uid === state.userInfo.id ? (
+          {gameData.turn.uid === state.userInfo.id ? (
             <div
               style={{ width: "100%" }}
               className="d-flex justify-content-center align-items-center p-1"

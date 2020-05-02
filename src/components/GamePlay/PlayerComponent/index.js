@@ -60,11 +60,10 @@ function PlayerComponent({ data, firebase, time, gameData }) {
           style={{ width: "40px", height: "40px" }}
         ></img>
       </div>
-      {gameData.status.type === "playing" &&
-      gameData.round.turn.uid === data.id ? (
+      {gameData.status.type === "playing" && gameData.turn.uid === data.id ? (
         <div className="d-flex">
           <CounterConponent time={time} />
-          {gameData.round.turn.uid === state.userInfo.id ? (
+          {gameData.turn.uid === state.userInfo.id ? (
             <div
               style={{ width: "100%" }}
               className="d-flex justify-content-center align-items-center p-1"

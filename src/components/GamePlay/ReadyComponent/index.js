@@ -14,44 +14,13 @@ function ReadyComponent({ master, player, watcher, gameData }) {
 
   const [showExitBtn, setShowExitBtn] = React.useState(true);
 
-  const [showReadyBtn, setShowReadyBtn] = React.useState(true);
-  const [showCancelBtn, setShowCancelBtn] = React.useState(false);
-  const [noExitOrInvite, setNoExitOrInvite] = React.useState(false);
+  const [loadingReady, setLoadingReady] = React.useState(false);
 
   React.useEffect(() => {
-    setShowReadyBtn(true);
-    setShowCancelBtn(false);
-
-    function doSnapShot(snapshot) {
-      if (snapshot.exists()) {
-        setShowReadyBtn(false);
-        setShowCancelBtn(true);
-        setNoExitOrInvite(true);
-      }
+    if (gameData.player && gameData.player[state.userInfo.id]) {
+      setLoadingReady(false);
     }
-
-    if (state.room.type && state.room.id) {
-      firebase
-        .database()
-        .ref(
-          `/rooms/${state.room.type}/${state.room.id.toString()}/game/player/${
-            state.userInfo.id
-          }`
-        )
-        .once("value")
-        .then(doSnapShot);
-    }
-
-    return () =>
-      firebase
-        .database()
-        .ref(
-          `/rooms/${state.room.type}/${state.room.id.toString()}/game/player/${
-            state.userInfo.id
-          }`
-        )
-        .off("value", doSnapShot);
-  }, [firebase, state.room.id, state.room.type, state.userInfo.id]);
+  }, [state.userInfo.id, gameData.player]);
 
   const onLeaveRoom = () => {
     setShowExitBtn(false);
@@ -68,9 +37,7 @@ function ReadyComponent({ master, player, watcher, gameData }) {
           ? "player"
           : "watcher",
     })
-      .then((result) => {
-        console.log(result);
-      })
+      .then()
       .catch((error) => {
         console.log(error);
         setShowExitBtn(true);
@@ -80,35 +47,30 @@ function ReadyComponent({ master, player, watcher, gameData }) {
   const onReadyPlay = () => {
     const readyAction = firebase.functions().httpsCallable("readyAction");
 
-    if (gameData.status.ready === 0) {
-      setNoExitOrInvite(true);
-      setShowReadyBtn(false);
-    }
-
     readyAction({
       roomType: state.room.type,
       roomId: state.room.id,
       uid: state.userInfo.id,
-    }).then((result) => {
-      if (gameData.status.ready === 0) {
-        setShowCancelBtn(true);
-      }
-    });
+    })
+      .then()
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const onCancelPlay = () => {
     const cancelAction = firebase.functions().httpsCallable("cancelAction");
 
-    setShowCancelBtn(false);
-    setNoExitOrInvite(false);
-
     cancelAction({
       roomType: state.room.type,
       roomId: state.room.id,
-    }).then((result) => {
-      setShowReadyBtn(true);
-      console.log(result);
-    });
+    })
+      .then(() => {
+        setLoadingReady(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -116,32 +78,38 @@ function ReadyComponent({ master, player, watcher, gameData }) {
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
         {master &&
         player &&
-        showReadyBtn &&
         (master.id === state.userInfo.id || player.id === state.userInfo.id) ? (
-          <div
-            className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
-            onClick={() => {
-              onReadyPlay();
-            }}
-          >
-            <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
-          </div>
+          <React.Fragment>
+            {loadingReady ? (
+              <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
+                <h3 className="mb-0 text-center brown-color">LOADING...</h3>
+              </div>
+            ) : gameData.player && gameData.player[state.userInfo.id] ? (
+              <div
+                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                onClick={() => {
+                  setLoadingReady(true);
+                  onCancelPlay();
+                }}
+              >
+                <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
+              </div>
+            ) : (
+              <div
+                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                onClick={() => {
+                  setLoadingReady(true);
+                  onReadyPlay();
+                }}
+              >
+                <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
+              </div>
+            )}
+          </React.Fragment>
         ) : (
           ""
         )}
-        {master && player && showCancelBtn ? (
-          <div
-            className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
-            onClick={() => {
-              onCancelPlay();
-            }}
-          >
-            <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
-          </div>
-        ) : (
-          ""
-        )}
-        {noExitOrInvite ? (
+        {gameData.player && gameData.player[state.userInfo.id] ? (
           ""
         ) : (
           <div className="d-flex">

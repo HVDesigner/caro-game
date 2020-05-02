@@ -78,17 +78,17 @@ function GamePlayComponent({ master, player, gameData }) {
     function onSnapShot(snapshot) {
       if (snapshot.val()) {
         setTurnInRound({
-          uid: gameData.round.turn.uid,
+          uid: gameData.turn.uid,
           value: snapshot.val().value,
         });
       }
     }
 
     roomRef
-      .child(`game/player/${gameData.round.turn.uid}`)
+      .child(`game/player/${gameData.turn.uid}`)
       .once("value")
       .then(onSnapShot);
-  }, [firebase, state.room.id, state.room.type, gameData.round.turn.uid]);
+  }, [firebase, state.room.id, state.room.type, gameData.turn.uid]);
 
   React.useEffect(() => {
     const updatePositionWithValue = (rowkey, colkey, value) => {
@@ -170,8 +170,8 @@ function GamePlayComponent({ master, player, gameData }) {
           for (let index = 0; index < keys.length; index++) {
             const element = keys[index];
 
-            if (element !== gameData.round.turn.uid) {
-              roomRef.child("game/round/turn").update({ uid: element });
+            if (element !== gameData.turn.uid) {
+              roomRef.child("game/turn").update({ uid: element });
             }
           }
         }
@@ -183,7 +183,10 @@ function GamePlayComponent({ master, player, gameData }) {
       statusGame.isPlay &&
       (master.id === state.userInfo.id || player.id === state.userInfo.id)
     ) {
-      if (caroTable[rowkey][colkey] === 0 || caroTable[rowkey][colkey] === 3) {
+      if (
+        (caroTable[rowkey][colkey] === 0 || caroTable[rowkey][colkey] === 3) &&
+        gameData.turn.uid === state.userInfo.id
+      ) {
         if (
           choicePosition.rowkey === "" &&
           choicePosition.colkey === "" &&
@@ -209,8 +212,7 @@ function GamePlayComponent({ master, player, gameData }) {
         if (
           choicePosition.rowkey === rowkey &&
           choicePosition.colkey === colkey &&
-          choicePosition.clickCount === 1 &&
-          gameData.round.turn.uid === state.userInfo.id
+          choicePosition.clickCount === 1
         ) {
           firebase
             .database()
@@ -231,9 +233,6 @@ function GamePlayComponent({ master, player, gameData }) {
             rowkey,
             colkey
           );
-          // if (gameNewStatus_.isPlay === false) {
-          //   setCounter(0);
-          // }
 
           setStatusGame(gameNewStatus_);
 
