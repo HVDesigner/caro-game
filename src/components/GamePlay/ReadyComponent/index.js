@@ -8,7 +8,7 @@ import WatcherList from "./WatcherList/";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
-function ReadyComponent({ master, player, watcher, gameData }) {
+function ReadyComponent({ master, player, watcher, gameData, ownType }) {
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
@@ -30,12 +30,7 @@ function ReadyComponent({ master, player, watcher, gameData }) {
       roomId: state.room.id,
       type: state.room.type,
       userId: state.userInfo.id,
-      userType:
-        master.id === state.userInfo.id
-          ? "master"
-          : player.id === state.userInfo.id
-          ? "player"
-          : "watcher",
+      userType: ownType,
     })
       .then()
       .catch((error) => {
@@ -76,9 +71,7 @@ function ReadyComponent({ master, player, watcher, gameData }) {
   return (
     <div>
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
-        {master &&
-        player &&
-        (master.id === state.userInfo.id || player.id === state.userInfo.id) ? (
+        {master && player && (ownType === "master" || ownType === "player") ? (
           <React.Fragment>
             {loadingReady ? (
               <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
@@ -113,7 +106,7 @@ function ReadyComponent({ master, player, watcher, gameData }) {
           ""
         ) : (
           <div className="d-flex">
-            {master.id === state.userInfo.id ? (
+            {ownType === "master" ? (
               <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
                 <h3 className="mb-0 text-center brown-color p-2">Mời chơi</h3>
               </div>

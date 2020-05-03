@@ -79,7 +79,16 @@ function MasterComponent({ data, firebase, time, gameData }) {
           <CounterConponent time={time} />
         </div>
       ) : (
-        ""
+        <div
+          style={{ width: "100%" }}
+          className="d-flex justify-content-center align-items-center p-1"
+        >
+          <Badge pill variant="success" className="shadow">
+            <p className="text-white roboto-font" style={{ fontSize: "12px" }}>
+              Chủ phòng
+            </p>
+          </Badge>
+        </div>
       )}
     </div>
   );

@@ -33,10 +33,26 @@ function GamePlayComponent() {
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
+  const [ownType, setOwnType] = React.useState("");
+
   React.useEffect(() => {
+    function getUserType(participants) {
+      if (participants.master.id === state.userInfo.id) {
+        return "master";
+      } else if (
+        participants.player &&
+        participants.player.id === state.userInfo.id
+      ) {
+        return "player";
+      } else {
+        return "watcher";
+      }
+    }
+
     function doSnapShot(snapshot) {
       if (snapshot.val()) {
         setRoomInfo(snapshot.val());
+        setOwnType(getUserType(snapshot.val().participants));
       }
       setLoading(false);
     }
@@ -53,7 +69,7 @@ function GamePlayComponent() {
         .database()
         .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
         .off("value", doSnapShot);
-  }, [firebase, state.room.type, state.room.id]);
+  }, [firebase, state.room.type, state.room.id, state.userInfo.id]);
 
   if (loading) {
     return <Loading />;
@@ -189,11 +205,7 @@ function GamePlayComponent() {
             {state.room.type === "block-head" ? (
               <Original time={roomInfo.time} gameData={game} />
             ) : (
-              <Gomoku
-                master={roomInfo.participants.master}
-                player={roomInfo.participants.player}
-                gameData={game}
-              />
+              <Gomoku gameData={game} roomInfo={roomInfo} ownType={ownType} />
             )}
           </div>
         ) : (
@@ -202,6 +214,7 @@ function GamePlayComponent() {
             player={roomInfo.participants.player}
             watcher={roomInfo.participants.watcher}
             gameData={game}
+            ownType={ownType}
           />
         )}
 
