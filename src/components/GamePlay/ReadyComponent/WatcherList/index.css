@@ -3,6 +3,7 @@
 }
 
 .watcher-list-box {
+  background-image: url("./../../../../assets/matching_background.svg");
   max-height: 40vh;
   min-height: 20vh;
 }

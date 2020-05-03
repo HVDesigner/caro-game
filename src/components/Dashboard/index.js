@@ -63,7 +63,7 @@ function Dashboard() {
                 style={{ backgroundPosition: "right center" }}
               >
                 <h5 className="m-auto">
-                  <span className="text-warning">Elo:</span> 1000
+                  <span className="text-warning">Elo:</span> {state.user.elo}
                 </h5>
               </li>
             </ul>
@@ -106,9 +106,9 @@ function Dashboard() {
                 alt="rooms"
                 className="wood-btn"
                 onClick={() => {
-                  if (state.userInfo.id) {
+                  if (state.user.uid) {
                     userRef
-                      .child(`${state.userInfo.id}/game-type-select`)
+                      .child(`${state.user.uid}/game-type-select`)
                       .update({ value: "gomoku" })
                       .then(() => {
                         changeRoute("lobby");
@@ -155,16 +155,10 @@ function Dashboard() {
               </div>
               <div className="svg_btn">
                 <img
-                  src={
-                    state.userInfo.image_url
-                      ? state.userInfo.image_url
-                      : UserSVG
-                  }
+                  src={state.user.image_url ? state.user.image_url : UserSVG}
                   alt="user"
                   className={
-                    state.userInfo.image_url
-                      ? "rounded-circle border"
-                      : "wood-btn"
+                    state.user.image_url ? "rounded-circle border" : "wood-btn"
                   }
                   onClick={() => {
                     changeRoute("profile");

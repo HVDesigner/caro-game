@@ -15,14 +15,22 @@ function GlobalState(props) {
       id: 0,
       type: "",
     },
-    userInfo: {
+    user: {
       coin: 0,
+      createdAt: 0,
       elo: 0,
-      id: "",
-      name: "",
       image_url: "",
       locale: "",
-      platform: "",
+      location: { path: "dashboard" },
+      name: { value: "", status: "original" },
+      room_id: { value: 0, type: "none" },
+      setting: {
+        sound: true,
+        matchingByElo: true,
+        language: { status: "", value: "" },
+      },
+      uid: "",
+      updatedAt: 0,
     },
     "square-position": {
       status: false,
@@ -32,14 +40,22 @@ function GlobalState(props) {
   });
 
   const changeRoute = (path, id = 0, type = "") => {
-    if (state.userInfo.id && state.route.path !== path) {
-      const userByIdRef = firebase.database().ref(`users/${state.userInfo.id}`);
+    if (state.user.uid && state.user.location.path !== path) {
+      const userDoc = firebase
+        .firestore()
+        .collection("users")
+        .doc(state.user.uid);
 
       if (path === "room") {
-        userByIdRef.child("location").update({ path });
-        userByIdRef.child("room_id").update({ value: id, type });
+        userDoc.update({
+          "location.path": path,
+          "room_id.value": id,
+          "room_id.type": type,
+        });
       } else {
-        userByIdRef.child("location").update({ path });
+        userDoc.update({
+          "location.path": path,
+        });
       }
     }
   };

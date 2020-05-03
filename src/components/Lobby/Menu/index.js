@@ -94,7 +94,7 @@ function MenuComponent({ gameType }) {
           <Nav.Item className="text-white elo-lobby d-flex align-items-center p-2">
             <h5 className="ml-2 mr-2 mb-0 d-flex align-items-center text-stroke-carotv">
               <span className="text-warning mr-1">Elo:</span>
-              1000
+              {state.userInfo.elo}
             </h5>
           </Nav.Item>
           <Nav.Item className="text-white d-flex align-items-center p-2">

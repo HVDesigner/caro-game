@@ -9,6 +9,7 @@ import GamePlay from "./../../../Core/game";
 import Square from "./../../Square/";
 import Alphabet from "./Alphabet/";
 import Numeric from "./Numeric/";
+import ReadyComponent from "./../ReadyComponent/";
 
 // Contexts
 import { FirebaseContext } from "./../../../Firebase/";
@@ -17,6 +18,26 @@ import AppContext from "./../../../context/";
 function GamePlayComponent({ gameData, roomInfo, ownType }) {
   const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
+
+  const [initTable] = React.useState([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ]);
 
   const [caroTable, setCaroTable] = React.useState([
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -49,6 +70,27 @@ function GamePlayComponent({ gameData, roomInfo, ownType }) {
     clickCount: 0,
   });
 
+  const onUpdateWinner = React.useCallback(() => {
+    const winAction = firebase.functions().httpsCallable("winAction");
+
+    winAction({
+      roomType: state.room.type,
+      roomId: state.room.id,
+      userType: ownType,
+      prevWinNumber: roomInfo.participants[ownType].win
+        ? roomInfo.participants[ownType].win
+        : 0,
+      winnerId: state.userInfo.id,
+    });
+  }, [
+    firebase,
+    state.room.id,
+    state.room.type,
+    ownType,
+    roomInfo.participants,
+    state.userInfo.id,
+  ]);
+
   React.useEffect(() => {
     const updatePositionWithValue = (rowkey, colkey, value) => {
       let _caroTableLocal = caroTable;
@@ -66,53 +108,65 @@ function GamePlayComponent({ gameData, roomInfo, ownType }) {
       .database()
       .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`);
 
-    if (gameData.history) {
-      const keys = Object.keys(gameData.history);
+    function onSnapShot(snapshot) {
+      if (snapshot.exists()) {
+        const keys = Object.keys(snapshot.val());
 
-      for (let index = 0; index < keys.length; index++) {
-        const element = keys[index];
-        const historyData = gameData.history[element];
+        for (let index = 0; index < keys.length; index++) {
+          const element = keys[index];
+          const historyData = snapshot.val()[element];
 
-        updatePositionWithValue(
-          historyData.row,
-          historyData.col,
-          historyData.value
-        );
+          updatePositionWithValue(
+            historyData.row,
+            historyData.col,
+            historyData.value
+          );
 
-        const newStatusOfGame = GamePlay(
-          caroTable,
-          "gomoku",
-          roomInfo.rule
-        ).checkAround(historyData.row, historyData.col);
+          const newStatusOfGame = GamePlay(
+            caroTable,
+            "gomoku",
+            roomInfo.rule
+          ).checkAround(historyData.row, historyData.col);
 
-        if (newStatusOfGame.isPlay === false) {
-          roomRef.child(`game/status`).update({ type: "winner" });
+          setStatusGame(newStatusOfGame);
 
-          const keysUser = Object.keys(gameData.player);
+          if (newStatusOfGame.isPlay === false) {
+            roomRef.child(`game/status`).update({ type: "winner" });
 
-          for (let index = 0; index < keysUser.length; index++) {
-            const element = keysUser[index];
-            const dataUser = gameData.player[element];
+            const keysUser = Object.keys(gameData.player);
 
-            if (dataUser.value === newStatusOfGame.winner) {
-              roomRef.child(`game/player/${element}`).update({ winner: true });
-            } else {
-              roomRef.child(`game/player/${element}`).update({ winner: false });
+            for (let index = 0; index < keysUser.length; index++) {
+              const element = keysUser[index];
+              const dataUser = gameData.player[element];
+
+              if (dataUser.value === newStatusOfGame.winner) {
+                roomRef
+                  .child(`game/player/${element}`)
+                  .update({ winner: true });
+              } else {
+                roomRef
+                  .child(`game/player/${element}`)
+                  .update({ winner: false });
+              }
             }
           }
         }
-
-        setStatusGame(newStatusOfGame);
       }
     }
+
+    roomRef.child(`game/history`).on("value", onSnapShot);
+    return () => roomRef.child(`game/history`).off("value", onSnapShot);
   }, [
     caroTable,
     firebase,
     gameData.history,
     gameData.player,
+    ownType,
     roomInfo.rule,
     state.room.id,
     state.room.type,
+    state.userInfo.id,
+    initTable,
   ]);
 
   const changeTurn = () => {
@@ -177,6 +231,12 @@ function GamePlayComponent({ gameData, roomInfo, ownType }) {
 
           if (gameNewStatus_.isPlay) {
             changeTurn();
+          } else {
+            if (
+              gameData.player[state.userInfo.id].value === gameNewStatus_.winner
+            ) {
+              onUpdateWinner();
+            }
           }
 
           firebase
@@ -231,31 +291,48 @@ function GamePlayComponent({ gameData, roomInfo, ownType }) {
   };
 
   return (
-    <Row>
-      <Col className="p-0" xs="10">
-        <div className="game-play-body">
-          <div style={{ width: "100vw" }}>
-            {caroTable.map((row, rowkey) => {
-              return (
-                <span key={rowkey} className="row_">
-                  <Alphabet rowkey={rowkey} />
-                  {row.map((colValue, colkey) => (
-                    <Square
-                      key={colkey}
-                      rowkey={rowkey}
-                      colkey={colkey}
-                      onClickSquare={onClickSquare}
-                      value={colValue}
-                    />
-                  ))}
-                </span>
-              );
-            })}
-            <Numeric />
+    <div>
+      {gameData.status.type === "waiting" ? (
+        <ReadyComponent
+          master={roomInfo.participants.master}
+          player={roomInfo.participants.player}
+          watcher={roomInfo.participants.watcher}
+          gameData={gameData}
+          ownType={ownType}
+          initTable={initTable}
+          setCaroTable={setCaroTable}
+          setStatusGame={setStatusGame}
+        />
+      ) : (
+        ""
+      )}
+
+      <Row>
+        <Col className="p-0" xs="10">
+          <div className="game-play-body">
+            <div style={{ width: "100vw" }}>
+              {caroTable.map((row, rowkey) => {
+                return (
+                  <span key={rowkey} className="row_">
+                    <Alphabet rowkey={rowkey} />
+                    {row.map((colValue, colkey) => (
+                      <Square
+                        key={colkey}
+                        rowkey={rowkey}
+                        colkey={colkey}
+                        onClickSquare={onClickSquare}
+                        value={colValue}
+                      />
+                    ))}
+                  </span>
+                );
+              })}
+              <Numeric />
+            </div>
           </div>
-        </div>
-      </Col>
-    </Row>
+        </Col>
+      </Row>
+    </div>
   );
 }
 export default GamePlayComponent;

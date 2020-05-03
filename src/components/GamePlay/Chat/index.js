@@ -33,21 +33,17 @@ function ChatComponent({ gameStatus, setShowMenu }) {
             </p>
           </div>
         </div>
-        {gameStatus === "playing" ? (
-          <div>
-            <img
-              src={MoreSVG}
-              alt="more"
-              style={{ width: "1.5em" }}
-              className="shadow wood-btn ml-2"
-              onClick={() => {
-                setShowMenu(true);
-              }}
-            />
-          </div>
-        ) : (
-          ""
-        )}
+        <div>
+          <img
+            src={MoreSVG}
+            alt="more"
+            style={{ width: "1.5em" }}
+            className="shadow wood-btn ml-2"
+            onClick={() => {
+              setShowMenu(true);
+            }}
+          />
+        </div>
       </div>
     </div>
   );

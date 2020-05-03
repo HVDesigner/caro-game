@@ -10,7 +10,7 @@ import Loading from "./../Loading/";
 import Gomoku from "./Gomoku/";
 import Original from "./Original/";
 import Chat from "./Chat/";
-import ReadyComponent from "./ReadyComponent/";
+// import ReadyComponent from "./ReadyComponent/";
 import WinnerModal from "./WinnerModal/";
 import MasterUser from "./MasterComponent/";
 import PlayerUser from "./PlayerComponent/";
@@ -141,6 +141,7 @@ function GamePlayComponent() {
                   firebase={firebase}
                   time={roomInfo.time}
                   gameData={game}
+                  roomInfo={roomInfo}
                 />
               ) : (
                 ""
@@ -171,6 +172,7 @@ function GamePlayComponent() {
                   firebase={firebase}
                   time={roomInfo.time}
                   gameData={game}
+                  roomInfo={roomInfo}
                 />
               ) : (
                 <div className="d-flex flex-column pr-2">
@@ -194,29 +196,28 @@ function GamePlayComponent() {
           </Col>
         </Row>
 
-        {game.status.type === "playing" || game.status.type === "winner" ? (
-          <div
-            onMouseOut={() => {
-              if (state.userInfo.platform === "web") {
-                getPositonSquare(false, 0, 0);
-              }
-            }}
-          >
-            {state.room.type === "block-head" ? (
-              <Original time={roomInfo.time} gameData={game} />
-            ) : (
-              <Gomoku gameData={game} roomInfo={roomInfo} ownType={ownType} />
-            )}
-          </div>
-        ) : (
-          <ReadyComponent
+        <div
+          onMouseOut={() => {
+            if (state.userInfo.platform === "web") {
+              getPositonSquare(false, 0, 0);
+            }
+          }}
+          className="position-relative"
+        >
+          {state.room.type === "block-head" ? (
+            <Original time={roomInfo.time} gameData={game} />
+          ) : (
+            <Gomoku gameData={game} roomInfo={roomInfo} ownType={ownType} />
+          )}
+        </div>
+
+        {/* <ReadyComponent
             master={roomInfo.participants.master}
             player={roomInfo.participants.player}
             watcher={roomInfo.participants.watcher}
             gameData={game}
             ownType={ownType}
-          />
-        )}
+          /> */}
 
         <div className="flex-fill position-relative">
           <Chat gameData={game} setShowMenu={setShowMenu} />

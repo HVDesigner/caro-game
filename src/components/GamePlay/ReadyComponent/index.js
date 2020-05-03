@@ -8,11 +8,21 @@ import WatcherList from "./WatcherList/";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
-function ReadyComponent({ master, player, watcher, gameData, ownType }) {
+function ReadyComponent({
+  master,
+  player,
+  watcher,
+  gameData,
+  ownType,
+  initTable,
+  setCaroTable,
+  setStatusGame,
+}) {
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
-  const [showExitBtn, setShowExitBtn] = React.useState(true);
+  const [showLoadingExitBtn, setShowLoadingExitBtn] = React.useState(true);
+  const [showExBtn, setShowExBtn] = React.useState(true);
 
   const [loadingReady, setLoadingReady] = React.useState(false);
 
@@ -22,8 +32,8 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
     }
   }, [state.userInfo.id, gameData.player]);
 
-  const onLeaveRoom = () => {
-    setShowExitBtn(false);
+  const onLeaveRoom = React.useCallback(() => {
+    setShowLoadingExitBtn(false);
     const leaveRoom = firebase.functions().httpsCallable("leaveRoom");
 
     leaveRoom({
@@ -35,12 +45,18 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
       .then()
       .catch((error) => {
         console.log(error);
-        setShowExitBtn(true);
+        setShowLoadingExitBtn(true);
       });
-  };
+  }, [firebase, ownType, state.room.id, state.room.type, state.userInfo.id]);
 
-  const onReadyPlay = () => {
+  const onReadyPlay = React.useCallback(() => {
     const readyAction = firebase.functions().httpsCallable("readyAction");
+
+    setCaroTable(initTable);
+    setStatusGame({
+      isPlay: true,
+      winner: "",
+    });
 
     readyAction({
       roomType: state.room.type,
@@ -51,7 +67,15 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
       .catch((error) => {
         console.log(error);
       });
-  };
+  }, [
+    firebase,
+    initTable,
+    setCaroTable,
+    setStatusGame,
+    state.room.id,
+    state.room.type,
+    state.userInfo.id,
+  ]);
 
   const onCancelPlay = () => {
     const cancelAction = firebase.functions().httpsCallable("cancelAction");
@@ -69,7 +93,7 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
   };
 
   return (
-    <div>
+    <div className="position-absolute w-100 h-100 p-2" style={{ zIndex: "1" }}>
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
         {master && player && (ownType === "master" || ownType === "player") ? (
           <React.Fragment>
@@ -82,6 +106,7 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
                   setLoadingReady(true);
+                  setShowExBtn(true);
                   onCancelPlay();
                 }}
               >
@@ -92,6 +117,7 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
                   setLoadingReady(true);
+                  setShowExBtn(false);
                   onReadyPlay();
                 }}
               >
@@ -104,7 +130,7 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
         )}
         {gameData.player && gameData.player[state.userInfo.id] ? (
           ""
-        ) : (
+        ) : showExBtn ? (
           <div className="d-flex">
             {ownType === "master" ? (
               <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
@@ -118,15 +144,17 @@ function ReadyComponent({ master, player, watcher, gameData, ownType }) {
               <h3
                 className="mb-0 text-center brown-color p-2"
                 onClick={() => {
-                  if (showExitBtn) {
+                  if (showLoadingExitBtn) {
                     onLeaveRoom();
                   }
                 }}
               >
-                {showExitBtn ? "Thoát" : "Đang thoát..."}
+                {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
               </h3>
             </div>
           </div>
+        ) : (
+          ""
         )}
       </div>
       <WatcherList watcher={watcher ? watcher : ""} />

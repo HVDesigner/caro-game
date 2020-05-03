@@ -9,6 +9,15 @@ function WinnerModal({ gameData }) {
 
   const [win, setWin] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
+  const [loadingNextBtn, setLoadingNextBtn] = React.useState(false);
+
+  const [countSecondNext, setCountSecondNext] = React.useState(10);
+
+  const onNextAction = React.useCallback(() => {
+    const nextAction = firebase.functions().httpsCallable("nextAction");
+
+    nextAction({ roomType: state.room.type, roomId: state.room.id });
+  }, [firebase, state.room.type, state.room.id]);
 
   React.useEffect(() => {
     if (gameData.player[state.userInfo.id].winner) {
@@ -17,13 +26,26 @@ function WinnerModal({ gameData }) {
       setWin(false);
     }
     setLoading(false);
-  }, [gameData.player, state.userInfo.id]);
+  }, [gameData.player, state.userInfo.id, countSecondNext]);
 
-  const onNextAction = () => {
-    const nextAction = firebase.functions().httpsCallable("nextAction");
+  React.useEffect(() => {
+    let countdown = setInterval(() => {}, 1000);
 
-    nextAction({ roomType: state.room.type, roomId: state.room.id });
-  };
+    countdown = setInterval(
+      () => setCountSecondNext(countSecondNext - 1),
+      1000
+    );
+
+    if (countSecondNext === 0) {
+      clearInterval(countdown);
+      onNextAction();
+      setLoadingNextBtn(true);
+    }
+
+    return () => {
+      clearInterval(countdown);
+    };
+  }, [countSecondNext, onNextAction]);
 
   return (
     <div className="winner-modal d-flex justify-content-center align-items-center">
@@ -49,15 +71,15 @@ function WinnerModal({ gameData }) {
                 <h1 className="text-secondary text-stroke-carotv">BẠN THUA</h1>
               </React.Fragment>
             )}
+
             <div className="brown-border shadow rounded next-btn wood-btn">
-              <h5
-                className="text-center mt-2 mb-2 text-white"
-                onClick={() => {
-                  onNextAction();
-                }}
-              >
-                Tiếp tục
-              </h5>
+              {loadingNextBtn ? (
+                <h5 className="text-center mt-2 mb-2 text-white">Loading...</h5>
+              ) : (
+                <h5 className="text-center mt-2 mb-2 text-white">
+                  {countSecondNext}
+                </h5>
+              )}
             </div>
           </React.Fragment>
         )}

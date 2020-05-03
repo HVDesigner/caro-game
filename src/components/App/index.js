@@ -4,9 +4,9 @@ import LoadingComponent from "./../Loading/";
 
 // Constants
 import {
-  CHANGE_ROUTE,
+  CHANGE_LOCATION_PATH,
   GET_ROOM_ID,
-  SET_USER_INFO,
+  SET_USER_DATA,
 } from "./../../context/ActionTypes";
 
 // Contexts
@@ -45,7 +45,7 @@ function App() {
           const playerLocale = window.FBInstant.getLocale();
           const platform = window.FBInstant.getPlatform();
 
-          console.log(window.FBInstant);
+          // console.log(window.FBInstant);
 
           setUserInfo({
             playerId,
@@ -66,69 +66,25 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    const userRef = firebase
-      .database()
-      .ref(
-        `users/${
-          process.env.NODE_ENV === "development"
-            ? state.userInfo.id
-            : userInfo.playerId
-        }`
-      );
+    if (process.env.NODE_ENV === "production") {
+      const userCollection = firebase.firestore().collection("users");
 
-    function doSnapShot(snapshot) {
-      if (snapshot.exists()) {
-        dispatch({
-          type: GET_ROOM_ID,
-          payload: {
-            id: snapshot.val().room_id.value,
-            type: snapshot.val().room_id.type,
-          },
-        });
-
-        // update image
-        if (snapshot.val().image_url !== userInfo.playerPic) {
-          userRef.update({ image_url: userInfo.playerPic });
-        }
-
-        // check name
-        dispatch({
-          type: SET_USER_INFO,
-          payload: {
-            id:
-              process.env.NODE_ENV === "development"
-                ? snapshot.key
-                : userInfo.playerId,
-            name:
-              snapshot.val().name.status === "original"
-                ? process.env.NODE_ENV === "development"
-                  ? snapshot.val().name.value
-                  : userInfo.playerName
-                : snapshot.val().name.value,
-            image_url:
-              process.env.NODE_ENV === "development"
-                ? snapshot.val().image_url
-                : userInfo.playerPic,
-            locale:
-              process.env.NODE_ENV === "development"
-                ? snapshot.val().locale
-                : userInfo.playerLocale,
-            coin: snapshot.val().coin,
-            elo: snapshot.val().elo,
-            platform:
-              process.env.NODE_ENV === "development"
-                ? snapshot.val().locale
-                : userInfo.platform,
-          },
-        });
-      } else {
-        // add new user
-        userRef
-          .set({
+      function doSnapShot(doc) {
+        if (doc.exists) {
+          console.log("Document data:", doc.id);
+          dispatch({
+            type: SET_USER_DATA,
+            payload: { uid: doc.id, ...doc.data() },
+          });
+        } else {
+          const newUserdata = {
             coin: 1000,
             elo: 1000,
             image_url: userInfo.playerPic,
-            name: { status: "original", value: userInfo.playerName },
+            name: {
+              status: "original",
+              value: userInfo.playerName,
+            },
             locale: userInfo.playerLocale,
             setting: {
               sound: true,
@@ -142,97 +98,152 @@ function App() {
               path: "dashboard",
             },
             room_id: { value: 0, type: "none" },
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          })
-          .then(() => {
-            dispatch({
-              type: SET_USER_INFO,
-              payload: {
-                id: userInfo.playerId,
-                name: userInfo.playerName,
-                image_url: userInfo.playerPic,
-                locale: userInfo.playerLocale,
-                platform: userInfo.platform,
-              },
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          };
+
+          userCollection
+            .doc(userInfo.playerId)
+            .set(newUserdata)
+            .then(function () {
+              dispatch({
+                type: SET_USER_DATA,
+                payload: { ...newUserdata, uid: userInfo.playerId },
+              });
+            })
+            .catch(function (error) {
+              console.error("Error writing document: ", error);
             });
+        }
+      }
+
+      if (userInfo.playerId) {
+        userCollection
+          .doc(userInfo.playerId)
+          .get()
+          .then(doSnapShot)
+          .catch(function (error) {
+            console.log("Error getting document:", error);
           });
       }
     }
+    // const userRef = firebase
+    //   .database()
+    //   .ref(
+    //     `users/${
+    //       process.env.NODE_ENV === "development"
+    //         ? state.userInfo.id
+    //         : userInfo.playerId
+    //     }`
+    //   );
+    // if (state.userInfo.id) {
 
-    if (process.env.NODE_ENV === "development") {
-      if (state.userInfo.id) userRef.on("value", doSnapShot);
-    } else {
-      if (userInfo.playerId) userRef.on("value", doSnapShot);
-    }
+    // }
 
-    return () => userRef.off("value", doSnapShot);
+    // function doSnapShot(snapshot) {
+    //   if (snapshot.exists()) {
+    //     dispatch({
+    //       type: GET_ROOM_ID,
+    //       payload: {
+    //         id: snapshot.val().room_id.value,
+    //         type: snapshot.val().room_id.type,
+    //       },
+    //     });
+    //     // update image
+    //     if (snapshot.val().image_url !== userInfo.playerPic) {
+    //       userRef.update({ image_url: userInfo.playerPic });
+    //     }
+    //     // check name
+    //     dispatch({
+    //       type: SET_USER_INFO,
+    //       payload: {
+    //         id:
+    //           process.env.NODE_ENV === "development"
+    //             ? snapshot.key
+    //             : userInfo.playerId,
+    //         name:
+    //           snapshot.val().name.status === "original"
+    //             ? process.env.NODE_ENV === "development"
+    //               ? snapshot.val().name.value
+    //               : userInfo.playerName
+    //             : snapshot.val().name.value,
+    //         image_url:
+    //           process.env.NODE_ENV === "development"
+    //             ? snapshot.val().image_url
+    //             : userInfo.playerPic,
+    //         locale:
+    //           process.env.NODE_ENV === "development"
+    //             ? snapshot.val().locale
+    //             : userInfo.playerLocale,
+    //         coin: snapshot.val().coin,
+    //         elo: snapshot.val().elo,
+    //         platform:
+    //           process.env.NODE_ENV === "development"
+    //             ? snapshot.val().locale
+    //             : userInfo.platform,
+    //       },
+    //     });
+    //   } else {
+    //     // add new user
+    //     userRef
+    //       .set({
+
+    //       })
+    //       .then(() => {
+
+    //       });
+    //   }
+    // }
+    // if (process.env.NODE_ENV === "development") {
+    //   if (state.userInfo.id) userRef.on("value", doSnapShot);
+    // } else {
+    //   if (userInfo.playerId) userRef.on("value", doSnapShot);
+    // }
+    // return () => userRef.off("value", doSnapShot);
   }, [
-    dispatch,
     firebase,
-    userInfo.platform,
     userInfo.playerId,
     userInfo.playerLocale,
     userInfo.playerName,
     userInfo.playerPic,
-    state.userInfo.id,
+    dispatch,
   ]);
 
   React.useEffect(() => {
-    const userRef = firebase
-      .database()
-      .ref(
-        `users/${
-          process.env.NODE_ENV === "development"
-            ? state.userInfo.id
-            : userInfo.playerId
-        }/location`
-      );
+    let unsubscribe;
 
-    function doSnapShot(snapshot) {
-      if (snapshot.val()) {
-        switch (snapshot.key) {
-          case "location":
-            dispatch({
-              type: CHANGE_ROUTE,
-              payload: { path: snapshot.val().path },
-            });
-            break;
-          case "path":
-            dispatch({
-              type: CHANGE_ROUTE,
-              payload: { path: snapshot.val() },
-            });
-            break;
-
-          default:
-            break;
-        }
-      }
+    if (state.user.uid) {
+      unsubscribe = firebase
+        .firestore()
+        .collection("users")
+        .doc(state.user.uid)
+        .onSnapshot(function (querySnapshot) {
+          dispatch({
+            type: CHANGE_LOCATION_PATH,
+            payload: { path: querySnapshot.data().location.path },
+          });
+        });
     }
 
-    userRef.once("value", doSnapShot);
-    userRef.on("child_changed", doSnapShot);
-
-    return () => userRef.off("child_changed", doSnapShot);
-  }, [dispatch, firebase, state.userInfo.id, userInfo.playerId]);
+    return () => {
+      if (state.user.uid) {
+        return unsubscribe();
+      }
+    };
+  }, [dispatch, firebase, state.user.uid]);
 
   if (loading) {
     return <LoadingComponent />;
   }
 
-  if (
-    !state.userInfo.name &&
-    !state.userInfo.id &&
-    process.env.NODE_ENV === "development"
-  )
+  if (!state.user.uid && process.env.NODE_ENV === "development")
     return (
       <React.Suspense fallback={<LoadingComponent />}>
         <Login />
       </React.Suspense>
     );
 
-  switch (state.route.path) {
+  switch (state.user.location.path) {
     case "dashboard":
       return (
         <React.Suspense fallback={<LoadingComponent />}>

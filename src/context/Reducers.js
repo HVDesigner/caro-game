@@ -1,6 +1,6 @@
 import {
-  CHANGE_ROUTE,
-  SET_USER_INFO,
+  CHANGE_LOCATION_PATH,
+  SET_USER_DATA,
   GET_ROOMS_GOMOKU,
   GET_ROOMS_BLOCK_HEAD,
   GET_ROOM_ID,
@@ -22,10 +22,10 @@ export function reducer(state, action) {
         rooms: { ...state.rooms, gomoku: action.payload },
       };
 
-    case CHANGE_ROUTE:
-      return { ...state, route: action.payload };
-    case SET_USER_INFO:
-      return { ...state, userInfo: action.payload };
+    case CHANGE_LOCATION_PATH:
+      return { ...state, user: { ...state.user, location: action.payload } };
+    case SET_USER_DATA:
+      return { ...state, user: action.payload };
     case GET_ROOMS_GOMOKU:
       return { ...state, rooms: { ...state.rooms, gomoku: action.payload } };
     case GET_ROOMS_BLOCK_HEAD:

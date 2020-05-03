@@ -14,8 +14,8 @@ function WatcherList({ watcher }) {
 
   return (
     <div>
-      <p className="text-warning mb-1">Danh sách người xem:</p>
-      <Container className="brown-border rounded pt-2 mb-2 watcher-list-box overflow-auto">
+      <p className="mb-1">Danh sách người xem:</p>
+      <Container className="brown-border rounded pt-2 mb-2 watcher-list-box overflow-auto shadow">
         <Row>
           {listWatcher.map((value, key) => (
             <Col key={key} className="mb-2">

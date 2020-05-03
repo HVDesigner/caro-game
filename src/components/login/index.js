@@ -5,7 +5,7 @@ import { FirebaseContext } from "./../../Firebase/";
 import {
   CHANGE_ROUTE,
   GET_ROOM_ID,
-  SET_USER_INFO,
+  SET_USER_DATA,
 } from "./../../context/ActionTypes";
 
 function Login() {
@@ -19,113 +19,24 @@ function Login() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    function doSnapShot(snapshot) {
-      if (snapshot.exists()) {
-        const keys = Object.keys(snapshot.val());
+    firebase
+      .firestore()
+      .collection("users")
+      .get()
+      .then(function (querySnapshot) {
         const arr = [];
-
-        for (let index = 0; index < keys.length; index++) {
-          const element = keys[index];
-
-          arr.push({ ...snapshot.val()[element], id: element });
-        }
-
+        querySnapshot.forEach(function (doc) {
+          arr.push({ uid: doc.id, ...doc.data() });
+        });
         setUserList(arr);
         setLoading(false);
-      }
-    }
-
-    firebase.database().ref("users").once("value").then(doSnapShot);
+      });
   }, [firebase]);
 
-  const getUserInfo = (id, name, image_url, locale, platform) => {
-    const userRef = firebase.database().ref("users/" + id);
-
-    userRef.once("value").then((snapshot) => {
-      if (snapshot.val()) {
-        dispatch({
-          type: CHANGE_ROUTE,
-          payload: { path: snapshot.val().location.path },
-        });
-
-        dispatch({
-          type: GET_ROOM_ID,
-          payload: {
-            id: snapshot.val().room_id.value,
-            type: snapshot.val().room_id.type,
-          },
-        });
-
-        // update image
-        if (snapshot.val().image_url !== image_url) {
-          userRef.update({ image_url });
-        }
-
-        // check name
-        if (snapshot.val().name.status === "original") {
-          dispatch({
-            type: SET_USER_INFO,
-            payload: {
-              id,
-              name,
-              image_url,
-              locale,
-              coin: snapshot.val().coin,
-              elo: snapshot.val().elo,
-              platform,
-            },
-          });
-        } else {
-          dispatch({
-            type: SET_USER_INFO,
-            payload: {
-              id,
-              name: snapshot.val().name,
-              image_url,
-              locale,
-              coin: snapshot.val().coin,
-              elo: snapshot.val().elo,
-              platform,
-            },
-          });
-        }
-      } else {
-        // add new user
-        userRef
-          .set({
-            coin: 1000,
-            elo: 1000,
-            image_url,
-            name: { status: "original", value: name },
-            locale,
-            setting: {
-              sound: true,
-              language: {
-                status: "original",
-                value: locale === "vi_VN" ? "vn" : "en",
-              },
-              matchingByElo: true,
-            },
-            location: {
-              path: "dashboard",
-            },
-            room_id: { value: 0, type: "none" },
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          })
-          .then(() => {
-            dispatch({
-              type: SET_USER_INFO,
-              payload: {
-                id,
-                name,
-                image_url,
-                locale,
-                platform,
-              },
-            });
-          });
-      }
+  const getUserInfo = (value) => {
+    dispatch({
+      type: SET_USER_DATA,
+      payload: value,
     });
   };
 
@@ -145,21 +56,23 @@ function Login() {
       ) : (
         <Row>
           <Col>
-            {userList.map((value, key) => (
-              <Card key={key} className="mb-1">
-                <Card.Body
-                  className="d-flex"
-                  onClick={() => {
-                    getUserInfo(value.id, value.name.value, "", "vi_VN", "web");
-                  }}
-                >
-                  <p className="mb-0 mr-auto">
-                    <strong>{value.name.value}</strong>
-                  </p>
-                  <p className="mb-0">{value.id}</p>
-                </Card.Body>
-              </Card>
-            ))}
+            {userList.map((value) => {
+              return (
+                <Card key={value.uid} className="mb-1">
+                  <Card.Body
+                    className="d-flex"
+                    onClick={() => {
+                      getUserInfo(value);
+                    }}
+                  >
+                    <p className="mb-0 mr-auto">
+                      <strong>{value.name.value}</strong>
+                    </p>
+                    <p className="mb-0">{value.uid}</p>
+                  </Card.Body>
+                </Card>
+              );
+            })}
           </Col>
         </Row>
       )}
