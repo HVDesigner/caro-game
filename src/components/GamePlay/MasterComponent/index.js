@@ -105,7 +105,7 @@ function MasterComponent({ roomData, firebase }) {
           ) : (
             ""
           )}
-          <CounterConponent time={thisUser.time} />
+          <CounterConponent time={roomData.time} />
         </div>
       ) : (
         <div

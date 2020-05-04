@@ -8,16 +8,7 @@ import WatcherList from "./WatcherList/";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
-function ReadyComponent({
-  master,
-  player,
-  watcher,
-  gameData,
-  ownType,
-  initTable,
-  setCaroTable,
-  setStatusGame,
-}) {
+function ReadyComponent({ roomData, ownType, setStatusGame }) {
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
@@ -27,19 +18,24 @@ function ReadyComponent({
   const [loadingReady, setLoadingReady] = React.useState(false);
 
   React.useEffect(() => {
-    if (gameData.player && gameData.player[state.userInfo.id]) {
+    if (roomData.game.player && roomData.game.player[state.user.uid]) {
       setLoadingReady(false);
     }
-  }, [state.userInfo.id, gameData.player]);
+  }, [roomData.game.player, state.user.uid]);
 
-  const onLeaveRoom = React.useCallback(() => {
+  const onLeaveRoom = () => {
     setShowLoadingExitBtn(false);
     const leaveRoom = firebase.functions().httpsCallable("leaveRoom");
 
+    console.log({
+      roomId: state.user.room_id.value,
+      userId: state.user.uid,
+      userType: ownType,
+    });
+
     leaveRoom({
-      roomId: state.room.id,
-      type: state.room.type,
-      userId: state.userInfo.id,
+      roomId: state.user.room_id.value,
+      userId: state.user.uid,
       userType: ownType,
     })
       .then()
@@ -47,43 +43,41 @@ function ReadyComponent({
         console.log(error);
         setShowLoadingExitBtn(true);
       });
-  }, [firebase, ownType, state.room.id, state.room.type, state.userInfo.id]);
+  };
 
-  const onReadyPlay = React.useCallback(() => {
+  const onReadyPlay = () => {
     const readyAction = firebase.functions().httpsCallable("readyAction");
 
-    setCaroTable(initTable);
-    setStatusGame({
-      isPlay: true,
-      winner: "",
-    });
-
     readyAction({
-      roomType: state.room.type,
-      roomId: state.room.id,
-      uid: state.userInfo.id,
+      roomId: state.user.room_id.value,
+      uid: state.user.uid,
     })
-      .then()
+      .then((result) => {
+        console.log(result);
+        if (result.data.ready === 2) {
+          setStatusGame({
+            isPlay: true,
+            winner: "",
+          });
+        }
+      })
       .catch((error) => {
         console.log(error);
       });
-  }, [
-    firebase,
-    initTable,
-    setCaroTable,
-    setStatusGame,
-    state.room.id,
-    state.room.type,
-    state.userInfo.id,
-  ]);
+  };
 
   const onCancelPlay = () => {
-    const cancelAction = firebase.functions().httpsCallable("cancelAction");
+    let roomUpdate = {};
+    roomUpdate[`game.status.ready`] = roomData.game.status.ready - 1;
+    roomUpdate[
+      `game.player.${state.user.uid}`
+    ] = firebase.firestore.FieldValue.delete();
 
-    cancelAction({
-      roomType: state.room.type,
-      roomId: state.room.id,
-    })
+    firebase
+      .firestore()
+      .collection("rooms")
+      .doc(state.user.room_id.value)
+      .update(roomUpdate)
       .then(() => {
         setLoadingReady(false);
       })
@@ -95,13 +89,15 @@ function ReadyComponent({
   return (
     <div className="position-absolute w-100 h-100 p-2" style={{ zIndex: "1" }}>
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
-        {master && player && (ownType === "master" || ownType === "player") ? (
+        {roomData.participants.master &&
+        roomData.participants.player &&
+        (ownType === "master" || ownType === "player") ? (
           <React.Fragment>
             {loadingReady ? (
               <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
                 <h3 className="mb-0 text-center brown-color">LOADING...</h3>
               </div>
-            ) : gameData.player && gameData.player[state.userInfo.id] ? (
+            ) : roomData.game.player && roomData.game.player[state.user.uid] ? (
               <div
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
@@ -128,7 +124,7 @@ function ReadyComponent({
         ) : (
           ""
         )}
-        {gameData.player && gameData.player[state.userInfo.id] ? (
+        {roomData.game.player && roomData.game.player[state.user.uid] ? (
           ""
         ) : showExBtn ? (
           <div className="d-flex">
@@ -157,7 +153,7 @@ function ReadyComponent({
           ""
         )}
       </div>
-      <WatcherList watcher={watcher ? watcher : ""} />
+      <WatcherList roomData={roomData} />
     </div>
   );
 }

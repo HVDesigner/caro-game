@@ -38,7 +38,12 @@ function PlayerComponent({ roomData, firebase }) {
               coin: doc.data().coin,
             });
           } else {
-            // doc.data() will be undefined in this case
+            setThisUser({
+              imageUrl: "",
+              name: "",
+              elo: "",
+              coin: "",
+            });
             console.log("No such document!");
           }
         });
@@ -83,7 +88,7 @@ function PlayerComponent({ roomData, firebase }) {
       {roomData.participants.player.status === "playing" &&
       roomData.game.turn.uid === roomData.participants.player.id ? (
         <div className="d-flex">
-          <CounterConponent time={thisUser.time} />
+          <CounterConponent time={roomData.time} />
           {roomData.game.turn.uid === state.user.uid ? (
             <div
               style={{ width: "100%" }}

@@ -105,6 +105,8 @@ function CreateRoom() {
           text: password ? bcrypt.hashSync(password, 10) : "",
         },
         game: {
+          player: {},
+          history: [],
           status: { ready: 0 },
           turn: { uid: state.user.uid },
         },
@@ -116,6 +118,7 @@ function CreateRoom() {
           master: {
             id: state.user.uid,
             status: "waiting",
+            win: 0,
           },
         },
         "game-play": gamePlay ? "gomoku" : "block-head",
@@ -124,7 +127,14 @@ function CreateRoom() {
       };
 
       getRndInteger().then((num) => {
-        firebase.firestore().collection(`rooms`).doc(num).set(createRoom);
+        firebase
+          .firestore()
+          .collection(`rooms`)
+          .doc(num)
+          .set(createRoom)
+          .then(() => {
+            changeRoute("room", num, gamePlay ? "gomoku" : "block-head");
+          });
       });
     } else {
       setShowErrorBet({ ...showErrorBet, status: true });

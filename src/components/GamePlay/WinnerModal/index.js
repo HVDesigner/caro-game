@@ -3,7 +3,7 @@ import "./index.css";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
-function WinnerModal({ gameData }) {
+function WinnerModal({ roomData, ownType }) {
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
@@ -11,41 +11,36 @@ function WinnerModal({ gameData }) {
   const [loading, setLoading] = React.useState(true);
   const [loadingNextBtn, setLoadingNextBtn] = React.useState(false);
 
-  const [countSecondNext, setCountSecondNext] = React.useState(10);
+  const onNextAction = () => {
+    setLoadingNextBtn(true);
+    // const nextAction = firebase.functions().httpsCallable("nextAction");
+    let roomUpdate = {};
+    roomUpdate[
+      `game.player.${state.user.uid}`
+    ] = firebase.firestore.FieldValue.delete();
+    roomUpdate[`game.status.ready`] = roomData.game.status.ready - 1;
+    if (win) {
+      roomUpdate[`game.turn.uid`] = state.user.uid;
+    }
+    roomUpdate[`participants.${ownType}.status`] = "waiting";
 
-  const onNextAction = React.useCallback(() => {
-    const nextAction = firebase.functions().httpsCallable("nextAction");
+    firebase
+      .firestore()
+      .collection("rooms")
+      .doc(state.user.room_id.value)
+      .update(roomUpdate);
 
-    nextAction({ roomType: state.room.type, roomId: state.room.id });
-  }, [firebase, state.room.type, state.room.id]);
+    // nextAction({ roomType: state.room.type, roomId: state.room.id });
+  };
 
   React.useEffect(() => {
-    if (gameData.player[state.userInfo.id].winner) {
+    if (roomData.participants[ownType].status === "winner") {
       setWin(true);
     } else {
       setWin(false);
     }
     setLoading(false);
-  }, [gameData.player, state.userInfo.id, countSecondNext]);
-
-  React.useEffect(() => {
-    let countdown = setInterval(() => {}, 1000);
-
-    countdown = setInterval(
-      () => setCountSecondNext(countSecondNext - 1),
-      1000
-    );
-
-    if (countSecondNext === 0) {
-      clearInterval(countdown);
-      onNextAction();
-      setLoadingNextBtn(true);
-    }
-
-    return () => {
-      clearInterval(countdown);
-    };
-  }, [countSecondNext, onNextAction]);
+  }, [roomData.participants, ownType, state.user.uid]);
 
   return (
     <div className="winner-modal d-flex justify-content-center align-items-center">
@@ -76,8 +71,13 @@ function WinnerModal({ gameData }) {
               {loadingNextBtn ? (
                 <h5 className="text-center mt-2 mb-2 text-white">Loading...</h5>
               ) : (
-                <h5 className="text-center mt-2 mb-2 text-white">
-                  {countSecondNext}
+                <h5
+                  className="text-center mt-2 mb-2 text-white"
+                  onClick={() => {
+                    onNextAction();
+                  }}
+                >
+                  Tiếp tục
                 </h5>
               )}
             </div>

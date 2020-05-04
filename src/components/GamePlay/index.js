@@ -61,27 +61,45 @@ function GamePlayComponent() {
           setRoomData({ rid: doc.id, ...doc.data() });
           setOwnType(getUserType(doc.data().participants));
           setOwnStatus(
-            doc.data().participants[getUserType(doc.data().participants)].status
+            doc.data().participants[getUserType(doc.data().participants)]
+              ? doc.data().participants[getUserType(doc.data().participants)]
+                  .status
+              : ""
           );
           setLoading(false);
         } else {
           console.log("No such document!");
         }
       });
+
+    const unsubscribe = firebase
+      .firestore()
+      .collection("rooms")
+      .doc(state.user.room_id.value)
+      .onSnapshot(function (doc) {
+        setRoomData({ rid: doc.id, ...doc.data() });
+        setOwnType(getUserType(doc.data().participants));
+        setOwnStatus(
+          doc.data().participants[getUserType(doc.data().participants)]
+            ? doc.data().participants[getUserType(doc.data().participants)]
+                .status
+            : ""
+        );
+      });
+
+    return () => unsubscribe();
   }, [firebase, state.user.room_id.value, state.user.uid]);
 
   if (loading) {
     return <Loading />;
   }
 
-  const game = roomData.game;
-
   return (
     <React.Fragment>
       <MenuModal showMenu={showMenu} setShowMenu={setShowMenu} />
       {(ownStatus === "winner" || ownStatus === "loser") &&
       (ownType === "master" || ownType === "player") ? (
-        <WinnerModal gameData={game} />
+        <WinnerModal roomData={roomData} ownType={ownType} />
       ) : (
         ""
       )}

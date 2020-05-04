@@ -131,6 +131,7 @@ function App() {
   }, [
     firebase,
     userInfo.playerId,
+    userInfo.platform,
     userInfo.playerLocale,
     userInfo.playerName,
     userInfo.playerPic,

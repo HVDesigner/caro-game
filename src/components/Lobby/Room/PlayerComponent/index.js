@@ -12,7 +12,7 @@ function PlayerInRoom({ roomData }) {
   const [imageUrl, setImageUrl] = React.useState("");
 
   React.useEffect(() => {
-    if (roomData.participants.master.id === state.user.uid) {
+    if (roomData.participants.player.id === state.user.uid) {
       setName(state.user.name.value);
       setElo(state.user.elo);
       setImageUrl(state.user.image_url);
@@ -20,7 +20,7 @@ function PlayerInRoom({ roomData }) {
       firebase
         .firestore()
         .collection("users")
-        .doc(roomData.participants.master.id)
+        .doc(roomData.participants.player.id)
         .get()
         .then(function (doc) {
           if (doc.exists) {
@@ -35,7 +35,7 @@ function PlayerInRoom({ roomData }) {
     }
   }, [
     firebase,
-    roomData.participants.master.id,
+    roomData.participants.player.id,
     state.user.elo,
     state.user.image_url,
     state.user.name.value,

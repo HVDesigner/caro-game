@@ -5,12 +5,16 @@ import UserSVG from "./../../../../assets/Dashboard/user.svg";
 
 import { FirebaseContext } from "./../../../../Firebase/";
 
-function WatcherList({ watcher }) {
+function WatcherList({ roomData }) {
   const [listWatcher, setListWatcher] = React.useState([]);
 
   React.useEffect(() => {
-    setListWatcher(Object.keys(watcher));
-  }, [watcher]);
+    if (roomData.participants.watcher) {
+      setListWatcher(roomData.participants.watcher);
+    } else {
+      setListWatcher([]);
+    }
+  }, [roomData.participants.watcher]);
 
   return (
     <div>
@@ -32,24 +36,40 @@ export default WatcherList;
 
 function WatcherDetail({ uid }) {
   const firebase = React.useContext(FirebaseContext);
-  const [name, setName] = React.useState("");
-  const [imageUrl, setImageUrl] = React.useState("");
+  const [userData, setUserData] = React.useState({
+    name: "",
+    imageUrl: "",
+  });
 
   React.useEffect(() => {
     firebase
-      .database()
-      .ref(`users/${uid}`)
-      .once("value")
-      .then((snapshot) => {
-        setName(snapshot.val().name.value);
-        setImageUrl(snapshot.val().image_url);
+      .firestore()
+      .collection(`users`)
+      .doc(uid)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          setUserData({
+            name: doc.data().name.value,
+            imageUrl: doc.data().image_url,
+          });
+        } else {
+          setUserData({
+            name: "",
+            imageUrl: "",
+          });
+        }
       });
   }, [firebase, uid]);
 
   return (
     <div className="d-flex  watcher-detail">
-      <img src={imageUrl ? imageUrl : UserSVG} alt="user" className="mr-2" />
-      <p className="align-self-center text-white">{name}</p>
+      <img
+        src={userData.imageUrl ? userData.imageUrl : UserSVG}
+        alt="user"
+        className="mr-2"
+      />
+      <p className="align-self-center text-white">{userData.name}</p>
     </div>
   );
 }

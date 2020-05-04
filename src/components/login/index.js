@@ -73,6 +73,21 @@ function Login() {
       });
   };
 
+  const resetUser = (id) => {
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(id)
+      .update({
+        "location.path": "dashboard",
+        "room_id.value": 0,
+        "room_id.type": "none",
+      })
+      .then(() => {
+        console.log("reset done");
+      });
+  };
+
   return (
     <Container className="bg-light pt-2" style={{ minHeight: "100vh" }}>
       {loading ? (
@@ -98,6 +113,18 @@ function Login() {
                     </p>
                     <p className="mb-0">{value.uid}</p>
                   </Card.Body>
+                  <Card.Footer>
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      block
+                      onClick={() => {
+                        resetUser(value.uid);
+                      }}
+                    >
+                      Reset
+                    </Button>
+                  </Card.Footer>
                 </Card>
               );
             })}
