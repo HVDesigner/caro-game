@@ -3,11 +3,7 @@ import "./App.css";
 import LoadingComponent from "./../Loading/";
 
 // Constants
-import {
-  CHANGE_LOCATION_PATH,
-  GET_ROOM_ID,
-  SET_USER_DATA,
-} from "./../../context/ActionTypes";
+import { SET_USER_DATA } from "./../../context/ActionTypes";
 
 // Contexts
 import AppContext from "./../../context/";
@@ -69,7 +65,7 @@ function App() {
     if (process.env.NODE_ENV === "production") {
       const userCollection = firebase.firestore().collection("users");
 
-      function doSnapShot(doc) {
+      function doGet(doc) {
         if (doc.exists) {
           console.log("Document data:", doc.id);
           dispatch({
@@ -98,6 +94,7 @@ function App() {
               path: "dashboard",
             },
             room_id: { value: 0, type: "none" },
+            "game-type-select": { value: "gomoku" },
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           };
@@ -108,7 +105,11 @@ function App() {
             .then(function () {
               dispatch({
                 type: SET_USER_DATA,
-                payload: { ...newUserdata, uid: userInfo.playerId },
+                payload: {
+                  ...newUserdata,
+                  uid: userInfo.playerId,
+                  platform: userInfo.platform,
+                },
               });
             })
             .catch(function (error) {
@@ -121,85 +122,12 @@ function App() {
         userCollection
           .doc(userInfo.playerId)
           .get()
-          .then(doSnapShot)
+          .then(doGet)
           .catch(function (error) {
             console.log("Error getting document:", error);
           });
       }
     }
-    // const userRef = firebase
-    //   .database()
-    //   .ref(
-    //     `users/${
-    //       process.env.NODE_ENV === "development"
-    //         ? state.userInfo.id
-    //         : userInfo.playerId
-    //     }`
-    //   );
-    // if (state.userInfo.id) {
-
-    // }
-
-    // function doSnapShot(snapshot) {
-    //   if (snapshot.exists()) {
-    //     dispatch({
-    //       type: GET_ROOM_ID,
-    //       payload: {
-    //         id: snapshot.val().room_id.value,
-    //         type: snapshot.val().room_id.type,
-    //       },
-    //     });
-    //     // update image
-    //     if (snapshot.val().image_url !== userInfo.playerPic) {
-    //       userRef.update({ image_url: userInfo.playerPic });
-    //     }
-    //     // check name
-    //     dispatch({
-    //       type: SET_USER_INFO,
-    //       payload: {
-    //         id:
-    //           process.env.NODE_ENV === "development"
-    //             ? snapshot.key
-    //             : userInfo.playerId,
-    //         name:
-    //           snapshot.val().name.status === "original"
-    //             ? process.env.NODE_ENV === "development"
-    //               ? snapshot.val().name.value
-    //               : userInfo.playerName
-    //             : snapshot.val().name.value,
-    //         image_url:
-    //           process.env.NODE_ENV === "development"
-    //             ? snapshot.val().image_url
-    //             : userInfo.playerPic,
-    //         locale:
-    //           process.env.NODE_ENV === "development"
-    //             ? snapshot.val().locale
-    //             : userInfo.playerLocale,
-    //         coin: snapshot.val().coin,
-    //         elo: snapshot.val().elo,
-    //         platform:
-    //           process.env.NODE_ENV === "development"
-    //             ? snapshot.val().locale
-    //             : userInfo.platform,
-    //       },
-    //     });
-    //   } else {
-    //     // add new user
-    //     userRef
-    //       .set({
-
-    //       })
-    //       .then(() => {
-
-    //       });
-    //   }
-    // }
-    // if (process.env.NODE_ENV === "development") {
-    //   if (state.userInfo.id) userRef.on("value", doSnapShot);
-    // } else {
-    //   if (userInfo.playerId) userRef.on("value", doSnapShot);
-    // }
-    // return () => userRef.off("value", doSnapShot);
   }, [
     firebase,
     userInfo.playerId,
@@ -219,8 +147,8 @@ function App() {
         .doc(state.user.uid)
         .onSnapshot(function (querySnapshot) {
           dispatch({
-            type: CHANGE_LOCATION_PATH,
-            payload: { path: querySnapshot.data().location.path },
+            type: SET_USER_DATA,
+            payload: { ...querySnapshot.data(), uid: state.user.uid },
           });
         });
     }

@@ -1,10 +1,10 @@
 import React from "react";
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
-// import AppContext from "./../../../../context/";
+import AppContext from "./../../../../context/";
 import { FirebaseContext } from "./../../../../Firebase/";
 
-function PlayerInRoom({ playerUser }) {
-  // const { state } = React.useContext(AppContext);
+function PlayerInRoom({ roomData }) {
+  const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
   const [name, setName] = React.useState("");
@@ -12,17 +12,35 @@ function PlayerInRoom({ playerUser }) {
   const [imageUrl, setImageUrl] = React.useState("");
 
   React.useEffect(() => {
-    firebase
-      .database()
-      .ref("users/" + playerUser.id)
-      .once("value", function (snapshot) {
-        if (snapshot.val()) {
-          setName(snapshot.val().name.value);
-          setElo(snapshot.val().elo);
-          setImageUrl(snapshot.val().image_url);
-        }
-      });
-  }, [firebase, playerUser.id]);
+    if (roomData.participants.master.id === state.user.uid) {
+      setName(state.user.name.value);
+      setElo(state.user.elo);
+      setImageUrl(state.user.image_url);
+    } else {
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(roomData.participants.master.id)
+        .get()
+        .then(function (doc) {
+          if (doc.exists) {
+            console.log("Document data:", doc.data());
+            setName(doc.data().name.value);
+            setElo(doc.data().elo);
+            setImageUrl(doc.data().image_url);
+          } else {
+            console.log("No such document!");
+          }
+        });
+    }
+  }, [
+    firebase,
+    roomData.participants.master.id,
+    state.user.elo,
+    state.user.image_url,
+    state.user.name.value,
+    state.user.uid,
+  ]);
 
   return (
     <div className="d-flex justify-content-end align-items-center">

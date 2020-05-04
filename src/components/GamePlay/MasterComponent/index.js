@@ -7,62 +7,54 @@ import UserSVG from "./../../../assets/Dashboard/user.svg";
 // Contexts
 import AppContext from "./../../../context/";
 
+// Components
 import CounterConponent from "./../Counter/";
 
-function MasterComponent({ data, firebase, time, gameData, roomInfo }) {
+function MasterComponent({ roomData, firebase }) {
   const { state } = React.useContext(AppContext);
-  const [imageUrl, setImageUrl] = React.useState("");
-  const [name, setName] = React.useState("");
-  const [elo, setElo] = React.useState("");
-  const [coin, setCoin] = React.useState("");
+  const [thisUser, setThisUser] = React.useState({
+    imageUrl: "",
+    name: "",
+    elo: 0,
+    coin: 0,
+  });
 
   React.useEffect(() => {
-    function setUserData(image_url, name, elo, coin) {
-      setImageUrl(image_url);
-      setName(name);
-      setElo(elo);
-      setCoin(coin);
-    }
-
-    function doSnapShot(snapshot) {
-      if (snapshot.val()) {
-        setUserData(
-          snapshot.val().image_url,
-          snapshot.val().name.value,
-          snapshot.val().elo,
-          snapshot.val().coin
-        );
-      } else {
-        setUserData("", "", "");
-      }
-    }
-
-    if (data.id !== state.userInfo.id) {
-      firebase.database().ref(`users/${data.id}`).on("value", doSnapShot);
+    if (roomData.participants.master.id === state.user.uid) {
+      setThisUser({
+        imageUrl: state.user.image_url,
+        name: state.user.name.value,
+        elo: state.user.elo,
+        coin: state.user.coin,
+      });
     } else {
-      setUserData(
-        state.userInfo.image_url,
-        state.userInfo.name,
-        state.userInfo.elo,
-        state.userInfo.coin
-      );
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(roomData.participants.master.id)
+        .get()
+        .then(function (doc) {
+          if (doc.exists) {
+            setThisUser({
+              imageUrl: doc.data().image_url,
+              name: doc.data().name.value,
+              elo: doc.data().elo,
+              coin: doc.data().coin,
+            });
+          } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+          }
+        });
     }
-
-    return () => {
-      if (data.id !== state.userInfo.id)
-        return firebase
-          .database()
-          .ref(`users/${data.id}`)
-          .off("value", doSnapShot);
-    };
   }, [
     firebase,
-    data.id,
-    state.userInfo.id,
-    state.userInfo.image_url,
-    state.userInfo.name,
-    state.userInfo.elo,
-    state.userInfo.coin,
+    roomData.participants.master.id,
+    state.user.coin,
+    state.user.elo,
+    state.user.image_url,
+    state.user.name.value,
+    state.user.uid,
   ]);
 
   return (
@@ -72,30 +64,31 @@ function MasterComponent({ data, firebase, time, gameData, roomInfo }) {
         className="d-flex justify-content-center align-items-center"
       >
         <img
-          src={imageUrl ? imageUrl : UserSVG}
+          src={thisUser.imageUrl ? thisUser.imageUrl : UserSVG}
           alt="user"
-          className={imageUrl ? `rounded-circle` : ""}
+          className={thisUser.imageUrl ? `rounded-circle` : ""}
           style={{ width: "40px", height: "40px" }}
         ></img>
         <div className="ml-2">
-          <p className="text-white">{name ? name : "..."}</p>
-          {roomInfo.type === "room" ? (
+          <p className="text-white">{thisUser.name ? thisUser.name : "..."}</p>
+          {roomData.type === "room" ? (
             <small className="text-white">
               <span className="text-warning mr-1">Xu:</span>
-              {coin ? coin : "..."}
+              {thisUser.coin ? thisUser.coin : "..."}
             </small>
           ) : (
             <small className="text-white">
               <span className="text-warning mr-1">ELO:</span>
-              {elo ? elo : "..."}
+              {thisUser.elo ? thisUser.elo : "..."}
             </small>
           )}
         </div>
       </div>
 
-      {gameData.status.type === "playing" && gameData.turn.uid === data.id ? (
+      {roomData.participants.master.status === "playing" &&
+      roomData.game.turn.uid === roomData.participants.master.id ? (
         <div className="d-flex">
-          {gameData.turn.uid === state.userInfo.id ? (
+          {roomData.game.turn.uid === state.user.uid ? (
             <div
               style={{ width: "100%" }}
               className="d-flex justify-content-center align-items-center p-1"
@@ -112,7 +105,7 @@ function MasterComponent({ data, firebase, time, gameData, roomInfo }) {
           ) : (
             ""
           )}
-          <CounterConponent time={time} />
+          <CounterConponent time={thisUser.time} />
         </div>
       ) : (
         <div
@@ -126,8 +119,8 @@ function MasterComponent({ data, firebase, time, gameData, roomInfo }) {
           </Badge>
           <Badge pill variant="success" className="shadow ml-1">
             <p className="text-white roboto-font" style={{ fontSize: "12px" }}>
-              {roomInfo.participants.master.win
-                ? roomInfo.participants.master.win
+              {roomData.participants.master.win
+                ? roomData.participants.master.win
                 : 0}
             </p>
           </Badge>

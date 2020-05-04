@@ -36,7 +36,7 @@ function Square({ rowkey, colkey, onClickSquare, value }) {
         onClickSquare(rowkey, colkey);
       }}
       onMouseOver={() => {
-        if (state.userInfo.platform === "web") {
+        if (state.user.platform === "web") {
           getPositonSquare(true, alphabet[rowkey], colkey + 1);
         }
       }}

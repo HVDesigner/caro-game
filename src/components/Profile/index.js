@@ -19,21 +19,17 @@ function ProfileComponent() {
           <div className="d-flex flex-column align-items-center header-profile mt-3">
             <h4 className="text-white mb-3">Thông tin</h4>
             <img
-              src={
-                state.userInfo.image_url ? state.userInfo.image_url : UserSVG
-              }
+              src={state.user.image_url ? state.user.image_url : UserSVG}
               alt="img-profile"
-              className={
-                state.userInfo.image_url ? "rounded-circle shadow" : ""
-              }
-              style={state.userInfo.image_url ? {} : { border: "none" }}
+              className={state.user.image_url ? "rounded-circle shadow" : ""}
+              style={state.user.image_url ? {} : { border: "none" }}
             />
             <p className="text-white m-0">
-              {state.userInfo.name ? state.userInfo.name : "..."}
+              {state.user.name.value ? state.user.name.value : "..."}
             </p>
             <p className="text-white">
-              {state.userInfo.locale
-                ? LANGUAGE_BY_LOCALE[state.userInfo.locale]
+              {state.user.locale
+                ? LANGUAGE_BY_LOCALE[state.user.locale]
                 : "..."}
             </p>
           </div>
@@ -45,7 +41,7 @@ function ProfileComponent() {
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title">ELO</span>
-                <span className="text-white">{state.userInfo.elo}</span>
+                <span className="text-white">{state.user.elo}</span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>

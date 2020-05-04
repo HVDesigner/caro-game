@@ -30,8 +30,6 @@ function Dashboard() {
   const firebase = React.useContext(FirebaseContext);
   const { state, changeRoute } = GlobalState;
 
-  const userRef = firebase.database().ref("users");
-
   return (
     <div
       style={{ height: "100%", minHeight: "100vh" }}
@@ -54,7 +52,7 @@ function Dashboard() {
               <li className="nav-item text-white pl-2 pr-2 pb-2 pt-2 coin_dashboard">
                 <img src={CoinSVG} alt="logo"></img>
                 <h5 className="ml-3 mr-3 mb-0">
-                  {numeral(21928).format("0.0 a")}
+                  {numeral(state.user.coin).format("0.0a")}
                 </h5>
                 <img src={AddCoinSVG} alt="logo" className="m-0 wood-btn"></img>
               </li>
@@ -106,14 +104,16 @@ function Dashboard() {
                 alt="rooms"
                 className="wood-btn"
                 onClick={() => {
-                  if (state.user.uid) {
-                    userRef
-                      .child(`${state.user.uid}/game-type-select`)
-                      .update({ value: "gomoku" })
-                      .then(() => {
-                        changeRoute("lobby");
-                      });
-                  }
+                  firebase
+                    .firestore()
+                    .collection("users")
+                    .doc(state.user.uid)
+                    .update({
+                      "game-type-select.value": "gomoku",
+                    })
+                    .then(() => {
+                      changeRoute("lobby");
+                    });
                 }}
               ></img>
             </div>

@@ -6,19 +6,13 @@ import PlayerComponent from "./../PlayerComponent/";
 
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
 
-function BodyComponent({
-  password,
-  masterUser,
-  playerUser,
-  showFooter,
-  setShowFooter,
-}) {
+function BodyComponent({ roomData, setShowFooter, showFooter }) {
   const onJoinRoomSubmit = () => {};
 
   return (
     <div className="d-flex room-item-body p-2">
-      <MasterComponent masterUser={masterUser} />
-      {password && password.status ? (
+      <MasterComponent roomData={roomData} />
+      {roomData.password.status ? (
         <div className="lock-room">
           <img
             src={LockSVG}
@@ -41,8 +35,8 @@ function BodyComponent({
           />
         </div>
       )}
-      {playerUser ? (
-        <PlayerComponent playerUser={playerUser} />
+      {roomData.participants.player ? (
+        <PlayerComponent roomData={roomData} />
       ) : (
         <div className="d-flex justify-content-end align-items-center">
           <div className="d-flex flex-column text-white text-right">

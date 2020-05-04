@@ -1,9 +1,13 @@
 import React from "react";
+
+// SVGs
 import LeftSVG from "./../../../../assets/chevron-left.svg";
+
+// Contexts
 import { FirebaseContext } from "./../../../../Firebase/";
 import AppContext from "./../../../../context/";
 
-function PasswordInput({ roomId, type }) {
+function PasswordInput({ roomData }) {
   const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
 
@@ -21,7 +25,7 @@ function PasswordInput({ roomId, type }) {
       setPassError({ status: false, text: "" });
       const loginRoom = firebase.functions().httpsCallable("loginRoom");
 
-      loginRoom({ roomId, pass, type, userId: state.userInfo.id })
+      loginRoom({ uid: state.user.uid, ...roomData, rawText: pass })
         .then(function (result) {
           if (result.data.value) {
           } else {

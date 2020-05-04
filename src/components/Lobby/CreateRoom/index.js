@@ -1,7 +1,12 @@
 import React from "react";
 import "./CreateRoom.css";
 import { Form, Container, Row, Col, Nav } from "react-bootstrap";
+import bcrypt from "bcryptjs";
+
+// Components
 import CheckButton from "./../../CheckButton/";
+
+// Contexts
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
@@ -66,32 +71,65 @@ function CreateRoom() {
     return time[0];
   };
 
+  const getRndInteger = (min = 100000, max = 999999) => {
+    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    return firebase
+      .firestore()
+      .collection("rooms")
+      .doc(num.toString())
+      .get()
+      .then(function (doc) {
+        if (doc.exists) {
+          return num.toString();
+        } else {
+          return num.toString();
+        }
+      })
+      .catch(function (error) {
+        console.log("Error getting document:", error);
+        return num.toString();
+      });
+  };
+
   const onCreate = () => {
     setShowErrorBet({ ...showErrorBet, status: false });
-    const createRoom = firebase.functions().httpsCallable("createRoom");
 
     if (bet) {
       setCreating(true);
-      createRoom({
-        password,
+
+      let createRoom = {
         bet,
-        rule,
-        time: getTime().type,
-        title: name,
-        gamePlay,
-        user: {
-          id: state.userInfo.id,
-          name: state.userInfo.name,
+        password: {
+          status: password ? true : false,
+          text: password ? bcrypt.hashSync(password, 10) : "",
         },
-      }).then(function (result) {
-        console.log(result);
+        game: {
+          status: { ready: 0 },
+          turn: { uid: state.user.uid },
+        },
+        rule: rule ? "6-win" : "6-no-win",
+        time: getTime().type,
+        title: name ? name : `Phòng của ${state.user.name.value}`,
+        type: "room",
+        participants: {
+          master: {
+            id: state.user.uid,
+            status: "waiting",
+          },
+        },
+        "game-play": gamePlay ? "gomoku" : "block-head",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      getRndInteger().then((num) => {
+        firebase.firestore().collection(`rooms`).doc(num).set(createRoom);
       });
     } else {
       setShowErrorBet({ ...showErrorBet, status: true });
     }
   };
-
-  // const exitLobby = () => {};
 
   return (
     <Container className="create-room-body">
@@ -207,7 +245,7 @@ function CreateRoom() {
         <Col>
           <blockquote className="blockquote text-center mt-2">
             <p className="mb-0">
-              {`Phòng của ${state.userInfo.name}, ${
+              {`Phòng của ${state.user.name.value}, ${
                 password ? "có" : "không có"
               } mật khẩu, ${
                 bet ? "cược " + bet + " xu mỗi ván." : "không cược xu."

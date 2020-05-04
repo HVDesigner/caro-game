@@ -12,59 +12,14 @@ import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
 
 function Lobby() {
-  const firebase = React.useContext(FirebaseContext);
+  // const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
-
-  const [gameType, setGameType] = React.useState("");
-  const [gameTypeLoading, setGameTypeLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    function setGameTypeState(snapshot) {
-      if (snapshot.val()) {
-        if (snapshot.key === "game-type-select") {
-          setGameType(snapshot.val().value);
-        }
-
-        if (snapshot.key === "value") {
-          setGameType(snapshot.val());
-        }
-        setGameTypeLoading(false);
-      }
-    }
-
-    // Get game type
-    firebase
-      .database()
-      .ref(`users/${state.userInfo.id}/game-type-select`)
-      .once("value")
-      .then(setGameTypeState);
-  }, [firebase, state.userInfo.id]);
-
-  React.useEffect(() => {
-    function setGameTypeState(snapshot) {
-      if (snapshot.val()) {
-        setGameType(snapshot.val());
-        setGameTypeLoading(false);
-      }
-    }
-
-    firebase
-      .database()
-      .ref(`users/${state.userInfo.id}/game-type-select`)
-      .on("child_changed", setGameTypeState);
-
-    return () =>
-      firebase
-        .database()
-        .ref(`users/${state.userInfo.id}/game-type-select`)
-        .off("child_changed", setGameTypeState);
-  }, [firebase, state.userInfo.id]);
 
   return (
     <Container fluid className="rooms-lobby">
-      {gameTypeLoading ? "" : <Menu gameType={gameType} />}
+      <Menu />
 
-      {gameType === "gomoku" ? (
+      {state.user["game-type-select"].value === "gomoku" ? (
         <GomokuRoomsComponent />
       ) : (
         <BlockHeadRoomsComponent />
@@ -82,34 +37,42 @@ function GomokuRoomsComponent() {
   const [listRoom, setListRoom] = React.useState([]);
 
   React.useEffect(() => {
-    function converToArr(value) {
-      const keysArr = Object.keys(value);
-      const finalArr = [];
+    firebase
+      .firestore()
+      .collection("rooms")
+      .where("game-play", "==", "gomoku")
+      .get()
+      .then(function (querySnapshot) {
+        const arr = [];
 
-      for (let index = 0; index < keysArr.length; index++) {
-        const element = keysArr[index];
+        querySnapshot.forEach(function (doc) {
+          arr.push({ rid: doc.id, ...doc.data() });
+        });
 
-        finalArr.push({ id: element, ...value[element] });
-      }
+        setListRoom(arr);
+        setLoading(false);
+      })
+      .catch(function (error) {
+        console.log("Error getting document:", error);
+      });
+  }, [firebase]);
 
-      return finalArr;
-    }
+  React.useEffect(() => {
+    const unsubscribe = firebase
+      .firestore()
+      .collection("rooms")
+      .where("game-play", "==", "gomoku")
+      .onSnapshot(function (querySnapshot) {
+        const arr = [];
 
-    function getListRoomState(snapshot) {
-      if (snapshot && snapshot.val()) {
-        if (snapshot.val()) {
-          setListRoom(converToArr(snapshot.val()));
-        }
-      } else {
-        setListRoom([]);
-      }
-      setLoading(false);
-    }
+        querySnapshot.forEach(function (doc) {
+          arr.push({ rid: doc.id, ...doc.data() });
+        });
 
-    firebase.database().ref("rooms/gomoku").on("value", getListRoomState);
+        setListRoom(arr);
+      });
 
-    return () =>
-      firebase.database().ref("rooms/gomoku").off("value", getListRoomState);
+    return () => unsubscribe();
   }, [firebase]);
 
   if (loading)
@@ -125,8 +88,8 @@ function GomokuRoomsComponent() {
     <Row>
       {listRoom.map((value) => {
         return (
-          <Col className="room-item-col" key={value.id} md="4">
-            <Room roomId={value.id} data={value} type={"gomoku"} />
+          <Col className="room-item-col" key={value.rid} md="4">
+            <Room roomData={value} />
           </Col>
         );
       })}
@@ -140,39 +103,43 @@ function BlockHeadRoomsComponent() {
   const [listRoom, setListRoom] = React.useState([]);
 
   React.useEffect(() => {
-    function converToArr(value) {
-      const keysArr = Object.keys(value);
-      const finalArr = [];
+    firebase
+      .firestore()
+      .collection("rooms")
+      .where("game-play", "==", "block-head")
+      .get()
+      .then(function (querySnapshot) {
+        const arr = [];
 
-      for (let index = 0; index < keysArr.length; index++) {
-        const element = keysArr[index];
+        querySnapshot.forEach(function (doc) {
+          arr.push({ rid: doc.id, ...doc.data() });
+        });
 
-        finalArr.push({ id: element, ...value[element] });
-      }
+        setListRoom(arr);
+        setLoading(false);
+      })
+      .catch(function (error) {
+        console.log("Error getting document:", error);
+      });
+  }, [firebase]);
 
-      return finalArr;
-    }
+  React.useEffect(() => {
+    const unsubscribe = firebase
+      .firestore()
+      .collection("rooms")
+      .where("game-play", "==", "block-head")
+      .onSnapshot(function (querySnapshot) {
+        const arr = [];
 
-    function getListRoomState(snapshot) {
-      if (snapshot && snapshot.val()) {
-        if (snapshot.val()) {
-          setListRoom(converToArr(snapshot.val()));
-        }
-      } else {
-        setListRoom([]);
-      }
-      setLoading(false);
-    }
+        querySnapshot.forEach(function (doc) {
+          arr.push({ rid: doc.id, ...doc.data() });
+        });
 
-    firebase.database().ref("rooms/block-head").on("value", getListRoomState);
+        setListRoom(arr);
+      });
 
-    return () =>
-      firebase
-        .database()
-        .ref("rooms/block-head")
-        .off("value", getListRoomState);
-  });
-
+    return () => unsubscribe();
+  }, [firebase]);
   if (loading)
     return (
       <Row>
@@ -186,8 +153,8 @@ function BlockHeadRoomsComponent() {
     <Row>
       {listRoom.map((value) => {
         return (
-          <Col className="room-item-col" key={value.id} md="2">
-            <Room roomId={value.id} data={value} type={"block-head"} />
+          <Col className="room-item-col" key={value.rid} md="2">
+            <Room roomData={value} />
           </Col>
         );
       })}

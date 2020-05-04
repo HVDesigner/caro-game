@@ -7,16 +7,18 @@ function FooterComponent() {
   const { changeRoute, state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
 
-  const exitLooby = () => {
+  const exitLooby = React.useCallback(() => {
     firebase
-      .database()
-      .ref("users")
-      .child(`${state.userInfo.id}/game-type-select`)
-      .update({ value: "none" })
+      .firestore()
+      .collection("users")
+      .doc(state.user.uid)
+      .update({
+        "game-type-select.value": "none",
+      })
       .then(() => {
         changeRoute("dashboard");
       });
-  };
+  }, [changeRoute, firebase, state.user.uid]);
 
   return (
     <Row className="">

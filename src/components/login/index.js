@@ -2,11 +2,7 @@ import React from "react";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
-import {
-  CHANGE_ROUTE,
-  GET_ROOM_ID,
-  SET_USER_DATA,
-} from "./../../context/ActionTypes";
+import { SET_USER_DATA } from "./../../context/ActionTypes";
 
 function Login() {
   const StateGlobal = React.useContext(AppContext);
@@ -19,6 +15,7 @@ function Login() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    // Get all users
     firebase
       .firestore()
       .collection("users")
@@ -33,7 +30,7 @@ function Login() {
       });
   }, [firebase]);
 
-  const getUserInfo = (value) => {
+  const setUserData = (value) => {
     dispatch({
       type: SET_USER_DATA,
       payload: value,
@@ -42,7 +39,38 @@ function Login() {
 
   const submitForm = (e) => {
     e.preventDefault();
-    getUserInfo(id, name, "", "vi_VN", "web");
+    const newUserdata = {
+      coin: 1000,
+      elo: 1000,
+      image_url: "",
+      locale: "vi_VN",
+      location: { path: "dashboard" },
+      name: { value: name, status: "original" },
+      room_id: { value: 0, type: "none" },
+      setting: {
+        sound: true,
+        matchingByElo: true,
+        language: { status: "original", value: "vn" },
+      },
+      "game-type-select": { value: "gomoku" },
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(id)
+      .set(newUserdata)
+      .then(function () {
+        dispatch({
+          type: SET_USER_DATA,
+          payload: { ...newUserdata, uid: id, platform: "web" },
+        });
+      })
+      .catch(function (error) {
+        console.error("Error writing document: ", error);
+      });
   };
 
   return (
@@ -62,7 +90,7 @@ function Login() {
                   <Card.Body
                     className="d-flex"
                     onClick={() => {
-                      getUserInfo(value);
+                      setUserData(value);
                     }}
                   >
                     <p className="mb-0 mr-auto">

@@ -1,19 +1,21 @@
 import React from "react";
-import { Container, Row, Col, Badge } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import "./GamePlay.css";
 
 // SVGs
 import UserSVG from "./../../assets/Dashboard/user.svg";
 
 // Components
+// import ReadyComponent from "./ReadyComponent/";
 import Loading from "./../Loading/";
 import Gomoku from "./Gomoku/";
 import Original from "./Original/";
 import Chat from "./Chat/";
-// import ReadyComponent from "./ReadyComponent/";
 import WinnerModal from "./WinnerModal/";
 import MasterUser from "./MasterComponent/";
 import PlayerUser from "./PlayerComponent/";
+import MenuModal from "./MenuModal/";
+import PositionPoint from "./PositionPoint/";
 
 // Contexts
 import AppContext from "./../../context/";
@@ -29,19 +31,19 @@ function GamePlayComponent() {
   // menu modal
   const [showMenu, setShowMenu] = React.useState(false);
 
-  const [roomInfo, setRoomInfo] = React.useState({});
+  const [roomData, setRoomData] = React.useState({});
+  const [ownType, setOwnType] = React.useState("");
+  const [ownStatus, setOwnStatus] = React.useState("");
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
-  const [ownType, setOwnType] = React.useState("");
-
   React.useEffect(() => {
     function getUserType(participants) {
-      if (participants.master.id === state.userInfo.id) {
+      if (participants.master.id === state.user.uid) {
         return "master";
       } else if (
         participants.player &&
-        participants.player.id === state.userInfo.id
+        participants.player.id === state.user.uid
       ) {
         return "player";
       } else {
@@ -49,59 +51,36 @@ function GamePlayComponent() {
       }
     }
 
-    function doSnapShot(snapshot) {
-      if (snapshot.val()) {
-        setRoomInfo(snapshot.val());
-        setOwnType(getUserType(snapshot.val().participants));
-      }
-      setLoading(false);
-    }
-
-    if (state.room.type && state.room.id) {
-      firebase
-        .database()
-        .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
-        .on("value", doSnapShot);
-    }
-
-    return () =>
-      firebase
-        .database()
-        .ref(`/rooms/${state.room.type}/${state.room.id.toString()}`)
-        .off("value", doSnapShot);
-  }, [firebase, state.room.type, state.room.id, state.userInfo.id]);
+    firebase
+      .firestore()
+      .collection("rooms")
+      .doc(state.user.room_id.value)
+      .get()
+      .then(function (doc) {
+        if (doc.exists) {
+          setRoomData({ rid: doc.id, ...doc.data() });
+          setOwnType(getUserType(doc.data().participants));
+          setOwnStatus(
+            doc.data().participants[getUserType(doc.data().participants)].status
+          );
+          setLoading(false);
+        } else {
+          console.log("No such document!");
+        }
+      });
+  }, [firebase, state.user.room_id.value, state.user.uid]);
 
   if (loading) {
     return <Loading />;
   }
 
-  const game = roomInfo.game;
+  const game = roomData.game;
 
   return (
     <React.Fragment>
-      {showMenu ? (
-        <div className="menu-more d-flex justify-content-center">
-          <div className="menu-more-content rounded d-flex flex-column justify-content-center align-self-center p-2 brown-border">
-            <h4 className="text-center">MENU</h4>
-            <span className="brown-border rounded wood-btn p-1 mb-2">
-              <h5 className="text-center text-white mb-0">Đầu hàng</h5>
-            </span>
-            <span
-              className="brown-border rounded wood-btn p-1"
-              onClick={() => {
-                setShowMenu(false);
-              }}
-            >
-              <h5 className="text-center text-warning mb-0">Đóng</h5>
-            </span>
-          </div>
-        </div>
-      ) : (
-        ""
-      )}
-      {game.status.type === "winner" &&
-      (roomInfo.participants.master.id === state.userInfo.id ||
-        roomInfo.participants.player.id === state.userInfo.id) ? (
+      <MenuModal showMenu={showMenu} setShowMenu={setShowMenu} />
+      {(ownStatus === "winner" || ownStatus === "loser") &&
+      (ownType === "master" || ownType === "player") ? (
         <WinnerModal gameData={game} />
       ) : (
         ""
@@ -111,69 +90,40 @@ function GamePlayComponent() {
         className="game-play position-relative d-flex flex-column"
         style={{ maxHeight: "100vh", minHeight: "100vh", width: "100vw" }}
         onMouseMove={(e) => {
-          if (state.userInfo.platform === "web") {
+          if (state.user.platform === "web") {
             setMousePosition({ x: e.clientX, y: e.clientY });
           }
         }}
       >
-        {state.userInfo.platform === "web" &&
-        state["square-position"].status ? (
-          <Badge
-            variant="success"
-            className="position-label position-absolute"
-            style={{
-              left: `${mousePosition.x + 10}px`,
-              top: `${mousePosition.y + 15}px`,
-            }}
-          >
-            {`${state["square-position"].row} - ${state["square-position"].col}`}
-          </Badge>
-        ) : (
-          ""
-        )}
-
+        <PositionPoint mousePosition={mousePosition} />
         <Row>
           <Col className="p-0">
             <div style={{ width: "100vw" }} className="d-flex flex-fill">
-              {roomInfo.participants ? (
-                <MasterUser
-                  data={roomInfo.participants.master}
-                  firebase={firebase}
-                  time={roomInfo.time}
-                  gameData={game}
-                  roomInfo={roomInfo}
-                />
-              ) : (
-                ""
-              )}
+              <MasterUser firebase={firebase} roomData={roomData} />
 
               <div
                 style={{ width: "100%" }}
                 className="d-flex flex-fill flex-column align-items-center"
               >
                 <p className="text-white mb-0">
-                  {state.room.type === "gomoku" ? "GOMOKU" : "CHẶN 2 ĐẦU"}
+                  {state.user.room_id.type === "gomoku"
+                    ? "GOMOKU"
+                    : "CHẶN 2 ĐẦU"}
                 </p>
 
                 <small className="text-white">
                   <span className="text-warning mr-1">id:</span>
-                  {state.room.id}
+                  {state.user.room_id.value}
                 </small>
 
                 <small className="text-white">
                   <span className="text-warning mr-1">Cược:</span>
-                  {roomInfo.bet}
+                  {roomData.bet}
                 </small>
               </div>
 
-              {roomInfo.participants && roomInfo.participants.player ? (
-                <PlayerUser
-                  data={roomInfo.participants.player}
-                  firebase={firebase}
-                  time={roomInfo.time}
-                  gameData={game}
-                  roomInfo={roomInfo}
-                />
+              {roomData.participants && roomData.participants.player ? (
+                <PlayerUser roomData={roomData} firebase={firebase} />
               ) : (
                 <div className="d-flex flex-column pr-2">
                   <div
@@ -198,29 +148,21 @@ function GamePlayComponent() {
 
         <div
           onMouseOut={() => {
-            if (state.userInfo.platform === "web") {
+            if (state.user.platform === "web") {
               getPositonSquare(false, 0, 0);
             }
           }}
           className="position-relative"
         >
-          {state.room.type === "block-head" ? (
-            <Original time={roomInfo.time} gameData={game} />
+          {state.user.room_id.type === "block-head" ? (
+            <Original roomData={roomData} ownType={ownType} />
           ) : (
-            <Gomoku gameData={game} roomInfo={roomInfo} ownType={ownType} />
+            <Gomoku roomData={roomData} ownType={ownType} />
           )}
         </div>
 
-        {/* <ReadyComponent
-            master={roomInfo.participants.master}
-            player={roomInfo.participants.player}
-            watcher={roomInfo.participants.watcher}
-            gameData={game}
-            ownType={ownType}
-          /> */}
-
         <div className="flex-fill position-relative">
-          <Chat gameData={game} setShowMenu={setShowMenu} />
+          <Chat roomData={roomData} setShowMenu={setShowMenu} />
         </div>
         <Row>
           <Col>

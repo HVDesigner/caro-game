@@ -7,30 +7,22 @@ import Footer from "./Footer/";
 import Body from "./Body/";
 import PasswordInput from "./PasswordInput/";
 
-function Room({ roomId, data, type }) {
+function Room({ roomData }) {
   const [showFooter, setShowFooter] = React.useState(false);
 
   return (
     <div className="room-item d-flex flex-column shadow mt-2">
-      <Header
-        roomId={roomId}
-        rule={data.rule}
-        type={data.type}
-        bet={data.bet}
-        time={data.time}
-      />
+      <Header roomData={roomData} />
 
       <Body
+        roomData={roomData}
         setShowFooter={setShowFooter}
         showFooter={showFooter}
-        masterUser={data.participants ? data.participants.master : ""}
-        playerUser={data.participants ? data.participants.player : ""}
-        password={data.password}
       />
 
-      <Footer title={data.title} />
+      <Footer roomData={roomData} />
 
-      {showFooter ? <PasswordInput roomId={roomId} type={type} /> : ""}
+      {showFooter ? <PasswordInput roomData={roomData} /> : ""}
     </div>
   );
 }
