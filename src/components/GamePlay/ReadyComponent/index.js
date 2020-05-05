@@ -86,18 +86,16 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
       });
   };
 
-  return (
-    <div className="position-absolute w-100 h-100 p-2" style={{ zIndex: "1" }}>
-      <div className="d-flex flex-column justify-content-center mt-3 mb-3">
-        {roomData.participants.master &&
-        roomData.participants.player &&
-        (ownType === "master" || ownType === "player") ? (
+  const showReadyBtnFunc = () => {
+    switch (ownType) {
+      case "master":
+        return (
           <React.Fragment>
             {loadingReady ? (
               <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
                 <h3 className="mb-0 text-center brown-color">LOADING...</h3>
               </div>
-            ) : roomData.game.player && roomData.game.player[state.user.uid] ? (
+            ) : roomData.game.player[state.user.uid] ? (
               <div
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
@@ -108,7 +106,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
               >
                 <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
               </div>
-            ) : (
+            ) : roomData.participants.player && roomData.participants.master ? (
               <div
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
@@ -119,39 +117,125 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
               >
                 <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
               </div>
+            ) : (
+              ""
             )}
+            <div className="d-flex">
+              {loadingReady ? (
+                ""
+              ) : (
+                <React.Fragment>
+                  <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
+                    <h3 className="mb-0 text-center brown-color p-2">
+                      Mời chơi
+                    </h3>
+                  </div>
+                  <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
+                    <h3
+                      className="mb-0 text-center brown-color p-2"
+                      onClick={() => {
+                        if (showLoadingExitBtn) {
+                          onLeaveRoom();
+                        }
+                      }}
+                    >
+                      {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                    </h3>
+                  </div>
+                </React.Fragment>
+              )}
+            </div>
           </React.Fragment>
-        ) : (
-          ""
-        )}
-        {roomData.game.player && roomData.game.player[state.user.uid] ? (
-          ""
-        ) : showExBtn ? (
-          <div className="d-flex">
-            {ownType === "master" ? (
-              <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
-                <h3 className="mb-0 text-center brown-color p-2">Mời chơi</h3>
+        );
+
+      case "player":
+        return (
+          <React.Fragment>
+            {loadingReady ? (
+              <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
+                <h3 className="mb-0 text-center brown-color">LOADING...</h3>
+              </div>
+            ) : roomData.game.player[state.user.uid] ? (
+              <div
+                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                onClick={() => {
+                  setLoadingReady(true);
+                  setShowExBtn(true);
+                  onCancelPlay();
+                }}
+              >
+                <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
+              </div>
+            ) : roomData.participants.player && roomData.participants.master ? (
+              <div
+                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                onClick={() => {
+                  setLoadingReady(true);
+                  setShowExBtn(false);
+                  onReadyPlay();
+                }}
+              >
+                <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
               </div>
             ) : (
               ""
             )}
-
-            <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
-              <h3
-                className="mb-0 text-center brown-color p-2"
-                onClick={() => {
-                  if (showLoadingExitBtn) {
-                    onLeaveRoom();
-                  }
-                }}
-              >
-                {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
-              </h3>
+            <div className="d-flex">
+              {loadingReady ? (
+                ""
+              ) : (
+                <React.Fragment>
+                  <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
+                    <h3
+                      className="mb-0 text-center brown-color p-2"
+                      onClick={() => {
+                        if (showLoadingExitBtn) {
+                          onLeaveRoom();
+                        }
+                      }}
+                    >
+                      {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                    </h3>
+                  </div>
+                </React.Fragment>
+              )}
             </div>
-          </div>
-        ) : (
-          ""
-        )}
+          </React.Fragment>
+        );
+
+      default:
+        return (
+          <React.Fragment>
+            {roomData.participants.player ? (
+              ""
+            ) : (
+              <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
+                <h3 className="mb-0 text-center brown-color">NGỒI CHƠI</h3>
+              </div>
+            )}
+            <div className="d-flex">
+              <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
+                <h3
+                  className="mb-0 text-center brown-color p-2"
+                  onClick={() => {
+                    if (showLoadingExitBtn) {
+                      onLeaveRoom();
+                    }
+                  }}
+                >
+                  {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                </h3>
+              </div>
+            </div>
+          </React.Fragment>
+        );
+    }
+  };
+
+  return (
+    <div className="position-absolute w-100 h-100 p-2" style={{ zIndex: "1" }}>
+      <div className="d-flex flex-column justify-content-center mt-3 mb-3">
+        {showReadyBtnFunc()}
       </div>
       <WatcherList roomData={roomData} />
     </div>

@@ -147,10 +147,12 @@ function App() {
         .collection("users")
         .doc(state.user.uid)
         .onSnapshot(function (querySnapshot) {
-          dispatch({
-            type: SET_USER_DATA,
-            payload: { ...querySnapshot.data(), uid: state.user.uid },
-          });
+          if (querySnapshot.exists) {
+            dispatch({
+              type: SET_USER_DATA,
+              payload: { ...querySnapshot.data(), uid: state.user.uid },
+            });
+          }
         });
     }
 

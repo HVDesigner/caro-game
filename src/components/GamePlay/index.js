@@ -71,20 +71,37 @@ function GamePlayComponent() {
           console.log("No such document!");
         }
       });
+  }, [firebase, state.user.room_id.value, state.user.uid]);
+
+  React.useEffect(() => {
+    function getUserType(participants) {
+      if (participants.master.id === state.user.uid) {
+        return "master";
+      } else if (
+        participants.player &&
+        participants.player.id === state.user.uid
+      ) {
+        return "player";
+      } else {
+        return "watcher";
+      }
+    }
 
     const unsubscribe = firebase
       .firestore()
       .collection("rooms")
       .doc(state.user.room_id.value)
       .onSnapshot(function (doc) {
-        setRoomData({ rid: doc.id, ...doc.data() });
-        setOwnType(getUserType(doc.data().participants));
-        setOwnStatus(
-          doc.data().participants[getUserType(doc.data().participants)]
-            ? doc.data().participants[getUserType(doc.data().participants)]
-                .status
-            : ""
-        );
+        if (doc.exists) {
+          setRoomData({ rid: doc.id, ...doc.data() });
+          setOwnType(getUserType(doc.data().participants));
+          setOwnStatus(
+            doc.data().participants[getUserType(doc.data().participants)]
+              ? doc.data().participants[getUserType(doc.data().participants)]
+                  .status
+              : ""
+          );
+        }
       });
 
     return () => unsubscribe();

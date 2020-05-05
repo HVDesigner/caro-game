@@ -70,9 +70,31 @@ function GamePlayComponent({ roomData, ownType }) {
     clickCount: 0,
   });
 
+  const resetTable = () => {
+    setCaroTable([
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]);
+  };
+
   const onUpdateWinner = () => {
-    // const winAction = firebase.functions().httpsCallable("winAction");
     let updateRoom = {};
+    
     updateRoom[`participants.${ownType}.status`] = "winner";
     updateRoom[`participants.${ownType}.win`] =
       roomData.participants[ownType].win + 1;
@@ -85,16 +107,6 @@ function GamePlayComponent({ roomData, ownType }) {
       .collection("rooms")
       .doc(state.user.room_id.value)
       .update(updateRoom);
-
-    // winAction({
-    //   roomType: state.room.type,
-    //   roomId: state.room.id,
-    //   userType: ownType,
-    //   prevWinNumber: roomInfo.participants[ownType].win
-    //     ? roomInfo.participants[ownType].win
-    //     : 0,
-    //   winnerId: state.userInfo.id,
-    // });
   };
 
   React.useEffect(() => {
@@ -144,10 +156,11 @@ function GamePlayComponent({ roomData, ownType }) {
         }
       }
     } else {
-      setCaroTable(initTable);
+      if (JSON.stringify(caroTable) !== JSON.stringify(initTable)) {
+        resetTable();
+      }
     }
   }, [
-    caroTable,
     firebase,
     state.user.room_id.value,
     roomData.game.player,
@@ -155,6 +168,7 @@ function GamePlayComponent({ roomData, ownType }) {
     roomData.game.history,
     roomData.participants,
     ownType,
+    caroTable,
   ]);
 
   const changeTurn = () => {
@@ -190,7 +204,7 @@ function GamePlayComponent({ roomData, ownType }) {
         switch (choicePosition.clickCount) {
           case 1:
             if (
-              choicePosition.rowkey !== rowkey &&
+              choicePosition.rowkey !== rowkey ||
               choicePosition.colkey !== colkey
             ) {
               // Selected new position
@@ -286,12 +300,13 @@ function GamePlayComponent({ roomData, ownType }) {
     return _caroTableLocal;
   };
 
-  console.log("gomoku render");
+  console.log("render gomoku");
 
   return (
     <div>
       {roomData.participants[ownType] &&
-      roomData.participants[ownType].status === "waiting" ? (
+      (roomData.participants[ownType].status === "waiting" ||
+        ownType === "watcher") ? (
         <ReadyComponent
           roomData={roomData}
           ownType={ownType}
