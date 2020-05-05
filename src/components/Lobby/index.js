@@ -21,8 +21,10 @@ function Lobby() {
 
       {state.user["game-type-select"].value === "gomoku" ? (
         <GomokuRoomsComponent />
-      ) : (
+      ) : state.user["game-type-select"].value === "block-head" ? (
         <BlockHeadRoomsComponent />
+      ) : (
+        ""
       )}
 
       <Footer />
@@ -55,9 +57,7 @@ function GomokuRoomsComponent() {
       .catch(function (error) {
         console.log("Error getting document:", error);
       });
-  }, [firebase]);
 
-  React.useEffect(() => {
     const unsubscribe = firebase
       .firestore()
       .collection("rooms")
@@ -121,9 +121,7 @@ function BlockHeadRoomsComponent() {
       .catch(function (error) {
         console.log("Error getting document:", error);
       });
-  }, [firebase]);
 
-  React.useEffect(() => {
     const unsubscribe = firebase
       .firestore()
       .collection("rooms")

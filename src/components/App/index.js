@@ -67,7 +67,6 @@ function App() {
 
       function doGet(doc) {
         if (doc.exists) {
-          console.log("Document data:", doc.id);
           dispatch({
             type: SET_USER_DATA,
             payload: { uid: doc.id, ...doc.data() },

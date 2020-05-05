@@ -13,7 +13,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
   const firebase = React.useContext(FirebaseContext);
 
   const [showLoadingExitBtn, setShowLoadingExitBtn] = React.useState(true);
-  const [showExBtn, setShowExBtn] = React.useState(true);
 
   const [loadingReady, setLoadingReady] = React.useState(false);
 
@@ -100,7 +99,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
                   setLoadingReady(true);
-                  setShowExBtn(true);
                   onCancelPlay();
                 }}
               >
@@ -111,7 +109,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
                   setLoadingReady(true);
-                  setShowExBtn(false);
                   onReadyPlay();
                 }}
               >
@@ -160,7 +157,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
                   setLoadingReady(true);
-                  setShowExBtn(true);
                   onCancelPlay();
                 }}
               >
@@ -171,7 +167,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                 onClick={() => {
                   setLoadingReady(true);
-                  setShowExBtn(false);
                   onReadyPlay();
                 }}
               >

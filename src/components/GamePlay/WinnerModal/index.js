@@ -34,7 +34,10 @@ function WinnerModal({ roomData, ownType }) {
   };
 
   React.useEffect(() => {
-    if (roomData.participants[ownType].status === "winner") {
+    if (
+      roomData.participants[ownType] &&
+      roomData.participants[ownType].status === "winner"
+    ) {
       setWin(true);
     } else {
       setWin(false);
@@ -56,14 +59,20 @@ function WinnerModal({ roomData, ownType }) {
                 <h5 className="text-warning text-stroke-carotv text-center mb-3">
                   Chúc mừng
                 </h5>
-                <h1 className="text-warning text-stroke-carotv">BẠN THẮNG</h1>
+                <h1 className="text-warning text-stroke-carotv mb-0">BẠN THẮNG</h1>
+                <h5 className="text-warning text-stroke-carotv text-center">
+                  + {roomData.bet} xu
+                </h5>
               </React.Fragment>
             ) : (
               <React.Fragment>
                 <h5 className="text-muted text-stroke-carotv text-center mb-3">
                   Rất tiếc
                 </h5>
-                <h1 className="text-secondary text-stroke-carotv">BẠN THUA</h1>
+                <h1 className="text-secondary text-stroke-carotv mb-0">BẠN THUA</h1>
+                <h5 className="text-secondary text-stroke-carotv text-center">
+                  - {roomData.bet} xu
+                </h5>
               </React.Fragment>
             )}
 

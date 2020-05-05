@@ -94,7 +94,7 @@ function GamePlayComponent({ roomData, ownType }) {
 
   const onUpdateWinner = () => {
     let updateRoom = {};
-    
+
     updateRoom[`participants.${ownType}.status`] = "winner";
     updateRoom[`participants.${ownType}.win`] =
       roomData.participants[ownType].win + 1;
@@ -107,10 +107,46 @@ function GamePlayComponent({ roomData, ownType }) {
       .collection("rooms")
       .doc(state.user.room_id.value)
       .update(updateRoom);
+
+    if (roomData.type === "room") {
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(state.user.uid)
+        .update({
+          coin: parseInt(state.user.coin) + parseInt(roomData.bet),
+        });
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(
+          roomData.participants[ownType === "master" ? "player" : "master"].id
+        )
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            firebase
+              .firestore()
+              .collection("users")
+              .doc(
+                roomData.participants[
+                  ownType === "master" ? "player" : "master"
+                ].id
+              )
+              .update({
+                coin: parseInt(doc.data().coin) - parseInt(roomData.bet),
+              });
+          }
+        });
+    }
   };
 
   React.useEffect(() => {
-    if (roomData.participants[ownType].status === "playing") {
+    if (
+      roomData.participants[ownType] &&
+      roomData.participants[ownType].status === "playing"
+    ) {
       setStatusGame({
         isPlay: true,
         winner: "",
@@ -140,20 +176,6 @@ function GamePlayComponent({ roomData, ownType }) {
         ).checkAround(element.row, element.col);
 
         setStatusGame(newStatusOfGame);
-
-        if (newStatusOfGame.isPlay === false) {
-          const keysUser = Object.keys(roomData.game.player);
-
-          for (let index = 0; index < keysUser.length; index++) {
-            const element = keysUser[index];
-            const dataUser = roomData.game.player[element];
-            if (dataUser.value === newStatusOfGame.winner) {
-              // roomRef.child(`game/player/${element}`).update({ winner: true });
-            } else {
-              // roomRef.child(`game/player/${element}`).update({ winner: false });
-            }
-          }
-        }
       }
     } else {
       if (JSON.stringify(caroTable) !== JSON.stringify(initTable)) {
@@ -299,8 +321,6 @@ function GamePlayComponent({ roomData, ownType }) {
 
     return _caroTableLocal;
   };
-
-  console.log("render gomoku");
 
   return (
     <div>

@@ -9,8 +9,7 @@ import UserSVG from "./../../assets/Dashboard/user.svg";
 import DefaultSVG from "./../../assets/default-btn.svg";
 
 function PlayNow() {
-  const GlobalState = React.useContext(AppContext);
-  const { changeRoute, state } = GlobalState;
+  const { changeRoute, state } = React.useContext(AppContext);
 
   const [gomoku, setGomoku] = React.useState({ status: true, type: "Gomoku" });
 
@@ -201,17 +200,17 @@ function PlayNow() {
       <div className="d-flex align-items-center mt-3 mb-3">
         <div style={{ width: "50%" }} className="player p-2 ml-2 mr-1 shadow">
           <img
-            src={state.userInfo.image_url ? state.userInfo.image_url : UserSVG}
+            src={state.user.image_url ? state.user.image_url : UserSVG}
             alt="proflie_image"
             style={{ width: "15vw" }}
             className={`${
-              state.userInfo.image_url ? "rounded-circle border" : ""
+              state.user.image_url ? "rounded-circle border" : ""
             } m-auto d-block`}
           />
           <p className="text-center text-white mb-0">
-            {state.userInfo.name ? state.userInfo.name : "..."}
+            {state.user.name.value ? state.user.name.value : "..."}
           </p>
-          <p className="text-center text-white mb-0">Elo: 1000</p>
+          <p className="text-center text-white mb-0">Elo: {state.user.elo}</p>
         </div>
 
         <div

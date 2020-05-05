@@ -47,6 +47,31 @@ function PlayerComponent({ roomData, firebase }) {
             console.log("No such document!");
           }
         });
+
+      var unsubscribe = firebase
+        .firestore()
+        .collection("users")
+        .doc(roomData.participants.player.id)
+        .onSnapshot(function (snapshot) {
+          if (snapshot.exists) {
+            setThisUser({
+              imageUrl: snapshot.data().image_url,
+              name: snapshot.data().name.value,
+              elo: snapshot.data().elo,
+              coin: snapshot.data().coin,
+            });
+          } else {
+            setThisUser({
+              imageUrl: "",
+              name: "",
+              elo: "",
+              coin: "",
+            });
+            console.log("No such document!");
+          }
+        });
+
+      return () => unsubscribe();
     }
   }, [
     firebase,

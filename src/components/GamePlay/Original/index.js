@@ -87,7 +87,6 @@ function GamePlayComponent({ roomData, ownType }) {
   };
 
   const onUpdateWinner = () => {
-    // const winAction = firebase.functions().httpsCallable("winAction");
     let updateRoom = {};
     updateRoom[`participants.${ownType}.status`] = "winner";
     updateRoom[`participants.${ownType}.win`] =
@@ -102,19 +101,23 @@ function GamePlayComponent({ roomData, ownType }) {
       .doc(state.user.room_id.value)
       .update(updateRoom);
 
-    // winAction({
-    //   roomType: state.room.type,
-    //   roomId: state.room.id,
-    //   userType: ownType,
-    //   prevWinNumber: roomInfo.participants[ownType].win
-    //     ? roomInfo.participants[ownType].win
-    //     : 0,
-    //   winnerId: state.userInfo.id,
-    // });
+    if (roomData.type === "room") {
+      let userUpdate = {};
+      userUpdate[`coin`] = state.user.coin - roomData.bet;
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(state.user.uid)
+        .update(userUpdate);
+    }
   };
 
   React.useEffect(() => {
-    if (roomData.participants[ownType].status === "playing") {
+    if (
+      roomData.participants[ownType] &&
+      roomData.participants[ownType].status === "playing"
+    ) {
       setStatusGame({
         isPlay: true,
         winner: "",
@@ -303,8 +306,6 @@ function GamePlayComponent({ roomData, ownType }) {
 
     return _caroTableLocal;
   };
-
-  console.log("render gomoku");
 
   return (
     <div>

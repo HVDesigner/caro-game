@@ -24,7 +24,6 @@ function PlayerInRoom({ roomData }) {
         .get()
         .then(function (doc) {
           if (doc.exists) {
-            console.log("Document data:", doc.data());
             setName(doc.data().name.value);
             setElo(doc.data().elo);
             setImageUrl(doc.data().image_url);
