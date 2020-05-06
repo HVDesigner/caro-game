@@ -1,6 +1,9 @@
 import React from "react";
 import "./index.css";
 
+// Functions
+import { leaveRoom } from "./../../../functions/";
+
 // Components
 import WatcherList from "./WatcherList/";
 
@@ -24,24 +27,32 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
 
   const onLeaveRoom = () => {
     setShowLoadingExitBtn(false);
-    const leaveRoom = firebase.functions().httpsCallable("leaveRoom");
-
-    console.log({
-      roomId: state.user.room_id.value,
-      userId: state.user.uid,
-      userType: ownType,
-    });
-
-    leaveRoom({
-      roomId: state.user.room_id.value,
-      userId: state.user.uid,
-      userType: ownType,
-    })
+    leaveRoom(
+      {
+        roomId: state.user.room_id.value,
+        userId: state.user.uid,
+        userType: ownType,
+      },
+      firebase
+    )
       .then()
       .catch((error) => {
         console.log(error);
         setShowLoadingExitBtn(true);
       });
+
+    // const leaveRoom = firebase.functions().httpsCallable("leaveRoom");
+
+    // leaveRoom({
+    //   roomId: state.user.room_id.value,
+    //   userId: state.user.uid,
+    //   userType: ownType,
+    // })
+    //   .then()
+    //   .catch((error) => {
+    //     console.log(error);
+    //     setShowLoadingExitBtn(true);
+    //   });
   };
 
   const onReadyPlay = () => {

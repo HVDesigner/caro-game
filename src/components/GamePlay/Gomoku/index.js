@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
 import "./../GamePlay.css";
+import { winAction } from "./../../../functions/";
 
 // Game Core
 import GamePlay from "./../../../Core/game";
@@ -39,25 +40,7 @@ function GamePlayComponent({ roomData, ownType }) {
   const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
 
-  const [caroTable, setCaroTable] = React.useState([
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  ]);
+  const [caroTable, setCaroTable] = React.useState(initTable);
 
   const [statusGame, setStatusGame] = React.useState({
     isPlay: false,
@@ -71,75 +54,20 @@ function GamePlayComponent({ roomData, ownType }) {
   });
 
   const resetTable = () => {
-    setCaroTable([
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ]);
+    setCaroTable(initTable);
   };
 
-  const onUpdateWinner = () => {
-    let updateRoom = {};
-
-    updateRoom[`participants.${ownType}.status`] = "winner";
-    updateRoom[`participants.${ownType}.win`] =
-      roomData.participants[ownType].win + 1;
-    updateRoom[
-      `participants.${ownType === "master" ? "player" : "master"}.status`
-    ] = "loser";
-
-    firebase
-      .firestore()
-      .collection("rooms")
-      .doc(state.user.room_id.value)
-      .update(updateRoom);
-
-    if (roomData.type === "room") {
+  const onUpdateWinner = async () => {
+    winAction(
+      {
+        ownType,
+        roomData,
+        roomId: state.user.room_id.value,
+        userCoin: state.user.coin,
+        userId: state.user.uid,
+      },
       firebase
-        .firestore()
-        .collection("users")
-        .doc(state.user.uid)
-        .update({
-          coin: parseInt(state.user.coin) + parseInt(roomData.bet),
-        });
-
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(
-          roomData.participants[ownType === "master" ? "player" : "master"].id
-        )
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            firebase
-              .firestore()
-              .collection("users")
-              .doc(
-                roomData.participants[
-                  ownType === "master" ? "player" : "master"
-                ].id
-              )
-              .update({
-                coin: parseInt(doc.data().coin) - parseInt(roomData.bet),
-              });
-          }
-        });
-    }
+    );
   };
 
   React.useEffect(() => {

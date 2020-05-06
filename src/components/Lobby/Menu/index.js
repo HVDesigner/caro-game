@@ -27,56 +27,6 @@ function MenuComponent({ gameType }) {
       countUserPlayingGomoku: 0,
       countUserPlayingBlockHead: 0,
     });
-    //   function doSnapShot(snapshot) {
-    //     if (snapshot.val()) {
-    //       const keys = Object.keys(snapshot.val());
-
-    //       let countTotalUserInGomoku = 0;
-    //       let countTotalUserInBlockHead = 0;
-    //       let countUserPlayingGomoku = 0;
-    //       let countUserPlayingBlockHead = 0;
-
-    //       for (let index = 0; index < keys.length; index++) {
-    //         const element = keys[index];
-    //         const data = snapshot.val()[element];
-
-    //         switch (data.location.path) {
-    //           case "lobby":
-    //             if (data["game-type-select"].value === "gomoku") {
-    //               countTotalUserInGomoku = countTotalUserInGomoku + 1;
-    //             }
-    //             if (data["game-type-select"].value === "block-head") {
-    //               countTotalUserInBlockHead = countTotalUserInBlockHead + 1;
-    //             }
-    //             break;
-    //           case "room":
-    //             if (data.room_id.type === "gomoku") {
-    //               countTotalUserInGomoku = countTotalUserInGomoku + 1;
-    //               countUserPlayingGomoku = countUserPlayingGomoku + 1;
-    //             }
-
-    //             if (data.room_id.type === "block-head") {
-    //               countTotalUserInBlockHead = countTotalUserInBlockHead + 1;
-    //               countUserPlayingBlockHead = countUserPlayingBlockHead + 1;
-    //             }
-    //             break;
-    //           default:
-    //             break;
-    //         }
-    //       }
-
-    //       setCount({
-    //         countTotalUserInGomoku,
-    //         countTotalUserInBlockHead,
-    //         countUserPlayingGomoku,
-    //         countUserPlayingBlockHead,
-    //       });
-    //     }
-    //   }
-
-    //   firebase.database().ref("users").on("value", doSnapShot);
-
-    //   return () => firebase.database().ref("users").off("value", doSnapShot);
   }, [firebase]);
 
   const changGameType = (type) => {
