@@ -7,33 +7,23 @@ import CheckButton from "./../CheckButton/";
 
 import UserSVG from "./../../assets/Dashboard/user.svg";
 import DefaultSVG from "./../../assets/default-btn.svg";
+import { FirebaseContext } from "./../../Firebase/";
 
 function PlayNow() {
   const { changeRoute, state } = React.useContext(AppContext);
+  const firebase = React.useContext(FirebaseContext);
 
-  const [gomoku, setGomoku] = React.useState({ status: true, type: "Gomoku" });
+  // true gomoku
+  // false block-head
+  const [gamePlay, setGamePlay] = React.useState(true);
 
-  const [twoHeadBlock, setTwoHeadBlock] = React.useState({
-    status: false,
-    type: "Block Two Head",
-  });
+  // true 6-win
+  // false 6-no-win
+  const [rule, setRule] = React.useState(true);
 
-  const [sixWin, setSixWin] = React.useState({ status: true, type: "Six Win" });
-
-  const [sixNotWin, setSixNotWin] = React.useState({
-    status: false,
-    type: "Six Not Win",
-  });
-
-  const [enemyFree, setEnemyFree] = React.useState({
-    status: true,
-    type: "Free Enemy",
-  });
-
-  const [enemySimilar, setEnemySimilar] = React.useState({
-    status: false,
-    type: "Similar Enemy",
-  });
+  // true matching
+  // false no-matching
+  const [matchingByElo, setMatchingByElo] = React.useState(true);
 
   const [tenSecond, setTenSecond] = React.useState({ status: false, type: 10 });
 
@@ -46,36 +36,6 @@ function PlayNow() {
     status: true,
     type: 30,
   });
-
-  const GomokuOrTowHead = (id, value) => {
-    if (id === 1) {
-      setGomoku({ status: value, type: "Gomoku" });
-      setTwoHeadBlock({ status: false, type: "Block Two Head" });
-    } else {
-      setGomoku({ status: false, type: "Gomoku" });
-      setTwoHeadBlock({ status: value, type: "Block Two Head" });
-    }
-  };
-
-  const sixOrNotFunc = (id, value) => {
-    if (id === 1) {
-      setSixWin({ status: value, type: "Six Win" });
-      setSixNotWin({ status: false, type: "Six Not Win" });
-    } else {
-      setSixWin({ status: false, type: "Six Win" });
-      setSixNotWin({ status: value, type: "Six Not Win" });
-    }
-  };
-
-  const findEnemy = (id, value) => {
-    if (id === 1) {
-      setEnemyFree({ status: value, type: "Free Enemy" });
-      setEnemySimilar({ status: false, type: "Similar Enemy" });
-    } else {
-      setEnemyFree({ status: false, type: "Free Enemy" });
-      setEnemySimilar({ status: value, type: "Similar Enemy" });
-    }
-  };
 
   const timeInTurn = (id, value) => {
     if (id === 1) {
@@ -93,6 +53,56 @@ function PlayNow() {
     }
   };
 
+  const filterElo = (elo) => {
+    if (0 <= elo && elo < 1150) {
+      return "nhap-mon";
+    } else if (1150 <= elo && elo < 1300) {
+      return "tap-su";
+    } else if (1300 <= elo && elo < 1450) {
+      return "tan-thu";
+    } else if (1450 <= elo && elo < 1600) {
+      return "ky-thu";
+    } else if (1600 <= elo && elo < 1750) {
+      return "cao-thu";
+    } else if (1750 <= elo && elo < 1900) {
+      return "sieu-cao-thu";
+    } else if (1900 <= elo && elo < 2050) {
+      return "kien-tuong";
+    } else if (2050 <= elo && elo < 2200) {
+      return "dai-kien-tuong";
+    } else if (2200 <= elo && elo < 2350) {
+      return "ky-tien";
+    } else if (2350 <= elo && elo < 2500) {
+      return "ky-thanh";
+    } else {
+      return "nhat-dai-ton-su";
+    }
+  };
+
+  const FindPlayer = () => {
+    const data = {
+      "elo-level": filterElo(state.user.elo),
+      room_type: gamePlay ? "gomoku" : "block-head",
+      rule: rule ? "6-win" : "6-no-win",
+      "matching-by-elo": matchingByElo,
+      time: [tenSecond, twentySecond, thirtySecond].filter((m) => m.status)[0]
+        .type,
+      createAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
+    firebase
+      .firestore()
+      .collection("quick-play-queue")
+      .doc(state.user.uid)
+      .set(data)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div className="playow-body d-flex flex-column">
       <div className="setting-game">
@@ -101,30 +111,34 @@ function PlayNow() {
           <div className="pl-3 flex-fill">
             <CheckButton
               text={"Gomoku"}
-              value={gomoku.status}
-              func={GomokuOrTowHead}
-              id={1}
+              value={gamePlay}
+              func={() => {
+                setGamePlay(true);
+              }}
             />
             <CheckButton
               text={"Chặn 2 đầu"}
-              value={twoHeadBlock.status}
-              func={GomokuOrTowHead}
-              id={2}
+              value={!gamePlay}
+              func={() => {
+                setGamePlay(false);
+              }}
             />
           </div>
 
           <div className="flex-fill">
             <CheckButton
               text={"6 thắng"}
-              value={sixWin.status}
-              id={1}
-              func={sixOrNotFunc}
+              value={rule}
+              func={() => {
+                setRule(true);
+              }}
             />
             <CheckButton
               text={"6 không thắng"}
-              value={sixNotWin.status}
-              id={2}
-              func={sixOrNotFunc}
+              value={!rule}
+              func={() => {
+                setRule(false);
+              }}
             />
           </div>
         </div>
@@ -167,18 +181,20 @@ function PlayNow() {
             <div className="flex-fill">
               <CheckButton
                 text={"Đối thủ bất kỳ"}
-                value={enemyFree.status}
-                id={1}
-                func={findEnemy}
+                value={!matchingByElo}
+                func={() => {
+                  setMatchingByElo(false);
+                }}
               />
             </div>
 
             <div className="flex-fill">
               <CheckButton
                 text={"Đối thủ cùng trình độ"}
-                value={enemySimilar.status}
-                id={2}
-                func={findEnemy}
+                value={matchingByElo}
+                func={() => {
+                  setMatchingByElo(true);
+                }}
               />
             </div>
           </div>
@@ -191,7 +207,6 @@ function PlayNow() {
           alt="exit"
           onClick={() => {
             timeInTurn(3, true);
-            sixOrNotFunc(1, true);
           }}
           className="wood-btn"
         />
@@ -233,17 +248,7 @@ function PlayNow() {
           src={FindSVG}
           alt="exit"
           onClick={() => {
-            console.log({
-              gomoku,
-              twoHeadBlock,
-              sixWin,
-              sixNotWin,
-              enemyFree,
-              enemySimilar,
-              tenSecond,
-              twentySecond,
-              thirtySecond,
-            });
+            FindPlayer();
           }}
           className="wood-btn"
         />

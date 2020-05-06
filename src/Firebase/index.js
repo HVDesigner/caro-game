@@ -4,14 +4,14 @@ import "firebase/functions";
 import "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCx5AD4sWwFIMuNyT1T3eftcC-783_0Ssc",
-  authDomain: "carotv-683cc.firebaseapp.com",
-  databaseURL: "https://carotv-683cc.firebaseio.com",
-  projectId: "carotv-683cc",
-  storageBucket: "carotv-683cc.appspot.com",
-  messagingSenderId: "290104411772",
-  appId: "1:290104411772:web:36d46751f697f0b254ebf9",
-  measurementId: "G-WXMV1VTJT8",
+  apiKey: "AIzaSyCHFTkRPLU8yWYTDWKk1QhtogcOVoafHww",
+  authDomain: "caro-new.firebaseapp.com",
+  databaseURL: "https://caro-new.firebaseio.com",
+  projectId: "caro-new",
+  storageBucket: "caro-new.appspot.com",
+  messagingSenderId: "999626416120",
+  appId: "1:999626416120:web:a06a9eb6b15601ed4f000d",
+  measurementId: "G-QJH0BH5X24",
 };
 
 const FirebaseContext = createContext(null);
