@@ -10,7 +10,7 @@ import AppContext from "./../../../context/";
 // Components
 import CounterConponent from "./../Counter/";
 
-function MasterComponent({ roomData, firebase }) {
+function MasterComponent({ roomData, firebase, ownType }) {
   const { state } = React.useContext(AppContext);
   const [thisUser, setThisUser] = React.useState({
     imageUrl: "",
@@ -124,7 +124,12 @@ function MasterComponent({ roomData, firebase }) {
           ) : (
             ""
           )}
-          <CounterConponent time={roomData.time} />
+          <CounterConponent
+            time={roomData.time}
+            roomData={roomData}
+            userType={"master"}
+            ownType={ownType}
+          />
         </div>
       ) : (
         <div

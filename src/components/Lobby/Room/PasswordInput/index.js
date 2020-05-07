@@ -26,13 +26,7 @@ function PasswordInput({ roomData }) {
       const loginRoom = firebase.functions().httpsCallable("loginRoom");
 
       loginRoom({ uid: state.user.uid, ...roomData, rawText: pass })
-        .then(function (result) {
-          if (result.data.value) {
-          } else {
-            setLoginInProcess(false);
-            setPassError({ status: true, text: result.data.text });
-          }
-        })
+        .then()
         .catch(() => {
           setLoginInProcess(false);
           setPassError({ status: true, text: "Không thể đăng nhập" });

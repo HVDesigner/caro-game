@@ -46,17 +46,25 @@ function GlobalState(props) {
         .collection("users")
         .doc(state.user.uid);
 
-      if (path === "room") {
-        userDoc.update({
-          "location.path": path,
-          "room_id.value": id,
-          "room_id.type": type,
+      firebase.firestore().runTransaction((transaction) => {
+        return transaction.get(userDoc).then((doc) => {
+          if (!doc.exists) {
+            return { message: "changeRoute error" };
+          }
+
+          if (path === "room" && doc.data().location.path !== path) {
+            transaction.update(userDoc, {
+              "location.path": path,
+              "room_id.value": id,
+              "room_id.type": type,
+            });
+          } else {
+            transaction.update(userDoc, {
+              "location.path": path,
+            });
+          }
         });
-      } else {
-        userDoc.update({
-          "location.path": path,
-        });
-      }
+      });
     }
   };
 

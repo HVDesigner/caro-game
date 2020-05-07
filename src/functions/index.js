@@ -1,5 +1,5 @@
 export const leaveRoom = async (data, firebase) => {
-  const { roomId, userId, userType } = data;
+  const { roomId, userId } = data;
 
   let docRooms = firebase.firestore().collection("rooms").doc(roomId);
   let docUser = firebase.firestore().collection("users").doc(userId);
@@ -12,92 +12,100 @@ export const leaveRoom = async (data, firebase) => {
       "room_id.value": 0,
     });
 
-    const room = await docRooms.get();
+    firebase.firestore().runTransaction((transaction) => {
+      return transaction.get(docRooms).then((doc) => {
+        if (!doc.exists) {
+          console.log("Document does not exist!");
+        }
 
-    if (userType === "master") {
-      // If master leave room
+        console.log(doc.data().participants.master);
 
-      if (room.data().participants.player) {
-        // if have player
+        if (doc.data().participants.master.id === userId) {
+          // If master leave room
 
-        const playerID = room.data().participants.player.id;
+          if (doc.data().participants.player) {
+            // if have player
 
-        // update master
-        // remove player in participants list
-        // update turn
-        // remove player ready
-        // remove history
-        // update game status
-        await docRooms.update({
-          "participants.master.id": playerID,
-          "participants.master.status": "waiting",
-          "participants.master.win": 0,
-          "participants.player": firebase.firestore.FieldValue.delete(),
-          "game.turn.uid": playerID,
-          "game.player": {},
-          "game.history": [],
-          "game.status.ready": 0,
-        });
-      } else if (room.data().participants.watcher) {
-        // if only have watcher
+            const playerID = doc.data().participants.player.id;
 
-        const watcherId = room.data().participants.watcher[0];
+            // update master
+            // remove player in participants list
+            // update turn
+            // remove player ready
+            // remove history
+            // update game status
+            transaction.update(docRooms, {
+              "participants.master.id": playerID,
+              "participants.master.status": "waiting",
+              "participants.master.win": 0,
+              "participants.player": firebase.firestore.FieldValue.delete(),
+              "game.turn.uid": playerID,
+              "game.player": {},
+              "game.history": [],
+              "game.status.ready": 0,
+            });
+          } else if (doc.data().participants.watcher) {
+            // if only have watcher
 
-        // update master
-        // remove watcher in participants list
-        // update turn
-        // remove player ready
-        // remove history
-        // update game status
-        await docRooms.update({
-          "participants.master.id": watcherId,
-          "participants.master.status": "waiting",
-          "participants.master.win": 0,
-          "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
-            watcherId
-          ),
-          "game.turn.uid": watcherId,
-          "game.player": {},
-          "game.history": [],
-          "game.status.ready": 0,
-        });
-      } else {
-        // if only have master in room
+            const watcherId = doc.data().participants.watcher[0];
 
-        // remove room
-        await docRooms.delete();
-      }
-    } else if (userType === "player") {
-      // if player leave room
+            // update master
+            // remove watcher in participants list
+            // update turn
+            // remove player ready
+            // remove history
+            // update game status
+            transaction.update(docRooms, {
+              "participants.master.id": watcherId,
+              "participants.master.status": "waiting",
+              "participants.master.win": 0,
+              "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
+                watcherId
+              ),
+              "game.turn.uid": watcherId,
+              "game.player": {},
+              "game.history": [],
+              "game.status.ready": 0,
+            });
+          } else {
+            // if only have master in room
 
-      // update master
-      // remove player in participants list
-      // update turn
-      // remove player ready
-      // remove history
-      // update game status
-      await docRooms.update({
-        "participants.master.status": "waiting",
-        "participants.master.win": 0,
-        "game.turn.uid": room.data().participants.master.id,
-        "game.player": {},
-        "game.history": [],
-        "game.status.ready": 0,
+            // remove room
+            transaction.delete(docRooms);
+          }
+        } else if (doc.data().participants.player.id === userId) {
+          // if player leave room
+
+          // update master
+          // remove player in participants list
+          // update turn
+          // remove player ready
+          // remove history
+          // update game status
+          transaction.update(docRooms, {
+            "participants.master.status": "waiting",
+            "participants.master.win": 0,
+            "game.turn.uid": doc.data().participants.master.id,
+            "game.player": {},
+            "game.history": [],
+            "game.status.ready": 0,
+          });
+
+          transaction.update(docRooms, {
+            "participants.player": firebase.firestore.FieldValue.delete(),
+          });
+        } else {
+          // if watcher leave room
+
+          // remove watcher in participants list
+          transaction.update(docRooms, {
+            "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
+              userId
+            ),
+          });
+        }
       });
-
-      await docRooms.update({
-        "participants.player": firebase.firestore.FieldValue.delete(),
-      });
-    } else if (userType === "watcher") {
-      // if watcher leave room
-
-      // remove watcher in participants list
-      await docRooms.update({
-        "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
-          userId
-        ),
-      });
-    }
+    });
 
     return { code: 1, text: "Leave succeeded." };
   } catch (error) {
@@ -107,25 +115,19 @@ export const leaveRoom = async (data, firebase) => {
 };
 
 export const winAction = async (data, firebase) => {
-  const { ownType, roomData, roomId, userCoin, userId } = data;
+  const { ownType, roomId } = data;
 
   let updateRoom = {};
 
   updateRoom[`participants.${ownType}.status`] = "winner";
-
-  updateRoom[`participants.${ownType}.win`] =
-    roomData.participants[ownType].win + 1;
-
   updateRoom[
     `participants.${ownType === "master" ? "player" : "master"}.status`
   ] = "loser";
+  updateRoom[
+    `participants.${ownType}.win`
+  ] = firebase.firestore.FieldValue.increment(1);
+  updateRoom[`game.status.ready`] = 0;
+  updateRoom[`game.player`] = {};
 
   firebase.firestore().collection("rooms").doc(roomId).update(updateRoom);
-
-  if (roomData.type === "room") {
-    let userUpdate = {};
-    userUpdate[`coin`] = userCoin - roomData.bet;
-
-    firebase.firestore().collection("users").doc(userId).update(userUpdate);
-  }
 };

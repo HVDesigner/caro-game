@@ -5,7 +5,7 @@ import AppContext from "./../../../context/";
 import CounterConponent from "./../Counter/";
 import UserSVG from "./../../../assets/Dashboard/user.svg";
 
-function PlayerComponent({ roomData, firebase }) {
+function PlayerComponent({ roomData, firebase, ownType }) {
   const { state } = React.useContext(AppContext);
 
   const [thisUser, setThisUser] = React.useState({
@@ -113,7 +113,12 @@ function PlayerComponent({ roomData, firebase }) {
       {roomData.participants.player.status === "playing" &&
       roomData.game.turn.uid === roomData.participants.player.id ? (
         <div className="d-flex">
-          <CounterConponent time={roomData.time} />
+          <CounterConponent
+            time={roomData.time}
+            roomData={roomData}
+            userType={"player"}
+            ownType={ownType}
+          />
           {roomData.game.turn.uid === state.user.uid ? (
             <div
               style={{ width: "100%" }}

@@ -18,7 +18,6 @@ function WinnerModal({ roomData, ownType }) {
     roomUpdate[
       `game.player.${state.user.uid}`
     ] = firebase.firestore.FieldValue.delete();
-    roomUpdate[`game.status.ready`] = roomData.game.status.ready - 1;
     if (win) {
       roomUpdate[`game.turn.uid`] = state.user.uid;
     }

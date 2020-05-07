@@ -134,7 +134,11 @@ function GamePlayComponent() {
         <Row>
           <Col className="p-0">
             <div style={{ width: "100vw" }} className="d-flex flex-fill">
-              <MasterUser firebase={firebase} roomData={roomData} />
+              <MasterUser
+                firebase={firebase}
+                roomData={roomData}
+                ownType={ownType}
+              />
 
               <div
                 style={{ width: "100%" }}
@@ -158,7 +162,11 @@ function GamePlayComponent() {
               </div>
 
               {roomData.participants && roomData.participants.player ? (
-                <PlayerUser roomData={roomData} firebase={firebase} />
+                <PlayerUser
+                  roomData={roomData}
+                  firebase={firebase}
+                  ownType={ownType}
+                />
               ) : (
                 <div className="d-flex flex-column pr-2">
                   <div
