@@ -81,26 +81,43 @@ function PlayNow() {
 
   const FindPlayer = () => {
     const data = {
-      "elo-level": filterElo(state.user.elo),
+      elo_level: filterElo(state.user.elo),
       room_type: gamePlay ? "gomoku" : "block-head",
       rule: rule ? "6-win" : "6-no-win",
-      "matching-by-elo": matchingByElo,
+      matching_by_elo: matchingByElo,
       time: [tenSecond, twentySecond, thirtySecond].filter((m) => m.status)[0]
         .type,
       createAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid: state.user.uid,
     };
 
-    firebase
+    const finalData = {};
+    finalData[`${state.user.uid}`] = data;
+
+    const queueDoc = firebase
       .firestore()
       .collection("quick-play-queue")
-      .doc(state.user.uid)
-      .set(data)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      .doc("user-list");
+    const batch = firebase.firestore().batch();
+    batch.update(queueDoc, finalData);
+
+    batch.commit().then(function () {
+      console.log("commit success");
+    });
+
+    // firebase
+    //   .firestore()
+    //   .collection("quick-play-queue")
+    //   .doc("user-list")
+    //   .set({
+    //     `${state.user.uid}`: data
+    //   })
+    //   .then((res) => {
+    //     console.log(res);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
 
   return (

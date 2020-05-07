@@ -30,6 +30,26 @@ function Login() {
       });
   }, [firebase]);
 
+  React.useEffect(() => {
+    // let allQueue = firebase.firestore().collection("quick-play-queue");
+    // firebase.firestore().runTransaction(function (transaction) {
+    //   // This code may get re-run multiple times if there are conflicts.
+    //   return transaction.get(allQueue).then(function (sfDoc) {
+    //     if (!sfDoc.exists) {
+    //       console.log("Document does not exist!");
+    //     }
+    //     console.log(sfDoc);
+    //   });
+    // });
+    // allQueue = allQueue.where("rule", "==", "6-win");
+    // allQueue = allQueue.where("room_type", "==", "gomoku");
+    // allQueue = allQueue.where("elo-level", "==", "nhap-mon");
+    // allQueue.get().then((res) => {
+    //   const nominee = res.docs.filter((value) => value.id !== "123")[0].data();
+    //   console.log(nominee);
+    // });
+  }, [firebase]);
+
   const setUserData = (value) => {
     dispatch({
       type: SET_USER_DATA,
