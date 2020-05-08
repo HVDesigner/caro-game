@@ -40,23 +40,13 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
         console.log(error);
         setShowLoadingExitBtn(true);
       });
-
-    // const leaveRoom = firebase.functions().httpsCallable("leaveRoom");
-
-    // leaveRoom({
-    //   roomId: state.user.room_id.value,
-    //   userId: state.user.uid,
-    //   userType: ownType,
-    // })
-    //   .then()
-    //   .catch((error) => {
-    //     console.log(error);
-    //     setShowLoadingExitBtn(true);
-    //   });
   };
 
   const onReadyPlay = () => {
-    const readyAction = firebase.functions().httpsCallable("readyAction");
+    const readyAction = firebase
+      .app()
+      .functions("asia-east2")
+      .httpsCallable("readyAction");
 
     readyAction({
       roomId: state.user.room_id.value,

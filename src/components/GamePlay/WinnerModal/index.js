@@ -13,7 +13,6 @@ function WinnerModal({ roomData, ownType }) {
 
   const onNextAction = () => {
     setLoadingNextBtn(true);
-    // const nextAction = firebase.functions().httpsCallable("nextAction");
     let roomUpdate = {};
     roomUpdate[
       `game.player.${state.user.uid}`
@@ -58,7 +57,9 @@ function WinnerModal({ roomData, ownType }) {
                 <h5 className="text-warning text-stroke-carotv text-center mb-3">
                   Chúc mừng
                 </h5>
-                <h1 className="text-warning text-stroke-carotv mb-0">BẠN THẮNG</h1>
+                <h1 className="text-warning text-stroke-carotv mb-0">
+                  BẠN THẮNG
+                </h1>
                 <h5 className="text-warning text-stroke-carotv text-center">
                   + {roomData.bet} xu
                 </h5>
@@ -68,7 +69,9 @@ function WinnerModal({ roomData, ownType }) {
                 <h5 className="text-muted text-stroke-carotv text-center mb-3">
                   Rất tiếc
                 </h5>
-                <h1 className="text-secondary text-stroke-carotv mb-0">BẠN THUA</h1>
+                <h1 className="text-secondary text-stroke-carotv mb-0">
+                  BẠN THUA
+                </h1>
                 <h5 className="text-secondary text-stroke-carotv text-center">
                   - {roomData.bet} xu
                 </h5>

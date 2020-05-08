@@ -121,7 +121,7 @@ function Login() {
           <Col>
             {userList.map((value) => {
               return (
-                <Card key={value.uid} className="mb-1">
+                <Card key={value.uid} className="mb-2">
                   <Card.Body
                     className="d-flex"
                     onClick={() => {

@@ -20,65 +20,19 @@ function Counter({ time, roomData, userType, ownType }) {
       setCounter(0);
       clearInterval(timer);
 
-      if (userType !== ownType) {
-        let updateRoom = {};
+      let updateRoom = {};
 
-        updateRoom[`participants.${userType}.status`] = "loser";
-        updateRoom[
-          `participants.${userType === "master" ? "player" : "master"}.status`
-        ] = "winner";
-        updateRoom[
-          `participants.${userType === "master" ? "player" : "master"}.win`
-        ] = firebase.firestore.FieldValue.increment(1);
-
-        firebase
-          .firestore()
-          .collection("rooms")
-          .doc(state.user.room_id.value)
-          .update(updateRoom);
-
-        if (roomData.type === "room") {
-          const loserRef = firebase
-            .firestore()
-            .collection("users")
-            .doc(roomData.participants[userType].id);
-
-          const winnerRef = firebase
-            .firestore()
-            .collection("users")
-            .doc(
-              roomData.participants[userType === "master" ? "player" : "master"]
-                .id
-            );
-
-          firebase.firestore().runTransaction(function (transaction) {
-            return Promise.all([
-              transaction.get(loserRef).then(function (sfDoc) {
-                if (!sfDoc.exists) {
-                  return "Document does not exist!";
-                }
-
-                transaction.update(loserRef, {
-                  coin: firebase.firestore.FieldValue.increment(
-                    -parseInt(roomData.bet)
-                  ),
-                });
-              }),
-              transaction.get(winnerRef).then(function (sfDoc) {
-                if (!sfDoc.exists) {
-                  return "Document does not exist!";
-                }
-
-                transaction.update(winnerRef, {
-                  coin: firebase.firestore.FieldValue.increment(
-                    parseInt(roomData.bet)
-                  ),
-                });
-              }),
-            ]);
-          });
-        }
-      }
+      updateRoom[`participants.${userType}.status`] = "loser";
+      updateRoom[
+        `participants.${userType === "master" ? "player" : "master"}.status`
+      ] = "winner";
+      updateRoom[`game.status.ready`] = 0;
+      updateRoom[`game.player`] = {};
+      firebase
+        .firestore()
+        .collection("rooms")
+        .doc(state.user.room_id.value)
+        .update(updateRoom);
     }
 
     return () => clearInterval(timer);

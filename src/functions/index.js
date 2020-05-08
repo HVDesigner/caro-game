@@ -123,9 +123,6 @@ export const winAction = async (data, firebase) => {
   updateRoom[
     `participants.${ownType === "master" ? "player" : "master"}.status`
   ] = "loser";
-  updateRoom[
-    `participants.${ownType}.win`
-  ] = firebase.firestore.FieldValue.increment(1);
   updateRoom[`game.status.ready`] = 0;
   updateRoom[`game.player`] = {};
 

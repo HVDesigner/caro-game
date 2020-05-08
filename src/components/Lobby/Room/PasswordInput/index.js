@@ -23,7 +23,10 @@ function PasswordInput({ roomData }) {
     if (pass) {
       setLoginInProcess(true);
       setPassError({ status: false, text: "" });
-      const loginRoom = firebase.functions().httpsCallable("loginRoom");
+      const loginRoom = firebase
+        .app()
+        .functions("asia-east2")
+        .httpsCallable("loginRoom");
 
       loginRoom({ uid: state.user.uid, ...roomData, rawText: pass })
         .then()
