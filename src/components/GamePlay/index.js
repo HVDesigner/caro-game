@@ -39,7 +39,7 @@ function GamePlayComponent() {
 
   React.useEffect(() => {
     function getUserType(participants) {
-      if (participants.master.id === state.user.uid) {
+      if (participants.master && participants.master.id === state.user.uid) {
         return "master";
       } else if (
         participants.player &&
@@ -75,7 +75,7 @@ function GamePlayComponent() {
 
   React.useEffect(() => {
     function getUserType(participants) {
-      if (participants.master.id === state.user.uid) {
+      if (participants.master && participants.master.id === state.user.uid) {
         return "master";
       } else if (
         participants.player &&
@@ -134,11 +134,30 @@ function GamePlayComponent() {
         <Row>
           <Col className="p-0">
             <div style={{ width: "100vw" }} className="d-flex flex-fill">
-              <MasterUser
-                firebase={firebase}
-                roomData={roomData}
-                ownType={ownType}
-              />
+              {roomData.participants && roomData.participants.master ? (
+                <MasterUser
+                  firebase={firebase}
+                  roomData={roomData}
+                  ownType={ownType}
+                />
+              ) : (
+                <div className="d-flex flex-column pl-2">
+                  <div
+                    style={{ width: "100%" }}
+                    className="d-flex justify-content-center align-items-center"
+                  >
+                    <img
+                      src={UserSVG}
+                      alt="user"
+                      className="mt-1"
+                      style={{ width: "40px", height: "40px" }}
+                    ></img>
+                    <div className="ml-2">
+                      <p className="text-white">Trống</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div
                 style={{ width: "100%" }}

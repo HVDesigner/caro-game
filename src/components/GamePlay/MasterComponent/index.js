@@ -136,11 +136,18 @@ function MasterComponent({ roomData, firebase, ownType }) {
           style={{ width: "100%" }}
           className="d-flex justify-content-center align-items-center p-1"
         >
-          <Badge pill variant="success" className="shadow">
-            <p className="text-white roboto-font" style={{ fontSize: "12px" }}>
-              Chủ phòng
-            </p>
-          </Badge>
+          {roomData.type === "room" ? (
+            <Badge pill variant="success" className="shadow">
+              <p
+                className="text-white roboto-font"
+                style={{ fontSize: "12px" }}
+              >
+                Chủ phòng
+              </p>
+            </Badge>
+          ) : (
+            ""
+          )}
           <Badge pill variant="success" className="shadow ml-1">
             <p className="text-white roboto-font" style={{ fontSize: "12px" }}>
               {roomData.participants.master.win

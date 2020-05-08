@@ -18,8 +18,6 @@ export const leaveRoom = async (data, firebase) => {
           console.log("Document does not exist!");
         }
 
-        console.log(doc.data().participants.master);
-
         if (doc.data().participants.master.id === userId) {
           // If master leave room
 

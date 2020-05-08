@@ -8,13 +8,6 @@ function GlobalState(props) {
   const [firebase] = React.useState(React.useContext(FirebaseContext));
 
   const [state, dispatch] = React.useReducer(reducer, {
-    route: {
-      path: "dashboard",
-    },
-    room: {
-      id: 0,
-      type: "",
-    },
     user: {
       coin: 0,
       createdAt: 0,
@@ -29,6 +22,7 @@ function GlobalState(props) {
         matchingByElo: true,
         language: { status: "", value: "" },
       },
+      on_queue: false,
       uid: "",
       updatedAt: 0,
     },

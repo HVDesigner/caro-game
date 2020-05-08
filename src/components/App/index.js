@@ -92,6 +92,12 @@ function App() {
             location: {
               path: "dashboard",
             },
+            game: {
+              win: 0,
+              lost: 0,
+              tie: 0,
+            },
+            on_queue: false,
             room_id: { value: 0, type: "none" },
             "game-type-select": { value: "gomoku" },
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),

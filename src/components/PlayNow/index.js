@@ -7,6 +7,8 @@ import CheckButton from "./../CheckButton/";
 
 import UserSVG from "./../../assets/Dashboard/user.svg";
 import DefaultSVG from "./../../assets/default-btn.svg";
+import CancelSVG from "./../../assets/cancel.svg";
+
 import { FirebaseContext } from "./../../Firebase/";
 
 function PlayNow() {
@@ -36,6 +38,10 @@ function PlayNow() {
     status: true,
     type: 30,
   });
+
+  React.useEffect(() => {
+    setMatchingByElo(state.user.setting.matchingByElo);
+  }, [state.user.setting.matchingByElo]);
 
   const timeInTurn = (id, value) => {
     if (id === 1) {
@@ -100,29 +106,52 @@ function PlayNow() {
       .doc("user-list");
     const batch = firebase.firestore().batch();
     batch.update(queueDoc, finalData);
+    batch.update(firebase.firestore().collection("users").doc(state.user.uid), {
+      on_queue: true,
+    });
 
     batch.commit().then(function () {
       console.log("commit success");
     });
+  };
 
-    // firebase
-    //   .firestore()
-    //   .collection("quick-play-queue")
-    //   .doc("user-list")
-    //   .set({
-    //     `${state.user.uid}`: data
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+  const cancelFindPlay = () => {
+    const batch = firebase.firestore().batch();
+
+    let updateQueue = {};
+    updateQueue[`${state.user.uid}`] = firebase.firestore.FieldValue.delete();
+
+    batch.update(
+      firebase.firestore().collection("quick-play-queue").doc("user-list"),
+      updateQueue
+    );
+    batch.update(firebase.firestore().collection("users").doc(state.user.uid), {
+      on_queue: false,
+    });
+
+    batch.commit().then(function () {
+      console.log("commit success");
+    });
+  };
+
+  const updateMatchingByElo = (status) => {
+    const batch = firebase.firestore().batch();
+
+    batch.update(firebase.firestore().collection("users").doc(state.user.uid), {
+      "setting.matchingByElo": status,
+    });
+
+    batch.commit();
   };
 
   return (
     <div className="playow-body d-flex flex-column">
-      <div className="setting-game">
+      <div className="setting-game position-relative">
+        {state.user.on_queue ? (
+          <div className="cover-all-setup position-absolute h-100"></div>
+        ) : (
+          ""
+        )}
         <h4 className="text-white text-center mt-2">Chọn luật</h4>
         <div className="d-flex">
           <div className="pl-3 flex-fill">
@@ -201,6 +230,7 @@ function PlayNow() {
                 value={!matchingByElo}
                 func={() => {
                   setMatchingByElo(false);
+                  updateMatchingByElo(false);
                 }}
               />
             </div>
@@ -211,6 +241,7 @@ function PlayNow() {
                 value={matchingByElo}
                 func={() => {
                   setMatchingByElo(true);
+                  updateMatchingByElo(true);
                 }}
               />
             </div>
@@ -219,14 +250,19 @@ function PlayNow() {
       </div>
 
       <div className="play-now-btn mt-2">
-        <img
-          src={DefaultSVG}
-          alt="exit"
-          onClick={() => {
-            timeInTurn(3, true);
-          }}
-          className="wood-btn"
-        />
+        {state.user.on_queue ? (
+          ""
+        ) : (
+          <img
+            src={DefaultSVG}
+            alt="exit"
+            onClick={() => {
+              timeInTurn(3, true);
+              setRule(true);
+            }}
+            className="wood-btn"
+          />
+        )}
       </div>
 
       <div className="d-flex align-items-center mt-3 mb-3">
@@ -255,28 +291,43 @@ function PlayNow() {
             style={{ width: "15vw" }}
             className="m-auto d-block"
           />
-          <p className="text-center text-white mb-0">...</p>
+          <p className="text-center text-white mb-0">
+            {state.user.on_queue ? "Đang tìm đối thủ..." : "..."}
+          </p>
           <p className="text-center text-white mb-0">...</p>
         </div>
       </div>
 
       <div className="play-now-btn mb-2 d-flex fixed-bottom">
-        <img
-          src={FindSVG}
-          alt="exit"
-          onClick={() => {
-            FindPlayer();
-          }}
-          className="wood-btn"
-        />
-        <img
-          src={Exit}
-          alt="exit"
-          onClick={() => {
-            changeRoute("Dashboard");
-          }}
-          className="wood-btn"
-        />
+        {state.user.on_queue ? (
+          <img
+            src={CancelSVG}
+            alt="exit"
+            onClick={() => {
+              cancelFindPlay();
+            }}
+            className="wood-btn"
+          />
+        ) : (
+          <React.Fragment>
+            <img
+              src={FindSVG}
+              alt="exit"
+              onClick={() => {
+                FindPlayer();
+              }}
+              className="wood-btn"
+            />
+            <img
+              src={Exit}
+              alt="exit"
+              onClick={() => {
+                changeRoute("Dashboard");
+              }}
+              className="wood-btn"
+            />
+          </React.Fragment>
+        )}
       </div>
     </div>
   );

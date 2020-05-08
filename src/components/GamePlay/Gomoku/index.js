@@ -176,11 +176,7 @@ function GamePlayComponent({ roomData, ownType }) {
   };
 
   const onClickSquare = (rowkey, colkey) => {
-    if (
-      statusGame.isPlay &&
-      (ownType === "master" || ownType === "player")
-      /* && roomData.participants[ownType].status === "playing" */
-    ) {
+    if (statusGame.isPlay && (ownType === "master" || ownType === "player")) {
       if (
         (caroTable[rowkey][colkey] === 0 || caroTable[rowkey][colkey] === 3) &&
         roomData.game.turn.uid === state.user.uid

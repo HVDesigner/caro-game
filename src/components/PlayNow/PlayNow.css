@@ -25,3 +25,8 @@
   border-color: #4e311d !important;
   border-width: 2px !important;
 }
+
+.cover-all-setup {
+  width: 100vw;
+  background-color: transparent;
+}

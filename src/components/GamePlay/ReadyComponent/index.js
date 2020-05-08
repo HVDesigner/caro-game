@@ -27,19 +27,109 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
 
   const onLeaveRoom = () => {
     setShowLoadingExitBtn(false);
-    leaveRoom(
-      {
-        roomId: state.user.room_id.value,
-        userId: state.user.uid,
-        userType: ownType,
-      },
-      firebase
-    )
-      .then()
-      .catch((error) => {
-        console.log(error);
-        setShowLoadingExitBtn(true);
+    if (roomData.type === "room") {
+      leaveRoom(
+        {
+          roomId: state.user.room_id.value,
+          userId: state.user.uid,
+          userType: ownType,
+        },
+        firebase
+      )
+        .then()
+        .catch((error) => {
+          console.log(error);
+          setShowLoadingExitBtn(true);
+        });
+    } else if (roomData.type === "quick-play") {
+      let roomRef = firebase
+        .firestore()
+        .collection("rooms")
+        .doc(state.user.room_id.value);
+      let userCollection = firebase.firestore().collection("users");
+
+      firebase.firestore().runTransaction(function (transaction) {
+        return transaction.get(roomRef).then(function (sfDoc) {
+          if (!sfDoc.exists) {
+            console.log("Document does not exist!");
+          }
+
+          switch (ownType) {
+            case "master":
+              if (sfDoc.data().participants.player) {
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.master.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+                transaction.update(roomRef, {
+                  "participants.master": firebase.firestore.FieldValue.delete(),
+                  "game.turn.uid": sfDoc.data().participants.player.id,
+                });
+              } else {
+                if (sfDoc.data().participants.watcher) {
+                  for (const iterator of sfDoc.data().participants.watcher) {
+                    transaction.update(userCollection.doc(iterator), {
+                      "location.path": "lobby",
+                      room_id: { type: "none", value: 0 },
+                    });
+                  }
+                }
+
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.master.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+
+                transaction.delete(roomRef);
+              }
+              break;
+            case "player":
+              if (sfDoc.data().participants.master) {
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.player.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+                transaction.update(roomRef, {
+                  "participants.player": firebase.firestore.FieldValue.delete(),
+                  "game.turn.uid": sfDoc.data().participants.master.id,
+                });
+              } else {
+                if (sfDoc.data().participants.watcher) {
+                  for (const iterator of sfDoc.data().participants.watcher) {
+                    transaction.update(userCollection.doc(iterator), {
+                      "location.path": "lobby",
+                      room_id: { type: "none", value: 0 },
+                    });
+                  }
+                }
+
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.player.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+
+                transaction.delete(roomRef);
+              }
+              break;
+
+            default:
+              break;
+          }
+        });
       });
+    }
   };
 
   const onReadyPlay = () => {
@@ -123,11 +213,15 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 ""
               ) : (
                 <React.Fragment>
-                  <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
-                    <h3 className="mb-0 text-center brown-color p-2">
-                      Mời chơi
-                    </h3>
-                  </div>
+                  {roomData.type === "room" ? (
+                    <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
+                      <h3 className="mb-0 text-center brown-color p-2">
+                        Mời chơi
+                      </h3>
+                    </div>
+                  ) : (
+                    ""
+                  )}
                   <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
                     <h3
                       className="mb-0 text-center brown-color p-2"
