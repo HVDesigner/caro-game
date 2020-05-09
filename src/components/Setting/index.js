@@ -16,15 +16,7 @@ function Setting() {
   const [vn, setVN] = React.useState({ status: true, type: "VN" });
   const [en, setEN] = React.useState({ status: false, type: "EN" });
 
-  const [enemyFree, setEnemyFree] = React.useState({
-    status: true,
-    type: "Free Enemy",
-  });
-
-  const [enemySimilar, setEnemySimilar] = React.useState({
-    status: false,
-    type: "Similar Enemy",
-  });
+  const [matchingByElo, setMatchingByElo] = React.useState(false);
 
   const changeLanguage = (id, value) => {
     if (id === 1) {
@@ -33,16 +25,6 @@ function Setting() {
     } else {
       setVN({ status: false, type: "VN" });
       setEN({ status: value, type: "EN" });
-    }
-  };
-
-  const findEnemy = (id, value) => {
-    if (id === 1) {
-      setEnemyFree({ status: value, type: "Free Enemy" });
-      setEnemySimilar({ status: false, type: "Similar Enemy" });
-    } else {
-      setEnemyFree({ status: false, type: "Free Enemy" });
-      setEnemySimilar({ status: value, type: "Similar Enemy" });
     }
   };
 
@@ -108,18 +90,18 @@ function Setting() {
                   <div className="flex-fill">
                     <CheckButton
                       text={"Đối thủ bất kỳ"}
-                      value={enemyFree.status}
+                      value={!matchingByElo}
                       id={1}
-                      func={findEnemy}
+                      func={() => setMatchingByElo(false)}
                     />
                   </div>
 
                   <div className="flex-fill">
                     <CheckButton
                       text={"Đối thủ cùng trình độ"}
-                      value={enemySimilar.status}
+                      value={matchingByElo}
                       id={2}
-                      func={findEnemy}
+                      func={() => setMatchingByElo(true)}
                     />
                   </div>
                 </div>
