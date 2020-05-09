@@ -14,7 +14,7 @@ function MasterInRoom({ roomData }) {
   React.useEffect(() => {
     if (roomData.participants.master.id === state.user.uid) {
       setName(state.user.name.value);
-      setElo(state.user.elo);
+      setElo(state.user.elo[roomData["game-play"]]);
       setImageUrl(state.user.image_url);
     } else {
       firebase
@@ -26,7 +26,7 @@ function MasterInRoom({ roomData }) {
           if (doc.exists) {
             console.log("Document data:", doc.data());
             setName(doc.data().name.value);
-            setElo(doc.data().elo);
+            setElo(doc.data().elo[roomData["game-play"]]);
             setImageUrl(doc.data().image_url);
           } else {
             console.log("No such document!");
@@ -36,6 +36,7 @@ function MasterInRoom({ roomData }) {
   }, [
     firebase,
     roomData.participants.master.id,
+    roomData,
     state.user.uid,
     state.user.name.value,
     state.user.elo,

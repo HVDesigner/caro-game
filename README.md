@@ -2,9 +2,9 @@ Task
 
 - Setting
 
-  - Save Button : Setup
-  - Sound : Setup
-  - Language : Setup
+  - Save Button : **Setup**
+  - Sound : **Setup**
+  - Language : **Setup**
 
 - Profile
 
@@ -39,4 +39,5 @@ Task
   - Find Room
 
 - Create Room
+
   - Check coin limit

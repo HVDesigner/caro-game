@@ -42,7 +42,7 @@ export const leaveRoom = async (data, firebase) => {
               "game.history": [],
               "game.status.ready": 0,
             });
-          } else if (doc.data().participants.watcher) {
+          } else if (doc.data().participants.watcher.length > 0) {
             // if only have watcher
 
             const watcherId = doc.data().participants.watcher[0];
