@@ -31,12 +31,13 @@ Task
 
 - Lobby
 
-  - Count user in Gomoku
-  - Count user in Block Head
-  - Playing
-  - Free
+  - Count user in Gomoku : **Done**
+  - Count user in Block Head : **Done**
+  - Playing : **Done**
+  - Free : **Done**
   - Count Watcher in each room
   - Find Room
+  - Room No Lock
 
 - Create Room
 

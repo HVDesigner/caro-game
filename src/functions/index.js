@@ -18,7 +18,10 @@ export const leaveRoom = async (data, firebase) => {
           console.log("Document does not exist!");
         }
 
-        if (doc.data().participants.master.id === userId) {
+        if (
+          doc.data().participants.master &&
+          doc.data().participants.master.id === userId
+        ) {
           // If master leave room
 
           if (doc.data().participants.player) {
@@ -42,7 +45,10 @@ export const leaveRoom = async (data, firebase) => {
               "game.history": [],
               "game.status.ready": 0,
             });
-          } else if (doc.data().participants.watcher.length > 0) {
+          } else if (
+            doc.data().participants.watcher &&
+            doc.data().participants.watcher.length > 0
+          ) {
             // if only have watcher
 
             const watcherId = doc.data().participants.watcher[0];
@@ -71,7 +77,10 @@ export const leaveRoom = async (data, firebase) => {
             // remove room
             transaction.delete(docRooms);
           }
-        } else if (doc.data().participants.player.id === userId) {
+        } else if (
+          doc.data().participants.player &&
+          doc.data().participants.player.id === userId
+        ) {
           // if player leave room
 
           // update master

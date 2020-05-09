@@ -47,7 +47,7 @@ function PlayerInRoom({ roomData }) {
         {name && elo ? (
           <React.Fragment>
             <span>{name}</span>
-            <span>Elo: {elo}</span>
+            <span>Elo: {elo[roomData["game-play"]]}</span>
           </React.Fragment>
         ) : (
           <span>Trống</span>

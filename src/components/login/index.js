@@ -41,7 +41,7 @@ function Login() {
     e.preventDefault();
     const newUserdata = {
       coin: 1000,
-      elo: 1000,
+      elo: { gomoku: 1000, "block-head": 1000 },
       image_url: "",
       locale: "vi_VN",
       location: { path: "dashboard" },

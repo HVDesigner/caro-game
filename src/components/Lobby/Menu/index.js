@@ -9,25 +9,53 @@ import CoinSVG from "./../../../assets/Dashboard/Coin.svg";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
-function MenuComponent({ gameType }) {
+function MenuComponent() {
   const { state } = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
 
-  const [count, setCount] = React.useState({
-    countTotalUserInGomoku: 0,
-    countTotalUserInBlockHead: 0,
-    countUserPlayingGomoku: 0,
-    countUserPlayingBlockHead: 0,
-  });
+  const [countFreeGomoku, setCountFreeGomoku] = React.useState(0);
+  const [countPlayingGomoku, setCountPlayingGomoku] = React.useState(0);
+
+  const [countFreeBlockHead, setCountFreeBlockHead] = React.useState(0);
+  const [countPlayingBlockHead, setCountPlayingBlockHead] = React.useState(0);
 
   React.useEffect(() => {
-    setCount({
-      countTotalUserInGomoku: 0,
-      countTotalUserInBlockHead: 0,
-      countUserPlayingGomoku: 0,
-      countUserPlayingBlockHead: 0,
-    });
-  }, [firebase]);
+    const userCollection = firebase.firestore().collection("users");
+    let unsubscribeFreeGomoku = userCollection
+      .where("location.path", "==", "lobby")
+      .where("game-type-select.value", "==", "gomoku")
+      .onSnapshot((doc) => {
+        setCountFreeGomoku(doc.size);
+      });
+
+    let unsubscribePlayingGomoku = userCollection
+      .where("location.path", "==", "room")
+      .where("room_id.type", "==", "gomoku")
+      .onSnapshot((doc) => {
+        setCountPlayingGomoku(doc.size);
+      });
+
+    let unsubscribeFreeBlockHead = userCollection
+      .where("location.path", "==", "lobby")
+      .where("game-type-select.value", "==", "block-head")
+      .onSnapshot((doc) => {
+        setCountFreeBlockHead(doc.size);
+      });
+
+    let unsubscribePlayingBlockHead = userCollection
+      .where("location.path", "==", "room")
+      .where("room_id.type", "==", "block-head")
+      .onSnapshot((doc) => {
+        setCountPlayingBlockHead(doc.size);
+      });
+
+    return () => {
+      unsubscribeFreeGomoku();
+      unsubscribePlayingGomoku();
+      unsubscribeFreeBlockHead();
+      unsubscribePlayingBlockHead();
+    };
+  }, [firebase, state.user.uid]);
 
   const changGameType = (type) => {
     firebase.firestore().collection("users").doc(state.user.uid).update({
@@ -72,7 +100,7 @@ function MenuComponent({ gameType }) {
           <h5 className="p-1 m-0 text-stroke-carotv">
             Gomoku
             <span className="text-warning ml-1">
-              ({count.countTotalUserInGomoku})
+              ({countPlayingGomoku + countFreeGomoku})
             </span>
           </h5>
         </Nav.Item>
@@ -89,7 +117,7 @@ function MenuComponent({ gameType }) {
           <h5 className="p-1 m-0 text-stroke-carotv">
             Chặn 2 đầu
             <span className="text-warning ml-1">
-              ({count.countTotalUserInBlockHead})
+              ({countPlayingBlockHead + countFreeBlockHead})
             </span>
           </h5>
         </Nav.Item>
@@ -101,9 +129,9 @@ function MenuComponent({ gameType }) {
             Đang chơi
             <span className="text-warning ml-1">
               (
-              {gameType === "gomoku"
-                ? count.countUserPlayingGomoku
-                : count.countUserPlayingBlockHead}
+              {state.user["game-type-select"].value === "gomoku"
+                ? countPlayingGomoku
+                : countPlayingBlockHead}
               )
             </span>
           </h5>
@@ -113,10 +141,9 @@ function MenuComponent({ gameType }) {
             Chưa chơi
             <span className="text-warning ml-1">
               (
-              {gameType === "gomoku"
-                ? count.countTotalUserInGomoku - count.countUserPlayingGomoku
-                : count.countTotalUserInBlockHead -
-                  count.countUserPlayingBlockHead}
+              {state.user["game-type-select"].value === "gomoku"
+                ? countFreeGomoku
+                : countFreeBlockHead}
               )
             </span>
           </h5>

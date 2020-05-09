@@ -72,7 +72,7 @@ function GamePlayComponent({ roomData, ownType }) {
   const onUpdateWinner = () => {
     winAction(
       {
-        roomData,
+        ownType,
         roomId: state.user.room_id.value,
       },
       firebase

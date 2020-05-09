@@ -24,7 +24,6 @@ function MasterInRoom({ roomData }) {
         .get()
         .then(function (doc) {
           if (doc.exists) {
-            console.log("Document data:", doc.data());
             setName(doc.data().name.value);
             setElo(doc.data().elo[roomData["game-play"]]);
             setImageUrl(doc.data().image_url);

@@ -152,7 +152,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
       uid: state.user.uid,
     })
       .then((result) => {
-        console.log(result);
         if (result.data.ready === 2) {
           setStatusGame({
             isPlay: true,

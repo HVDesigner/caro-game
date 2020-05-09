@@ -9,7 +9,10 @@ function FooterComponent({ roomData }) {
         {roomData.title}
       </span>
       <span className="text-center text-stroke-carotv">
-        <FontAwesomeIcon icon={faEye} className="text-white mr-2" />0
+        <FontAwesomeIcon icon={faEye} className="text-white mr-2" />
+        {roomData.participants.watcher
+          ? roomData.participants.watcher.length
+          : 0}
       </span>
     </div>
   );

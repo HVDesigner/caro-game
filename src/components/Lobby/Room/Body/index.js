@@ -14,30 +14,33 @@ function BodyComponent({ roomData, setShowFooter, showFooter }) {
   const { state } = React.useContext(AppContext);
 
   const onJoinRoomSubmit = () => {
-    const roomByIdDoc = firebase
-      .firestore()
-      .collection("rooms")
-      .doc(roomData.rid);
-    const userDoc = firebase
-      .firestore()
-      .collection("users")
-      .doc(state.user.uid);
+    if (roomData.type === "room") {
+    } else {
+      const roomByIdDoc = firebase
+        .firestore()
+        .collection("rooms")
+        .doc(roomData.rid);
+      const userDoc = firebase
+        .firestore()
+        .collection("users")
+        .doc(state.user.uid);
 
-    const batch = firebase.firestore().batch();
-    batch.update(userDoc, {
-      room_id: {
-        type: roomData["game-play"],
-        value: roomData.rid,
-      },
-      "location.path": "room",
-    });
-    batch.update(roomByIdDoc, {
-      "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
-        state.user.uid
-      ),
-    });
+      const batch = firebase.firestore().batch();
+      batch.update(userDoc, {
+        room_id: {
+          type: roomData["game-play"],
+          value: roomData.rid,
+        },
+        "location.path": "room",
+      });
+      batch.update(roomByIdDoc, {
+        "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
+          state.user.uid
+        ),
+      });
 
-    batch.commit();
+      batch.commit();
+    }
   };
   return (
     <div className="d-flex room-item-body p-2">

@@ -11,7 +11,7 @@ function GlobalState(props) {
     user: {
       coin: 0,
       createdAt: 0,
-      elo: 0,
+      elo: { gomoku: 0, "block-head": 0 },
       image_url: "",
       locale: "",
       location: { path: "dashboard" },
@@ -21,6 +21,11 @@ function GlobalState(props) {
         sound: true,
         matchingByElo: true,
         language: { status: "", value: "" },
+      },
+      game: {
+        win: { gomoku: 0, "block-head": 0 },
+        lost: { gomoku: 0, "block-head": 0 },
+        tie: { gomoku: 0, "block-head": 0 },
       },
       on_queue: false,
       uid: "",

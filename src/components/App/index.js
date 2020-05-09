@@ -41,8 +41,6 @@ function App() {
           const playerLocale = window.FBInstant.getLocale();
           const platform = window.FBInstant.getPlatform();
 
-          // console.log(window.FBInstant);
-
           setUserInfo({
             playerId,
             playerName,

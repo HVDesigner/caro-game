@@ -111,9 +111,7 @@ function PlayNow() {
       on_queue: true,
     });
 
-    batch.commit().then(function () {
-      console.log("commit success");
-    });
+    batch.commit();
   };
 
   const cancelFindPlay = () => {
@@ -130,9 +128,7 @@ function PlayNow() {
       on_queue: false,
     });
 
-    batch.commit().then(function () {
-      console.log("commit success");
-    });
+    batch.commit();
   };
 
   const updateMatchingByElo = (status) => {
