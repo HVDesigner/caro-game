@@ -63,11 +63,13 @@ function WatcherDetail({ uid }) {
   }, [firebase, uid]);
 
   return (
-    <div className="d-flex  watcher-detail">
+    <div className="d-flex watcher-detail">
       <img
         src={userData.imageUrl ? userData.imageUrl : UserSVG}
         alt="user"
-        className="mr-2"
+        className={
+          userData.imageUrl ? `rounded-circle brown-border shadow mr-2` : `mr-2`
+        }
       />
       <p className="align-self-center text-white">{userData.name}</p>
     </div>

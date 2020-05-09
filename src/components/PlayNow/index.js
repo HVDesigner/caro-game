@@ -279,7 +279,9 @@ function PlayNow() {
           <p className="text-center text-white mb-0">
             {state.user.name.value ? state.user.name.value : "..."}
           </p>
-          <p className="text-center text-white mb-0">Elo: {state.user.elo}</p>
+          <p className="text-center text-white mb-0">
+            Elo: {state.user.elo[gamePlay ? "gomoku" : "block-head"]}
+          </p>
         </div>
 
         <div

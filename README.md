@@ -1,32 +1,36 @@
 Task
 
 - Setting
+
   - Save Button : Setup
   - Sound : Setup
   - Language : Setup
 
 - Profile
-  - Level Elo : Done
-  - Win : Done
-    - Gomoku : Done
-    - Block Head : Done
-  - Lost : Done
-    - Gomoku : Done
-    - Block Head : Done
-  - Tie : Done
-    - Gomoku : Done
-    - Block Head : Done
+
+  - Level Elo : **Done**
+  - Win : **Done**
+    - Gomoku : **Done**
+    - Block Head : **Done**
+  - Lost : **Done**
+    - Gomoku : **Done**
+    - Block Head : **Done**
+  - Tie : **Done**
+    - Gomoku : **Done**
+    - Block Head : **Done**
   - Like
 
 - Game Play
-  - Border Master icon
-  - Circle icon Watcher
-  - Border icon Watcher
+
+  - Border Master icon : **Done**
+  - Circle icon Watcher : **Done**
+  - Border icon Watcher : **Done**
   - Chat
   - Invite Friend
-  - Remove coin in `Ready Component` Quick Play mode
+  - Remove coin in `Winner Modal` Quick Play mode : **Done**
 
 - Lobby
+
   - Count user in Gomoku
   - Count user in Block Head
   - Playing

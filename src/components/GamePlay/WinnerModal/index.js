@@ -60,9 +60,13 @@ function WinnerModal({ roomData, ownType }) {
                 <h1 className="text-warning text-stroke-carotv mb-0">
                   BẠN THẮNG
                 </h1>
-                <h5 className="text-warning text-stroke-carotv text-center">
-                  + {roomData.bet} xu
-                </h5>
+                {roomData.type === "room" ? (
+                  <h5 className="text-warning text-stroke-carotv text-center">
+                    + {roomData.bet} xu
+                  </h5>
+                ) : (
+                  ""
+                )}
               </React.Fragment>
             ) : (
               <React.Fragment>
@@ -72,9 +76,13 @@ function WinnerModal({ roomData, ownType }) {
                 <h1 className="text-secondary text-stroke-carotv mb-0">
                   BẠN THUA
                 </h1>
-                <h5 className="text-secondary text-stroke-carotv text-center">
-                  - {roomData.bet} xu
-                </h5>
+                {roomData.type === "room" ? (
+                  <h5 className="text-secondary text-stroke-carotv text-center">
+                    - {roomData.bet} xu
+                  </h5>
+                ) : (
+                  ""
+                )}
               </React.Fragment>
             )}
 
