@@ -20,7 +20,7 @@ function PlayerComponent({ roomData, firebase, ownType }) {
       setThisUser({
         imageUrl: state.user.image_url,
         name: state.user.name.value,
-        elo: state.user.elo,
+        elo: state.user.elo[roomData.game_play],
         coin: state.user.coin,
       });
     } else {
@@ -34,15 +34,15 @@ function PlayerComponent({ roomData, firebase, ownType }) {
             setThisUser({
               imageUrl: doc.data().image_url,
               name: doc.data().name.value,
-              elo: doc.data().elo,
+              elo: doc.data().elo[roomData.game_play],
               coin: doc.data().coin,
             });
           } else {
             setThisUser({
               imageUrl: "",
               name: "",
-              elo: "",
-              coin: "",
+              elo: 0,
+              coin: 0,
             });
             console.log("No such document!");
           }
@@ -57,15 +57,15 @@ function PlayerComponent({ roomData, firebase, ownType }) {
             setThisUser({
               imageUrl: snapshot.data().image_url,
               name: snapshot.data().name.value,
-              elo: snapshot.data().elo,
+              elo: snapshot.data().elo[roomData.game_play],
               coin: snapshot.data().coin,
             });
           } else {
             setThisUser({
               imageUrl: "",
               name: "",
-              elo: "",
-              coin: "",
+              elo: 0,
+              coin: 0,
             });
             console.log("No such document!");
           }
@@ -76,6 +76,7 @@ function PlayerComponent({ roomData, firebase, ownType }) {
   }, [
     firebase,
     roomData.participants.player.id,
+    roomData.game_play,
     state.user.coin,
     state.user.elo,
     state.user.image_url,
@@ -104,7 +105,7 @@ function PlayerComponent({ roomData, firebase, ownType }) {
           src={thisUser.imageUrl ? thisUser.imageUrl : UserSVG}
           alt="user"
           className={
-            thisUser.imageUrl ? `rounded-circle align-items-center` : "mt-1"
+            thisUser.imageUrl ? `rounded-circle align-items-center brown-border shadow` : "mt-1"
           }
           style={{ width: "40px", height: "40px" }}
         ></img>

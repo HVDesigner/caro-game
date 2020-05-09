@@ -7,26 +7,32 @@ import Exit from "./../../assets/Exit.svg";
 import CheckButton from "./../CheckButton/";
 import DefaultSVG from "./../../assets/default-btn.svg";
 
+import { FirebaseContext } from "./../../Firebase/";
+
 function Setting() {
   const StateGlobal = React.useContext(AppContext);
-  const { changeRoute } = StateGlobal;
+  const firebase = React.useContext(FirebaseContext);
+  const { changeRoute, state } = StateGlobal;
 
+  // true Open
+  // false Off
   const [sound, setSound] = React.useState(true);
 
-  const [vn, setVN] = React.useState({ status: true, type: "VN" });
-  const [en, setEN] = React.useState({ status: false, type: "EN" });
+  // true vn
+  // false en
+  const [language, setLanguage] = React.useState(true);
 
   const [matchingByElo, setMatchingByElo] = React.useState(false);
 
-  const changeLanguage = (id, value) => {
-    if (id === 1) {
-      setVN({ status: value, type: "VN" });
-      setEN({ status: false, type: "EN" });
-    } else {
-      setVN({ status: false, type: "VN" });
-      setEN({ status: value, type: "EN" });
-    }
-  };
+  React.useEffect(() => {
+    setLanguage(state.user.setting.language.value === "vn" ? true : false);
+    setSound(state.user.setting.sound);
+    setMatchingByElo(state.user.setting.matchingByElo);
+  }, [
+    state.user.setting.language.value,
+    state.user.setting.sound,
+    state.user.setting.matchingByElo,
+  ]);
 
   return (
     <Container className="setting-body">
@@ -67,18 +73,22 @@ function Setting() {
                   <div className="flex-fill">
                     <CheckButton
                       text={"Tiếng Việt"}
-                      value={vn.status}
+                      value={language}
                       id={1}
-                      func={changeLanguage}
+                      func={() => {
+                        setLanguage(true);
+                      }}
                     />
                   </div>
 
                   <div className="flex-fill">
                     <CheckButton
                       text={"Tiếng Anh"}
-                      value={en.status}
+                      value={!language}
                       id={2}
-                      func={changeLanguage}
+                      func={() => {
+                        setLanguage(false);
+                      }}
                     />
                   </div>
                 </div>
@@ -112,7 +122,16 @@ function Setting() {
               <img
                 src={DefaultSVG}
                 alt="exit"
-                onClick={() => {}}
+                onClick={() => {
+                  firebase
+                    .firestore()
+                    .collection("users")
+                    .doc(state.user.uid)
+                    .update({
+                      "setting.matchingByElo": matchingByElo,
+                      "setting.sound": sound,
+                    });
+                }}
                 className="wood-btn d-block pl-2 pr-1"
               />
               <img

@@ -61,7 +61,10 @@ function Dashboard() {
                 style={{ backgroundPosition: "right center" }}
               >
                 <h5 className="m-auto">
-                  <span className="text-warning">Elo:</span> {state.user.elo}
+                  <span className="text-warning">Elo:</span>
+                  {Math.round(
+                    (state.user.elo.gomoku + state.user.elo["block-head"]) / 2
+                  )}
                 </h5>
               </li>
             </ul>

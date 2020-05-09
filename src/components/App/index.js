@@ -74,7 +74,10 @@ function App() {
         } else {
           const newUserdata = {
             coin: 1000,
-            elo: 1000,
+            elo: {
+              gomoku: 1000,
+              "block-head": 1000,
+            },
             image_url: userInfo.playerPic,
             name: {
               status: "original",
@@ -93,9 +96,9 @@ function App() {
               path: "dashboard",
             },
             game: {
-              win: 0,
-              lost: 0,
-              tie: 0,
+              win: { gomoku: 0, "block-head": 0 },
+              lost: { gomoku: 0, "block-head": 0 },
+              tie: { gomoku: 0, "block-head": 0 },
             },
             on_queue: false,
             room_id: { value: 0, type: "none" },

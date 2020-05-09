@@ -24,7 +24,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
       setThisUser({
         imageUrl: state.user.image_url,
         name: state.user.name.value,
-        elo: state.user.elo,
+        elo: state.user.elo[roomData.game_play],
         coin: state.user.coin,
       });
     } else {
@@ -38,7 +38,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
             setThisUser({
               imageUrl: doc.data().image_url,
               name: doc.data().name.value,
-              elo: doc.data().elo,
+              elo: doc.data().elo[roomData.game_play],
               coin: doc.data().coin,
             });
           } else {
@@ -56,7 +56,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
             setThisUser({
               imageUrl: snapshot.data().image_url,
               name: snapshot.data().name.value,
-              elo: snapshot.data().elo,
+              elo: snapshot.data().elo[roomData.game_play],
               coin: snapshot.data().coin,
             });
           } else {
@@ -69,6 +69,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
   }, [
     firebase,
     roomData.participants.master.id,
+    roomData.game_play,
     state.user.coin,
     state.user.elo,
     state.user.image_url,
@@ -85,7 +86,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
         <img
           src={thisUser.imageUrl ? thisUser.imageUrl : UserSVG}
           alt="user"
-          className={thisUser.imageUrl ? `rounded-circle` : ""}
+          className={thisUser.imageUrl ? `rounded-circle brown-border shadow` : ""}
           style={{ width: "40px", height: "40px" }}
         ></img>
         <div className="ml-2">

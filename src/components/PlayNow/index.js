@@ -88,7 +88,7 @@ function PlayNow() {
 
   const FindPlayer = () => {
     const data = {
-      elo_level: filterElo(state.user.elo),
+      elo_level: filterElo(state.user.elo[gamePlay ? "gomoku" : "block-head"]),
       room_type: gamePlay ? "gomoku" : "block-head",
       rule: rule ? "6-win" : "6-no-win",
       matching_by_elo: matchingByElo,

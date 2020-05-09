@@ -14,27 +14,27 @@ function ProfileComponent() {
 
   const filterElo = (elo) => {
     if (0 <= elo && elo < 1150) {
-      return "nhap-mon";
+      return "Nhập Môn";
     } else if (1150 <= elo && elo < 1300) {
-      return "tap-su";
+      return "Tập Sự";
     } else if (1300 <= elo && elo < 1450) {
-      return "tan-thu";
+      return "Tân Thủ";
     } else if (1450 <= elo && elo < 1600) {
-      return "ky-thu";
+      return "Kỳ Thủ";
     } else if (1600 <= elo && elo < 1750) {
-      return "cao-thu";
+      return "Cao Thủ";
     } else if (1750 <= elo && elo < 1900) {
-      return "sieu-cao-thu";
+      return "Siêu Cao Thủ";
     } else if (1900 <= elo && elo < 2050) {
-      return "kien-tuong";
+      return "Kiện Tướng";
     } else if (2050 <= elo && elo < 2200) {
-      return "dai-kien-tuong";
+      return "Đại Kiện Tướng";
     } else if (2200 <= elo && elo < 2350) {
-      return "ky-tien";
+      return "Kỳ Tiên";
     } else if (2350 <= elo && elo < 2500) {
-      return "ky-thanh";
+      return "Kỳ Thánh";
     } else {
-      return "nhat-dai-ton-su";
+      return "Nhất Đại Tôn Sư";
     }
   };
 
@@ -66,32 +66,59 @@ function ProfileComponent() {
           <ListGroup className="statistic shadow mb-3">
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">ELO</span>
-                <span className="text-white">{state.user.elo}</span>
+                <span className="text-warning title">ELO Gomoku</span>
+                <span className="text-white">{state.user.elo.gomoku}</span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Cấp độ</span>
-                <span className="text-white">{filterElo(state.user.elo)}</span>
+                <span className="text-warning title">ELO Chặn 2 đầu</span>
+                <span className="text-white">
+                  {state.user.elo["block-head"]}
+                </span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-warning title">Cấp độ Gomoku</span>
+                <span className="text-white">
+                  {filterElo(state.user.elo.gomoku)}
+                </span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-warning title">Cấp độ Chặn 2 đầu</span>
+                <span className="text-white">
+                  {filterElo(state.user.elo["block-head"])}
+                </span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title">Trận thắng</span>
-                <span className="text-white">{state.user.game.win}</span>
+                <span className="text-white">
+                  {state.user.game.win.gomoku +
+                    state.user.game.win["block-head"]}
+                </span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title">Trận thua</span>
-                <span className="text-white">{state.user.game.lost}</span>
+                <span className="text-white">
+                  {state.user.game.lost.gomoku +
+                    state.user.game.lost["block-head"]}
+                </span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title">Trận hòa</span>
-                <span className="text-white">{state.user.game.tie}</span>
+                <span className="text-white">
+                  {state.user.game.tie.gomoku +
+                    state.user.game.tie["block-head"]}
+                </span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
@@ -122,7 +149,7 @@ function ProfileComponent() {
       </Row>
       <Row>
         <Col>
-          <div className="profile-body">
+          <div className="profile-body mb-3">
             <img
               src={ExitSVG}
               alt="exit"

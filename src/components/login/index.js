@@ -54,9 +54,9 @@ function Login() {
       },
       "game-type-select": { value: "gomoku" },
       game: {
-        win: 0,
-        lost: 0,
-        tie: 0,
+        win: { gomoku: 0, "block-head": 0 },
+        lost: { gomoku: 0, "block-head": 0 },
+        tie: { gomoku: 0, "block-head": 0 },
       },
       on_queue: false,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
