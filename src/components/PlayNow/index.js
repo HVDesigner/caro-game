@@ -4,6 +4,7 @@ import AppContext from "./../../context/";
 import Exit from "./../../assets/Exit.svg";
 import FindSVG from "./../../assets/find_enemy.svg";
 import CheckButton from "./../CheckButton/";
+import { Spinner } from "react-bootstrap";
 
 import UserSVG from "./../../assets/Dashboard/user.svg";
 import DefaultSVG from "./../../assets/default-btn.svg";
@@ -294,7 +295,15 @@ function PlayNow() {
           <p className="text-center text-white mb-0">
             {state.user.on_queue ? "Đang tìm đối thủ..." : "..."}
           </p>
-          <p className="text-center text-white mb-0">...</p>
+          {state.user.on_queue ? (
+            <div className="text-center text-white mb-0">
+              <Spinner animation="border" role="status" size="sm">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <p className="text-center text-white mb-0">...</p>
+          )}
         </div>
       </div>
 

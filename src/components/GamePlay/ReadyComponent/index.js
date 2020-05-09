@@ -296,7 +296,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
       default:
         return (
           <React.Fragment>
-            {roomData.participants.player ? (
+            {roomData.participants.player || roomData.type !== "room" ? (
               ""
             ) : (
               <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
