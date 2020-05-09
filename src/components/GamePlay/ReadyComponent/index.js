@@ -125,6 +125,15 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
               break;
 
             default:
+              transaction.update(userCollection.doc(state.user.uid), {
+                "location.path": "lobby",
+                room_id: { type: "none", value: 0 },
+              });
+              transaction.update(roomRef, {
+                "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
+                  state.user.uid
+                ),
+              });
               break;
           }
         });
