@@ -36,6 +36,7 @@ function GamePlayComponent() {
   const [ownStatus, setOwnStatus] = React.useState("");
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
+  const [messageText, setMessageText] = React.useState("");
 
   React.useEffect(() => {
     function getUserType(participants) {
@@ -106,6 +107,27 @@ function GamePlayComponent() {
 
     return () => unsubscribe();
   }, [firebase, state.user.room_id.value, state.user.uid]);
+
+  const onSendMessage = (e) => {
+    e.preventDefault();
+    if (messageText) {
+      firebase
+        .firestore()
+        .collection("rooms")
+        .doc(state.user.room_id.value)
+        .update({
+          conversation: firebase.firestore.FieldValue.arrayUnion({
+            text: messageText,
+            uid: state.user.uid,
+            name: state.user.name.value,
+            createAt: Date.now(),
+          }),
+        })
+        .then(() => {
+          setMessageText("");
+        });
+    }
+  };
 
   if (loading) {
     return <Loading />;
@@ -224,16 +246,24 @@ function GamePlayComponent() {
         </div>
 
         <div className="flex-fill position-relative">
-          <Chat roomData={roomData} setShowMenu={setShowMenu} />
+          <Chat
+            roomData={roomData}
+            setShowMenu={setShowMenu}
+            ownType={ownType}
+          />
         </div>
         <Row>
           <Col>
             <div className="p-1 rounded">
-              <input
-                className="input-carotv-2 text-white text-left w-100"
-                placeholder="Nhập tin nhắn..."
-                type="text"
-              />
+              <form onSubmit={onSendMessage}>
+                <input
+                  className="input-carotv-2 text-white text-left w-100"
+                  placeholder="Nhập tin nhắn..."
+                  type="text"
+                  onChange={(e) => setMessageText(e.target.value)}
+                  value={messageText}
+                />
+              </form>
             </div>
           </Col>
         </Row>

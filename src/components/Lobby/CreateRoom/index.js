@@ -114,6 +114,7 @@ function CreateRoom() {
         time: getTime().type,
         title: name ? name : `Phòng của ${state.user.name.value}`,
         type: "room",
+        conversation: [],
         participants: {
           master: {
             id: state.user.uid,
