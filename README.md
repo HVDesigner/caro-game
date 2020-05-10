@@ -2,7 +2,7 @@ Task
 
 - Setting
 
-  - Save Button : **Setup**
+  - Save Button : **Done**
   - Sound : **Setup**
   - Language : **Setup**
 
@@ -25,7 +25,7 @@ Task
   - Border Master icon : **Done**
   - Circle icon Watcher : **Done**
   - Border icon Watcher : **Done**
-  - Chat
+  - Chat : **Done**
   - Invite Friend
   - Remove coin in `Winner Modal` Quick Play mode : **Done**
 
@@ -35,9 +35,9 @@ Task
   - Count user in Block Head : **Done**
   - Playing : **Done**
   - Free : **Done**
-  - Count Watcher in each room
+  - Count Watcher in each room : **Done**
   - Find Room
-  - Room No Lock
+  - Room No Lock : **Done**
 
 - Create Room
 

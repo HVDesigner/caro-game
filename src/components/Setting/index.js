@@ -5,7 +5,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import AppContext from "./../../context/";
 import Exit from "./../../assets/Exit.svg";
 import CheckButton from "./../CheckButton/";
-import DefaultSVG from "./../../assets/default-btn.svg";
+import SaveSVG from "./../../assets/save.svg";
 
 import { FirebaseContext } from "./../../Firebase/";
 
@@ -23,6 +23,8 @@ function Setting() {
   const [language, setLanguage] = React.useState(true);
 
   const [matchingByElo, setMatchingByElo] = React.useState(false);
+
+  const [message, setMessage] = React.useState("");
 
   React.useEffect(() => {
     setLanguage(state.user.setting.language.value === "vn" ? true : false);
@@ -118,11 +120,20 @@ function Setting() {
               </div>
             </div>
 
+            {message ? (
+              <div className="mt-5 text-center">
+                <h4 className="text-warning text-stroke-carotv">{message}</h4>
+              </div>
+            ) : (
+              ""
+            )}
             <div className="setting-btn mb-2 d-flex fixed-bottom">
               <img
-                src={DefaultSVG}
-                alt="exit"
+                src={SaveSVG}
+                alt="save"
                 onClick={() => {
+                  setMessage("");
+
                   firebase
                     .firestore()
                     .collection("users")
@@ -130,6 +141,9 @@ function Setting() {
                     .update({
                       "setting.matchingByElo": matchingByElo,
                       "setting.sound": sound,
+                    })
+                    .then(() => {
+                      setMessage("Thành công");
                     });
                 }}
                 className="wood-btn d-block pl-2 pr-1"

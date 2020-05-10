@@ -25,8 +25,17 @@ function FooterComponent() {
       <Nav className="fixed-bottom footer-lobby" fill>
         <Nav.Item
           className="text-white p-2 text-center wood-btn-back"
+          onClick={() => {}}
+        >
+          <h5 className="m-0 text-stroke-carotv">TÌM PHÒNG</h5>
+        </Nav.Item>
+        <Nav.Item
+          className="text-white p-2 text-center wood-btn-back"
           onClick={() => {
             changeRoute("create-room");
+          }}
+          style={{
+            borderLeft: "2px solid #4e311d",
           }}
         >
           <h5 className="m-0 text-stroke-carotv">TẠO BÀN</h5>

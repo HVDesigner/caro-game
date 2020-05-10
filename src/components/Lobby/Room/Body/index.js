@@ -15,6 +15,47 @@ function BodyComponent({ roomData, setShowFooter, showFooter }) {
 
   const onJoinRoomSubmit = () => {
     if (roomData.type === "room") {
+      const roomWithIdRef = firebase
+        .firestore()
+        .collection("rooms")
+        .doc(roomData.rid);
+
+      return firebase.firestore().runTransaction((transaction) => {
+        return transaction
+          .get(roomWithIdRef)
+          .then((tranDoc) => {
+            if (!tranDoc.exists) {
+              console.log("Document does not exist!");
+            }
+
+            const roomUpdates = {};
+            if (tranDoc.data().participants.player) {
+              roomUpdates[
+                "participants.watcher"
+              ] = firebase.firestore.FieldValue.arrayUnion(state.user.uid);
+            } else {
+              roomUpdates["participants.player.id"] = state.user.uid;
+              roomUpdates["participants.player.status"] = "waiting";
+              roomUpdates["participants.player.win"] = 0;
+            }
+
+            return transaction.update(roomWithIdRef, roomUpdates);
+          })
+          .then(async () => {
+            return await firebase
+              .firestore()
+              .collection("users")
+              .doc(state.user.uid)
+              .update({
+                "room_id.type": roomData["game-play"],
+                "room_id.value": roomData.rid,
+                "location.path": "room",
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
     } else {
       const roomByIdDoc = firebase
         .firestore()

@@ -18,7 +18,7 @@ function ProfileComponent() {
     <Container className="proflie-body">
       <Row>
         <Col>
-          <div className="d-flex flex-column align-items-center header-profile mt-3">
+          <div className="d-flex flex-column align-items-center header-profile mt-3 mb-1">
             <h4 className="text-white mb-3">Thông tin</h4>
             <img
               src={state.user.image_url ? state.user.image_url : UserSVG}
