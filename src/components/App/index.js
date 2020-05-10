@@ -17,6 +17,7 @@ const PlayNow = React.lazy(() => import("./../PlayNow/"));
 const Lobby = React.lazy(() => import("./../Lobby/"));
 const Login = React.lazy(() => import("./../login/"));
 const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
+const TopList = React.lazy(() => import("./../TopList/"));
 
 function App() {
   const { state, dispatch } = React.useContext(AppContext);
@@ -221,6 +222,12 @@ function App() {
       return (
         <React.Suspense fallback={<LoadingComponent />}>
           <GamePlay />
+        </React.Suspense>
+      );
+    case "toplist":
+      return (
+        <React.Suspense fallback={<LoadingComponent />}>
+          <TopList />
         </React.Suspense>
       );
 

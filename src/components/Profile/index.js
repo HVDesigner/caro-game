@@ -7,36 +7,12 @@ import { LANGUAGE_BY_LOCALE } from "./../../locale-constant";
 
 import AppContext from "./../../context/";
 
+import { filterElo } from "./../../functions/";
+
 function ProfileComponent() {
   const StateGlobal = React.useContext(AppContext);
 
   const { state, changeRoute } = StateGlobal;
-
-  const filterElo = (elo) => {
-    if (0 <= elo && elo < 1150) {
-      return "Nhập Môn";
-    } else if (1150 <= elo && elo < 1300) {
-      return "Tập Sự";
-    } else if (1300 <= elo && elo < 1450) {
-      return "Tân Thủ";
-    } else if (1450 <= elo && elo < 1600) {
-      return "Kỳ Thủ";
-    } else if (1600 <= elo && elo < 1750) {
-      return "Cao Thủ";
-    } else if (1750 <= elo && elo < 1900) {
-      return "Siêu Cao Thủ";
-    } else if (1900 <= elo && elo < 2050) {
-      return "Kiện Tướng";
-    } else if (2050 <= elo && elo < 2200) {
-      return "Đại Kiện Tướng";
-    } else if (2200 <= elo && elo < 2350) {
-      return "Kỳ Tiên";
-    } else if (2350 <= elo && elo < 2500) {
-      return "Kỳ Thánh";
-    } else {
-      return "Nhất Đại Tôn Sư";
-    }
-  };
 
   return (
     <Container className="proflie-body">

@@ -1,0 +1,19 @@
+.toplist-main {
+  background-image: url("./../../assets/matching_background.svg");
+  background-size: 60%;
+  height: 100vh;
+  width: 100vw;
+}
+
+.bottom-btn {
+  background-image: url("./../../assets/backgroung_carotv_2.svg");
+}
+
+.toplist-top-menu {
+  background-image: url("./../../assets/backgroung_carotv_2.svg");
+}
+
+.user-list-top img {
+  width: 50px;
+  height: 50px;
+}

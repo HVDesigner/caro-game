@@ -143,7 +143,14 @@ function Dashboard() {
         <Row>
           <Col>
             <div className="svg_btn mb-1">
-              <img src={TopTenSVG} alt="top-10" className="wood-btn"></img>
+              <img
+                src={TopTenSVG}
+                alt="top-10"
+                className="wood-btn"
+                onClick={() => {
+                  changeRoute("toplist");
+                }}
+              ></img>
             </div>
           </Col>
         </Row>
