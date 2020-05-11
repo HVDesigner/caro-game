@@ -20,7 +20,7 @@ function Counter({ time, roomData, userType, ownType }) {
       setCounter(0);
       clearInterval(timer);
 
-      let updateRoom = {};
+      const updateRoom = {};
 
       updateRoom[`participants.${userType}.status`] = "loser";
       updateRoom[
@@ -28,6 +28,7 @@ function Counter({ time, roomData, userType, ownType }) {
       ] = "winner";
       updateRoom[`game.status.ready`] = 0;
       updateRoom[`game.player`] = {};
+
       firebase
         .firestore()
         .collection("rooms")
