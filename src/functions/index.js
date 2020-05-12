@@ -1,8 +1,15 @@
+/**
+ *
+ * Chức năng trời khỏi bàn chơi.
+ *
+ * @param {({roomId, userId})} data
+ * @param {firebase} firebase
+ */
 export const leaveRoom = async (data, firebase) => {
   const { roomId, userId } = data;
 
-  let docRooms = firebase.firestore().collection("rooms").doc(roomId);
-  let docUser = firebase.firestore().collection("users").doc(userId);
+  const docRooms = firebase.firestore().collection("rooms").doc(roomId);
+  const docUser = firebase.firestore().collection("users").doc(userId);
 
   try {
     // Out room
@@ -121,10 +128,17 @@ export const leaveRoom = async (data, firebase) => {
   }
 };
 
+/**
+ * --------------------------------------------------------------------------------------
+ * Chức năng cập nhật thông tin khi thắng cuộc.
+ *
+ * @param {({ownType, roomId})} data
+ * @param {function} firebase
+ */
 export const winAction = async (data, firebase) => {
   const { ownType, roomId } = data;
 
-  let updateRoom = {};
+  const updateRoom = {};
 
   updateRoom[`participants.${ownType}.status`] = "winner";
   updateRoom[
@@ -136,6 +150,12 @@ export const winAction = async (data, firebase) => {
   firebase.firestore().collection("rooms").doc(roomId).update(updateRoom);
 };
 
+/**
+ * ----------------------------------------------------------------------------------------
+ * Chức năng chuyển ELO qua kiểu chữ.
+ *
+ * @param {number} elo
+ */
 export const filterElo = (elo) => {
   if (0 <= elo && elo < 1150) {
     return "Nhập Môn";
