@@ -1,39 +1,68 @@
 function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
+  /**
+   * Chức năng kiểm tra xung quanh để tìm người thắng.
+   * @param {number} rowkey
+   * @param {number} colkey
+   */
   const checkAround = (rowkey, colkey) => {
+    /**
+     * -----------------------------------------------------------------------------
+     *
+     * Hàng dọc.
+     */
     if (
       countPoint(getNorthToSouth(colkey)).winner === 1 ||
       countPoint(getNorthToSouth(colkey)).winner === 2
     ) {
+      // Nếu có người thắng.
       return {
         isPlay: false,
         winner: countPoint(getNorthToSouth(colkey)).winner,
       };
     }
 
+    /**
+     * -----------------------------------------------------------------------------
+     *
+     * Hàng ngang.
+     */
     if (
       countPoint(getWestToEast(rowkey)).winner === 1 ||
       countPoint(getWestToEast(rowkey)).winner === 2
     ) {
+      // Nếu có người thắng.
       return {
         isPlay: false,
         winner: countPoint(getWestToEast(rowkey)).winner,
       };
     }
 
+    /**
+     * -----------------------------------------------------------------------------
+     *
+     * Chéo trái.
+     */
     if (
       countPoint(getNorthwestToSoutheast(rowkey, colkey)).winner === 1 ||
       countPoint(getNorthwestToSoutheast(rowkey, colkey)).winner === 2
     ) {
+      // Nếu có người thắng.
       return {
         isPlay: false,
         winner: countPoint(getNorthwestToSoutheast(rowkey, colkey)).winner,
       };
     }
 
+    /**
+     * -----------------------------------------------------------------------------
+     *
+     * Chéo phải.
+     */
     if (
       countPoint(getNortheastToSouthwest(rowkey, colkey)).winner === 1 ||
       countPoint(getNortheastToSouthwest(rowkey, colkey)).winner === 2
     ) {
+      // Nếu có người thắng.
       return {
         isPlay: false,
         winner: countPoint(getNortheastToSouthwest(rowkey, colkey)).winner,
@@ -46,7 +75,17 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
     };
   };
 
+  /**
+   * --------------------------------------------------------------------------------------
+   * Chức năng tìm người thắng trong 1 hàng bất kỳ.
+   *
+   * @param {Array} arr
+   */
   const countPoint = (arr) => {
+    /**
+     * -------------------------------------------------------------------------------------
+     * Tìm người thắng với giá trị 1 (X).
+     */
     const maxOnePoint = () => {
       let max = 0;
       let count = 0;
@@ -103,6 +142,10 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
       return max;
     };
 
+    /**
+     * ------------------------------------------------------------------------------------
+     * TÌm người thắng với giá trị 2 (O).
+     */
     const maxTwoPoint = () => {
       let max = 0;
       let count = 0;
@@ -158,8 +201,16 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
       return max;
     };
 
+    /**
+     * ------------------------------------------------------------------------------------
+     * Nếu như có người thắng với giá trị 1 (X), thì trả về { winner: 1 }.
+     */
     if (maxOnePoint() >= 5) return { winner: 1 };
 
+    /**
+     * -------------------------------------------------------------------------------------
+     * Nếu như có người thắng với giá trị 2 (O), thì trả về { winner: 2 }.
+     */
     if (maxTwoPoint() >= 5) return { winner: 2 };
 
     return { winner: "" };
