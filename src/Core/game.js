@@ -72,26 +72,12 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
 
         let headCheck = 0;
 
-        for (let index = indexMaxArr[0]; index > 0; index--) {
-          const element = arr[index];
-
-          if (element === 2) {
-            headCheck = headCheck + 1;
-            break;
-          }
+        if (arr[indexMaxArr[0] - 1] === 2) {
+          headCheck = headCheck + 1;
         }
 
-        for (
-          let index = indexMaxArr[indexMaxArr.length - 1];
-          index < arr.length;
-          index++
-        ) {
-          const element = arr[index];
-
-          if (element === 2) {
-            headCheck = headCheck + 1;
-            break;
-          }
+        if (arr[indexMaxArr[indexMaxArr.length - 1] + 1] === 2) {
+          headCheck = headCheck + 1;
         }
 
         if (headCheck === 2) return 0;
@@ -141,27 +127,14 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
         }
 
         let headCheck = 0;
+        console.log(JSON.stringify(indexMaxArr));
 
-        for (let index = indexMaxArr[0]; index > 0; index--) {
-          const element = arr[index];
-
-          if (element === 1) {
-            headCheck = headCheck + 1;
-            break;
-          }
+        if (arr[indexMaxArr[0] - 1] === 1) {
+          headCheck = headCheck + 1;
         }
 
-        for (
-          let index = indexMaxArr[indexMaxArr.length - 1];
-          index < arr.length;
-          index++
-        ) {
-          const element = arr[index];
-
-          if (element === 1) {
-            headCheck = headCheck + 1;
-            break;
-          }
+        if (arr[indexMaxArr[indexMaxArr.length - 1] + 1] === 1) {
+          headCheck = headCheck + 1;
         }
 
         if (headCheck === 2) return 0;
@@ -179,7 +152,7 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
         }
       }
 
-      // Check Rule 6 Win
+      // Kiểm tra luật 6 quân không thắng.
       if (rule === "6-no-win" && max > 5) return 0;
 
       return max;
