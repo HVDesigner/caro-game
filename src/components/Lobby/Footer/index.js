@@ -7,7 +7,7 @@ function FooterComponent() {
   const { changeRoute, state } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
 
-  const exitLooby = React.useCallback(() => {
+  const exitLooby = () => {
     firebase
       .firestore()
       .collection("users")
@@ -18,7 +18,7 @@ function FooterComponent() {
       .then(() => {
         changeRoute("dashboard");
       });
-  }, [changeRoute, firebase, state.user.uid]);
+  };
 
   return (
     <Row className="">
@@ -27,7 +27,7 @@ function FooterComponent() {
           className="text-white p-2 text-center wood-btn-back"
           onClick={() => {}}
         >
-          <h5 className="m-0 text-stroke-carotv">TÌM PHÒNG</h5>
+          <h5 className="m-0 text-stroke-carotv">TÌM BÀN</h5>
         </Nav.Item>
         <Nav.Item
           className="text-white p-2 text-center wood-btn-back"

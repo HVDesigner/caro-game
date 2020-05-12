@@ -5,9 +5,12 @@ import { GET_SQUARE_POSITION } from "./ActionTypes";
 import { FirebaseContext } from "./../Firebase/";
 
 function GlobalState(props) {
-  const [firebase] = React.useState(React.useContext(FirebaseContext));
+  const firebase = React.useContext(FirebaseContext);
 
   const [state, dispatch] = React.useReducer(reducer, {
+    modal: {
+      "find-room": false,
+    },
     user: {
       coin: 0,
       createdAt: 0,

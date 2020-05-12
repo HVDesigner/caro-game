@@ -33,27 +33,29 @@ function App() {
   });
 
   React.useEffect(() => {
-    window.FBInstant.initializeAsync().then(function () {
-      window.FBInstant.startGameAsync()
-        .then(() => {
-          const playerName = window.FBInstant.player.getName();
-          const playerPic = window.FBInstant.player.getPhoto();
-          const playerId = window.FBInstant.player.getID();
-          const playerLocale = window.FBInstant.getLocale();
-          const platform = window.FBInstant.getPlatform();
+    if (process.env.NODE_ENV === "production") {
+      window.FBInstant.initializeAsync().then(function () {
+        window.FBInstant.startGameAsync()
+          .then(() => {
+            const playerName = window.FBInstant.player.getName();
+            const playerPic = window.FBInstant.player.getPhoto();
+            const playerId = window.FBInstant.player.getID();
+            const playerLocale = window.FBInstant.getLocale();
+            const platform = window.FBInstant.getPlatform();
 
-          setUserInfo({
-            playerId,
-            playerName,
-            playerPic,
-            playerLocale,
-            platform: platform.toLowerCase(),
+            setUserInfo({
+              playerId,
+              playerName,
+              playerPic,
+              playerLocale,
+              platform: platform.toLowerCase(),
+            });
+          })
+          .then(() => {
+            setLoading(false);
           });
-        })
-        .then(() => {
-          setLoading(false);
-        });
-    });
+      });
+    }
 
     if (process.env.NODE_ENV === "development") {
       setLoading(false);

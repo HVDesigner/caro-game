@@ -6,7 +6,6 @@ import "./GamePlay.css";
 import UserSVG from "./../../assets/Dashboard/user.svg";
 
 // Components
-// import ReadyComponent from "./ReadyComponent/";
 import Loading from "./../Loading/";
 import Gomoku from "./Gomoku/";
 import Original from "./Original/";

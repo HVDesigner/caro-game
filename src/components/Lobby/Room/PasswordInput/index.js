@@ -7,6 +7,9 @@ import LeftSVG from "./../../../../assets/chevron-left.svg";
 import { FirebaseContext } from "./../../../../Firebase/";
 import AppContext from "./../../../../context/";
 
+// Functions
+import { loginRoom } from "./../../../../functions/";
+
 function PasswordInput({ roomData }) {
   const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
@@ -23,12 +26,8 @@ function PasswordInput({ roomData }) {
     if (pass) {
       setLoginInProcess(true);
       setPassError({ status: false, text: "" });
-      const loginRoom = firebase
-        .app()
-        .functions("asia-east2")
-        .httpsCallable("loginRoom");
 
-      loginRoom({ uid: state.user.uid, ...roomData, rawText: pass })
+      loginRoom({ uid: state.user.uid, ...roomData, rawText: pass }, firebase)
         .then()
         .catch(() => {
           setLoginInProcess(false);

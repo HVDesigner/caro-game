@@ -180,7 +180,6 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
         }
 
         let headCheck = 0;
-        console.log(JSON.stringify(indexMaxArr));
 
         if (arr[indexMaxArr[0] - 1] === 1) {
           headCheck = headCheck + 1;
