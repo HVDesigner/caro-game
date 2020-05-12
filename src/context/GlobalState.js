@@ -38,6 +38,15 @@ function GlobalState(props) {
     },
   });
 
+  /**
+   *
+   * ----------------------------------------------------------------------------------
+   * Chức năng chuyển trang.
+   *
+   * @param {string} path
+   * @param {number} id
+   * @param {string} type
+   */
   const changeRoute = (path, id = 0, type = "") => {
     if (state.user.uid && state.user.location.path !== path) {
       const userDoc = firebase
@@ -67,6 +76,15 @@ function GlobalState(props) {
     }
   };
 
+  /**
+   *
+   * ----------------------------------------------------------------------------------
+   * Chức năng lấy vị trí của con trỏ chuột trên bàn cờ.
+   *
+   * @param {boolean} status
+   * @param {number} row
+   * @param {number} col
+   */
   const getPositonSquare = (status, row, col) => {
     return dispatch({
       type: GET_SQUARE_POSITION,
@@ -74,6 +92,10 @@ function GlobalState(props) {
     });
   };
 
+  /**
+   * ----------------------------------------------------------------------------------
+   * Trả về một Context Provider.
+   */
   return (
     <AppContext.Provider
       value={{

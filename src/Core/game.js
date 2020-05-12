@@ -1,5 +1,14 @@
+/**
+ * Game Core
+ *
+ * @param {Array} caroTable
+ * @param {("block-head" | "gomoku")} type
+ * @param {("6-no-win" | "6-win")} rule
+ */
 function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
   /**
+   *
+   * -------------------------------------------------------------------------------------
    * Chức năng kiểm tra xung quanh để tìm người thắng.
    * @param {number} rowkey
    * @param {number} colkey
@@ -76,6 +85,7 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
   };
 
   /**
+   *
    * --------------------------------------------------------------------------------------
    * Chức năng tìm người thắng trong 1 hàng bất kỳ.
    *
@@ -213,9 +223,20 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
      */
     if (maxTwoPoint() >= 5) return { winner: 2 };
 
+    /**
+     * -------------------------------------------------------------------------------------
+     * Nếu như chưa có người thắng, thì trả về { winner: '' }.
+     */
     return { winner: "" };
   };
 
+  /**
+   *
+   * ----------------------------------------------------------------------------------------
+   * Chức năng lấy mảng hàng dọc.
+   *
+   * @param {number} colkey
+   */
   const getNorthToSouth = (colkey) => {
     let arr = [];
     for (let index = 0; index < caroTable.length; index++) {
@@ -226,6 +247,13 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
     return arr;
   };
 
+  /**
+   *
+   * ----------------------------------------------------------------------------------------
+   * Chức năng lấy mảng hàng ngang.
+   *
+   * @param {number} rowkey
+   */
   const getWestToEast = (rowkey) => {
     let arr = [];
     arr = caroTable[rowkey];
@@ -233,6 +261,14 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
     return arr;
   };
 
+  /**
+   *
+   * -----------------------------------------------------------------------------------------
+   * Chức năng lấy mảng chéo trái.
+   *
+   * @param {number} rowkey
+   * @param {number} colkey
+   */
   const getNorthwestToSoutheast = (rowkey, colkey) => {
     let finalArr = [];
 
@@ -293,7 +329,17 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
     return finalArr;
   };
 
+  /**
+   * ------------------------------------------------------------------------------------------
+   * Chức năng lấy mảng chéo phải.
+   *
+   * @param {number} rowkey
+   * @param {number} colkey
+   */
   const getNortheastToSouthwest = (rowkey, colkey) => {
+    /**
+     * Khởi tạo giá trị mảng đích.
+     */
     let finalArr = [];
 
     const checkNortheast = () => {
@@ -346,6 +392,11 @@ function GamePlay(caroTable, type = "block-head", rule = "6-no-win") {
     return finalArr;
   };
 
+  /**
+   *
+   * ------------------------------------------------------------------------------------------
+   * Trả về chức năng kiểm tra xung quanh để tìm người thắng.
+   */
   return { checkAround };
 }
 
