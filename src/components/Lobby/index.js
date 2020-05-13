@@ -6,6 +6,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import Room from "./Room/";
 import Menu from "./Menu/";
 import Footer from "./Footer/";
+import FindRoomModal from "./FindRoom/";
 
 // contexts
 import AppContext from "./../../context/";
@@ -16,19 +17,22 @@ function Lobby() {
   const { state } = React.useContext(AppContext);
 
   return (
-    <Container fluid className="rooms-lobby">
-      <Menu />
+    <React.Fragment>
+      {state.modal["find-room"] ? <FindRoomModal /> : ""}
+      <Container fluid className="rooms-lobby position-relative">
+        <Menu />
 
-      {state.user["game-type-select"].value === "gomoku" ? (
-        <GomokuRoomsComponent />
-      ) : state.user["game-type-select"].value === "block-head" ? (
-        <BlockHeadRoomsComponent />
-      ) : (
-        ""
-      )}
+        {state.user["game-type-select"].value === "gomoku" ? (
+          <GomokuRoomsComponent />
+        ) : state.user["game-type-select"].value === "block-head" ? (
+          <BlockHeadRoomsComponent />
+        ) : (
+          ""
+        )}
 
-      <Footer />
-    </Container>
+        <Footer />
+      </Container>
+    </React.Fragment>
   );
 }
 export default Lobby;

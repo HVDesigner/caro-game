@@ -3,9 +3,18 @@ import { Row, Nav } from "react-bootstrap";
 import AppContext from "./../../../context/";
 import { FirebaseContext } from "./../../../Firebase/";
 
+import { TOGGLE_FIND_ROOM_MODAL } from "./../../../context/ActionTypes";
+
 function FooterComponent() {
-  const { changeRoute, state } = React.useContext(AppContext);
+  const { changeRoute, state, dispatch } = React.useContext(AppContext);
   const [firebase] = React.useState(React.useContext(FirebaseContext));
+
+  const findRoom = () => {
+    dispatch({
+      type: TOGGLE_FIND_ROOM_MODAL,
+      payload: true,
+    });
+  };
 
   const exitLooby = () => {
     firebase
@@ -25,7 +34,9 @@ function FooterComponent() {
       <Nav className="fixed-bottom footer-lobby" fill>
         <Nav.Item
           className="text-white p-2 text-center wood-btn-back"
-          onClick={() => {}}
+          onClick={() => {
+            findRoom();
+          }}
         >
           <h5 className="m-0 text-stroke-carotv">TÌM BÀN</h5>
         </Nav.Item>
