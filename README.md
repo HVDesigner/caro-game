@@ -28,6 +28,7 @@ Task
   - Chat : **Done**
   - Invite Friend
   - Remove coin in `Winner Modal` Quick Play mode : **Done**
+  - Count users in room
 
 - Lobby
 

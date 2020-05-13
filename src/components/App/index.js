@@ -32,7 +32,7 @@ function App() {
     playerName: "",
     playerPic: "",
     playerLocale: "",
-    platform: "",
+    platform: "web",
   });
 
   React.useEffect(() => {
@@ -162,7 +162,11 @@ function App() {
           if (querySnapshot.exists) {
             dispatch({
               type: SET_USER_DATA,
-              payload: { ...querySnapshot.data(), uid: state.user.uid },
+              payload: {
+                ...querySnapshot.data(),
+                uid: state.user.uid,
+                platform: userInfo.platform,
+              },
             });
           }
         });
@@ -173,7 +177,7 @@ function App() {
         return unsubscribe();
       }
     };
-  }, [dispatch, firebase, state.user.uid]);
+  }, [dispatch, firebase, state.user.uid, userInfo.platform]);
 
   const PageShow = (path) => {
     switch (path) {
