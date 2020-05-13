@@ -4,6 +4,8 @@ import AppContext from "./../../context/";
 import { FirebaseContext } from "./../../Firebase/";
 import { SET_USER_DATA } from "./../../context/ActionTypes";
 
+import { useFirestoreCollection, useFirestore } from "reactfire";
+
 function Login() {
   const StateGlobal = React.useContext(AppContext);
   const firebase = React.useContext(FirebaseContext);
@@ -14,21 +16,25 @@ function Login() {
   const [userList, setUserList] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
+  const allUser = useFirestore().collection("users");
+
+  const listUser = useFirestoreCollection(allUser);
+
+  console.log(listUser);
+  // .get()
+  // .then(function (querySnapshot) {
+
+  //   setUserList(arr);
+  // });
+
   React.useEffect(() => {
-    // Get all users
-    firebase
-      .firestore()
-      .collection("users")
-      .get()
-      .then(function (querySnapshot) {
-        const arr = [];
-        querySnapshot.forEach(function (doc) {
-          arr.push({ uid: doc.id, ...doc.data() });
-        });
-        setUserList(arr);
-        setLoading(false);
-      });
-  }, [firebase]);
+    const arr = [];
+    listUser.forEach(function (doc) {
+      arr.push({ uid: doc.id, ...doc.data() });
+    });
+    setUserList(arr);
+    setLoading(false);
+  }, [listUser]);
 
   const setUserData = (value) => {
     dispatch({
@@ -39,44 +45,44 @@ function Login() {
 
   const submitForm = (e) => {
     e.preventDefault();
-    const newUserdata = {
-      coin: 1000,
-      elo: { gomoku: 1000, "block-head": 1000 },
-      image_url: "",
-      locale: "vi_VN",
-      location: { path: "dashboard" },
-      name: { value: name, status: "original" },
-      room_id: { value: 0, type: "none" },
-      setting: {
-        sound: true,
-        matchingByElo: true,
-        language: { status: "original", value: "vn" },
-      },
-      "game-type-select": { value: "gomoku" },
-      game: {
-        win: { gomoku: 0, "block-head": 0 },
-        lost: { gomoku: 0, "block-head": 0 },
-        tie: { gomoku: 0, "block-head": 0 },
-      },
-      on_queue: false,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    };
+    // const newUserdata = {
+    //   coin: 1000,
+    //   elo: { gomoku: 1000, "block-head": 1000 },
+    //   image_url: "",
+    //   locale: "vi_VN",
+    //   location: { path: "dashboard" },
+    //   name: { value: name, status: "original" },
+    //   room_id: { value: 0, type: "none" },
+    //   setting: {
+    //     sound: true,
+    //     matchingByElo: true,
+    //     language: { status: "original", value: "vn" },
+    //   },
+    //   "game-type-select": { value: "gomoku" },
+    //   game: {
+    //     win: { gomoku: 0, "block-head": 0 },
+    //     lost: { gomoku: 0, "block-head": 0 },
+    //     tie: { gomoku: 0, "block-head": 0 },
+    //   },
+    //   on_queue: false,
+    //   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    //   updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    // };
 
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(id)
-      .set(newUserdata)
-      .then(function () {
-        dispatch({
-          type: SET_USER_DATA,
-          payload: { ...newUserdata, uid: id, platform: "web" },
-        });
-      })
-      .catch(function (error) {
-        console.error("Error writing document: ", error);
-      });
+    // firebase
+    //   .firestore()
+    //   .collection("users")
+    //   .doc(id)
+    //   .set(newUserdata)
+    //   .then(function () {
+    //     dispatch({
+    //       type: SET_USER_DATA,
+    //       payload: { ...newUserdata, uid: id, platform: "web" },
+    //     });
+    //   })
+    //   .catch(function (error) {
+    //     console.error("Error writing document: ", error);
+    //   });
   };
 
   const resetUser = (id) => {
@@ -96,47 +102,40 @@ function Login() {
 
   return (
     <Container className="bg-light pt-2" style={{ minHeight: "100vh" }}>
-      {loading ? (
-        <Row>
-          <Col>
-            <p className="text-center">Loading...</p>
-          </Col>
-        </Row>
-      ) : (
-        <Row>
-          <Col>
-            {userList.map((value) => {
-              return (
-                <Card key={value.uid} className="mb-2">
-                  <Card.Body
-                    className="d-flex"
+      <Row>
+        <Col>
+          {userList.map((value) => {
+            return (
+              <Card key={value.uid} className="mb-2">
+                <Card.Body
+                  className="d-flex"
+                  onClick={() => {
+                    setUserData(value);
+                  }}
+                >
+                  <p className="mb-0 mr-auto">
+                    <strong>{value.name.value}</strong>
+                  </p>
+                  <p className="mb-0">{value.uid}</p>
+                </Card.Body>
+                <Card.Footer>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    block
                     onClick={() => {
-                      setUserData(value);
+                      resetUser(value.uid);
                     }}
                   >
-                    <p className="mb-0 mr-auto">
-                      <strong>{value.name.value}</strong>
-                    </p>
-                    <p className="mb-0">{value.uid}</p>
-                  </Card.Body>
-                  <Card.Footer>
-                    <Button
-                      variant="primary"
-                      type="submit"
-                      block
-                      onClick={() => {
-                        resetUser(value.uid);
-                      }}
-                    >
-                      Reset
-                    </Button>
-                  </Card.Footer>
-                </Card>
-              );
-            })}
-          </Col>
-        </Row>
-      )}
+                    Reset
+                  </Button>
+                </Card.Footer>
+              </Card>
+            );
+          })}
+        </Col>
+      </Row>
+
       <Row>
         <Col>
           <h3 className="mt-3">Login</h3>

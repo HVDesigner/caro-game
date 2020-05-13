@@ -151,31 +151,31 @@ function App() {
   ]);
 
   React.useEffect(() => {
-    let unsubscribe;
+    // let unsubscribe;
 
     if (state.user.uid) {
-      unsubscribe = firebase
-        .firestore()
-        .collection("users")
-        .doc(state.user.uid)
-        .onSnapshot(function (querySnapshot) {
-          if (querySnapshot.exists) {
-            dispatch({
-              type: SET_USER_DATA,
-              payload: {
-                ...querySnapshot.data(),
-                uid: state.user.uid,
-                platform: userInfo.platform,
-              },
-            });
-          }
-        });
+      // unsubscribe = firebase
+      //   .firestore()
+      //   .collection("users")
+      //   .doc(state.user.uid)
+      //   .onSnapshot(function (querySnapshot) {
+      //     if (querySnapshot.exists) {
+      //       dispatch({
+      //         type: SET_USER_DATA,
+      //         payload: {
+      //           ...querySnapshot.data(),
+      //           uid: state.user.uid,
+      //           platform: userInfo.platform,
+      //         },
+      //       });
+      //     }
+      //   });
     }
 
     return () => {
-      if (state.user.uid) {
-        return unsubscribe();
-      }
+      // if (state.user.uid) {
+      //   return unsubscribe();
+      // }
     };
   }, [dispatch, firebase, state.user.uid, userInfo.platform]);
 
