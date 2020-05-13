@@ -23,7 +23,7 @@ function FindRoom() {
     if (e) {
       e.preventDefault();
     }
-    console.log(roomId);
+
     firebase
       .firestore()
       .collection("rooms")
@@ -31,13 +31,97 @@ function FindRoom() {
       .get()
       .then(function (doc) {
         if (doc.exists) {
-          console.log("Document data:", doc.data());
-          console.log(doc.data().password.status, password);
-          if (doc.data().password.status && password !== "") {
+          if (!doc.data().password.status) {
+            if (doc.data().type === "room") {
+              const roomWithIdRef = firebase
+                .firestore()
+                .collection("rooms")
+                .doc(roomId.toString());
+
+              return firebase.firestore().runTransaction((transaction) => {
+                return transaction
+                  .get(roomWithIdRef)
+                  .then((tranDoc) => {
+                    if (!tranDoc.exists) {
+                      console.log("Document does not exist!");
+                    }
+
+                    const roomUpdates = {};
+                    if (tranDoc.data().participants.player) {
+                      roomUpdates[
+                        "participants.watcher"
+                      ] = firebase.firestore.FieldValue.arrayUnion(
+                        state.user.uid
+                      );
+                    } else {
+                      roomUpdates["participants.player.id"] = state.user.uid;
+                      roomUpdates["participants.player.status"] = "waiting";
+                      roomUpdates["participants.player.win"] = 0;
+                    }
+
+                    return transaction.update(roomWithIdRef, roomUpdates);
+                  })
+                  .then(async () => {
+                    return await firebase
+                      .firestore()
+                      .collection("users")
+                      .doc(state.user.uid)
+                      .update({
+                        "room_id.type": doc.data()["game-play"],
+                        "room_id.value": roomId.toString(),
+                        "location.path": "room",
+                      });
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              });
+            } else {
+              const roomByIdDoc = firebase
+                .firestore()
+                .collection("rooms")
+                .doc(roomId.toString());
+              const userDoc = firebase
+                .firestore()
+                .collection("users")
+                .doc(state.user.uid);
+
+              const batch = firebase.firestore().batch();
+              batch.update(userDoc, {
+                room_id: {
+                  type: doc.data()["game-play"],
+                  value: roomId.toString(),
+                },
+                "location.path": "room",
+              });
+              batch.update(roomByIdDoc, {
+                "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
+                  state.user.uid
+                ),
+              });
+
+              batch.commit();
+            }
+          } else if (doc.data().password.status && password !== "") {
             loginRoom(
-              { uid: state.user.uid, ...doc.data(), rawText: password },
+              {
+                uid: state.user.uid,
+                ...doc.data(),
+                rid: roomId.toString(),
+                rawText: password,
+              },
               firebase
-            );
+            )
+              .then(() => {
+                closeModal();
+              })
+              .catch((error) => {
+                if (error.value === false) {
+                  setError(error.text);
+                } else {
+                  setError("Không thể vào bàn!");
+                }
+              });
           } else {
             setError("Bàn có mật khẩu!");
           }

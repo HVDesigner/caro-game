@@ -1,6 +1,9 @@
 import React from "react";
 import "./App.css";
 import LoadingComponent from "./../Loading/";
+import Sound from "react-sound";
+
+import BackgroundSound from "./../../assets/sound/background-music.mp3";
 
 // Constants
 import { SET_USER_DATA } from "./../../context/ActionTypes";
@@ -172,6 +175,66 @@ function App() {
     };
   }, [dispatch, firebase, state.user.uid]);
 
+  const PageShow = (path) => {
+    switch (path) {
+      case "dashboard":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <Dashboard />
+          </React.Suspense>
+        );
+      case "lobby":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <Lobby />
+          </React.Suspense>
+        );
+      case "create-room":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <CreateRoom />
+          </React.Suspense>
+        );
+      case "profile":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <Profile />
+          </React.Suspense>
+        );
+      case "setting":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <Setting />
+          </React.Suspense>
+        );
+      case "playnow":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <PlayNow />
+          </React.Suspense>
+        );
+      case "room":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <GamePlay />
+          </React.Suspense>
+        );
+      case "toplist":
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <TopList />
+          </React.Suspense>
+        );
+
+      default:
+        return (
+          <React.Suspense fallback={<LoadingComponent />}>
+            <Dashboard />
+          </React.Suspense>
+        );
+    }
+  };
+
   if (loading) {
     return <LoadingComponent />;
   }
@@ -183,63 +246,20 @@ function App() {
       </React.Suspense>
     );
 
-  switch (state.user.location.path) {
-    case "dashboard":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <Dashboard />
-        </React.Suspense>
-      );
-    case "lobby":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <Lobby />
-        </React.Suspense>
-      );
-    case "create-room":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <CreateRoom />
-        </React.Suspense>
-      );
-    case "profile":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <Profile />
-        </React.Suspense>
-      );
-    case "setting":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <Setting />
-        </React.Suspense>
-      );
-    case "playnow":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <PlayNow />
-        </React.Suspense>
-      );
-    case "room":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <GamePlay />
-        </React.Suspense>
-      );
-    case "toplist":
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <TopList />
-        </React.Suspense>
-      );
-
-    default:
-      return (
-        <React.Suspense fallback={<LoadingComponent />}>
-          <Dashboard />
-        </React.Suspense>
-      );
-  }
+  return (
+    <React.Fragment>
+      {state.user.setting.sound ? (
+        <Sound
+          url={BackgroundSound}
+          playStatus={Sound.status.PLAYING}
+          loop={true}
+        />
+      ) : (
+        ""
+      )}
+      {PageShow(state.user.location.path)}
+    </React.Fragment>
+  );
 }
 
 export default App;

@@ -192,6 +192,7 @@ export const filterElo = (elo) => {
  * @param {function} firebase
  */
 export const loginRoom = (data, firebase) => {
+  console.log(data);
   // Kiểm tra mật khẩu
   const checkPass = bcrypt.compareSync(data.rawText, data.password.text);
 
@@ -254,6 +255,8 @@ export const loginRoom = (data, firebase) => {
     return doLogin();
   } else {
     // Sai mật khẩu
-    return { value: checkPass, text: "Mật khẩu không chính xác." };
+    return new Promise((_, reject) =>
+      reject({ value: checkPass, text: "Mật khẩu không chính xác." })
+    );
   }
 };
