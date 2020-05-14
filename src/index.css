@@ -65,3 +65,21 @@ button:focus {
 .brown-color {
   color: #5c3c25 !important;
 }
+
+.bg-brown-wood {
+  background-image: url("./assets/matching_background.svg");
+  background-size: 60%;
+}
+
+.bg-gold-wood {
+  background-image: url("./assets/backgroung_carotv_2.svg");
+  background-size: 60%;
+}
+
+.h-100vh {
+  height: 100vh;
+}
+
+.w-100vw {
+  width: 100vw;
+}

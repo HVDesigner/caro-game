@@ -1,0 +1,9 @@
+.regiter-tournament-user img {
+  width: 50px;
+}
+
+.regiter-tournament-user {
+  background-image: url("./../../assets/backgroung_carotv_2.svg");
+  background-size: 150%;
+  max-height: 100%;
+}
