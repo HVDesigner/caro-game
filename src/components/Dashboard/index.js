@@ -129,6 +129,9 @@ function Dashboard() {
                 src={TournamentSVG}
                 alt="tournament"
                 className="wood-btn"
+                onClick={() => {
+                  changeRoute("tournament");
+                }}
               ></img>
             </div>
           </Col>
