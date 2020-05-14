@@ -81,7 +81,6 @@ function Setting() {
                     <CheckButton
                       text={"Tắt"}
                       value={!sound}
-                      id={1}
                       func={() => {
                         setSound(false);
                       }}
@@ -92,7 +91,6 @@ function Setting() {
                     <CheckButton
                       text={"Bật"}
                       value={sound}
-                      id={2}
                       func={() => {
                         setSound(true);
                       }}
@@ -108,7 +106,6 @@ function Setting() {
                     <CheckButton
                       text={"Tiếng Việt"}
                       value={language}
-                      id={1}
                       func={() => {
                         setLanguage(true);
                       }}
@@ -119,7 +116,6 @@ function Setting() {
                     <CheckButton
                       text={"Tiếng Anh"}
                       value={!language}
-                      id={2}
                       func={() => {
                         setLanguage(false);
                       }}
@@ -135,7 +131,6 @@ function Setting() {
                     <CheckButton
                       text={"Đối thủ bất kỳ"}
                       value={!matchingByElo}
-                      id={1}
                       func={() => setMatchingByElo(false)}
                     />
                   </div>
@@ -144,7 +139,6 @@ function Setting() {
                     <CheckButton
                       text={"Đối thủ cùng trình độ"}
                       value={matchingByElo}
-                      id={2}
                       func={() => setMatchingByElo(true)}
                     />
                   </div>
