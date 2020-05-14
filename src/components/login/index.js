@@ -1,6 +1,10 @@
 import React from "react";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
-import { useFirestoreCollection, useFirestore } from "reactfire";
+import {
+  useFirestoreCollection,
+  useFirestore,
+  useFirebaseApp,
+} from "reactfire";
 import firebase from "firebase/app";
 
 // Contexts
@@ -11,6 +15,7 @@ import { SET_USER_DATA } from "./../../context/ActionTypes";
 
 function Login() {
   const { dispatch } = React.useContext(AppContext);
+  const firebaseApp = useFirebaseApp();
 
   const [idState, setIDState] = React.useState("");
   const [name, setName] = React.useState("");
@@ -54,7 +59,7 @@ function Login() {
       image_url: "",
       locale: "vi_VN",
       location: { path: "dashboard" },
-      name: { value: name, status: "original" },
+      name: { value: name, status: "original", cost: 500 },
       room_id: { value: 0, type: "none" },
       setting: {
         sound: true,
@@ -72,7 +77,9 @@ function Login() {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
-    userCollectionFirestore
+    firebaseApp
+      .firestore()
+      .collection("users")
       .doc(idState)
       .set(newUserdata)
       .then(function () {
@@ -87,7 +94,9 @@ function Login() {
   };
 
   const resetUser = (id) => {
-    userCollectionFirestore
+    firebaseApp
+      .firestore()
+      .collection("users")
       .doc(id)
       .update({
         "location.path": "dashboard",
@@ -148,6 +157,7 @@ function Login() {
           <h3 className="mt-3">Login</h3>
         </Col>
       </Row>
+
       <Row>
         <Col>
           <Form onSubmit={submitForm} className="mb-5">

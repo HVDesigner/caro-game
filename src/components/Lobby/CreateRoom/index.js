@@ -106,6 +106,7 @@ function CreateRoom() {
           text: password ? bcrypt.hashSync(password, 10) : "",
         },
         game: {
+          "current-step": {},
           player: {},
           history: [],
           status: { ready: 0 },

@@ -15,6 +15,7 @@ import AppContext from "./../../context/";
 function Setting() {
   const { changeRoute, state } = React.useContext(AppContext);
   const firebaseApp = useFirebaseApp();
+  const [newName, setNewName] = React.useState("");
 
   // true Open
   // false Off
@@ -38,9 +39,38 @@ function Setting() {
     state.user.setting.matchingByElo,
   ]);
 
+  const updateName = (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    if (newName !== "") {
+      if (state.user.coin >= state.user.name.cost * 2) {
+        firebaseApp
+          .firestore()
+          .collection("users")
+          .doc(state.user.uid)
+          .update({
+            "name.cost": state.user.name.cost * 2,
+            "name.value": newName,
+          })
+          .then(() => {
+            setMessage("Đổi tên thành công");
+          })
+          .catch(() => {
+            setMessage("Đổi tên thất bại!");
+          });
+      } else {
+        setMessage("Bạn không đủ xu!");
+      }
+    } else {
+      setMessage("Bạn chưa nhập tên mới!");
+    }
+  };
+
   return (
     <Container className="setting-body">
-      <Row>
+      <Row className="mb-3">
         <Col>
           <div className="d-flex flex-column">
             <div className="setting-game">
@@ -122,13 +152,6 @@ function Setting() {
               </div>
             </div>
 
-            {message ? (
-              <div className="mt-5 text-center">
-                <h4 className="text-warning text-stroke-carotv">{message}</h4>
-              </div>
-            ) : (
-              ""
-            )}
             <div className="setting-btn mb-2 d-flex fixed-bottom">
               <img
                 src={SaveSVG}
@@ -145,7 +168,7 @@ function Setting() {
                       "setting.sound": sound,
                     })
                     .then(() => {
-                      setMessage("Thành công");
+                      setMessage("Áp dụng thành công!");
                     });
                 }}
                 className="wood-btn d-block pl-2 pr-1"
@@ -160,6 +183,45 @@ function Setting() {
               />
             </div>
           </div>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h4 className="text-white text-center mt-2">Đổi tên</h4>
+          <div className="p-3 rename-box brown-border d-flex flex-column justify-content-center align-items-center rounded shadow">
+            <form onSubmit={updateName}>
+              <input
+                placeholder="Nhập tên mới"
+                className="input-carotv-2 mb-2 w-100"
+                value={newName}
+                onChange={(e) => {
+                  setNewName(e.target.value);
+                }}
+              />
+            </form>
+            <div
+              className="p-1 rename-box-btn w-100 brown-border rounded shadow wood-btn"
+              onClick={() => {
+                updateName();
+              }}
+            >
+              <p className="mb-0 text-center">Thay đổi</p>
+            </div>
+            <p className="mb-0 mt-2 text-center text-warning text-stroke-carotv">
+              Phí đổi tên: {state.user.name.cost * 2}xu
+            </p>
+          </div>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          {message ? (
+            <div className="mt-5 text-center">
+              <h4 className="text-warning text-stroke-carotv">{message}</h4>
+            </div>
+          ) : (
+            ""
+          )}
         </Col>
       </Row>
     </Container>

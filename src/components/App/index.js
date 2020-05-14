@@ -75,6 +75,12 @@ function App() {
     if (process.env.NODE_ENV === "production") {
       function doGet(doc) {
         if (doc.exists) {
+          if (doc.data().name.value !== userInfo.playerName) {
+            userCollectionFirestore
+              .doc(userInfo.playerId)
+              .update({ "name.value": userInfo.playerName });
+          }
+
           dispatch({
             type: SET_USER_DATA,
             payload: { uid: doc.id, ...doc.data() },
@@ -90,6 +96,7 @@ function App() {
             name: {
               status: "original",
               value: userInfo.playerName,
+              cost: 500,
             },
             locale: userInfo.playerLocale,
             setting: {

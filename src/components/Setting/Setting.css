@@ -9,3 +9,11 @@
   max-width: 40%;
   margin: 0 auto;
 }
+
+.rename-box {
+  background-color: transparent;
+}
+
+.rename-box-btn {
+  background-image: url("./../../assets/backgroung_carotv_2.svg");
+}
