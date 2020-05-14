@@ -3,6 +3,7 @@ import "./Setting.css";
 import { Container, Row, Col } from "react-bootstrap";
 
 import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 // SVGs
 import Exit from "./../../assets/Exit.svg";
@@ -53,6 +54,9 @@ function Setting() {
           .update({
             "name.cost": state.user.name.cost * 2,
             "name.value": newName,
+            coin: firebase.firestore.FieldValue.increment(
+              -(state.user.name.cost * 2)
+            ),
           })
           .then(() => {
             setMessage("Đổi tên thành công");
