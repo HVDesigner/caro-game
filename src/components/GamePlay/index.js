@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "./GamePlay.css";
+import { useFirebaseApp } from "reactfire";
 
 // SVGs
 import UserSVG from "./../../assets/Dashboard/user.svg";
@@ -18,12 +19,11 @@ import PositionPoint from "./PositionPoint/";
 
 // Contexts
 import AppContext from "./../../context/";
-import { FirebaseContext } from "./../../Firebase/";
 
 // Table
 function GamePlayComponent() {
   const { state, getPositonSquare } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
 
   const [loading, setLoading] = React.useState(true);
 
@@ -51,7 +51,7 @@ function GamePlayComponent() {
       }
     }
 
-    firebase
+    firebaseApp
       .firestore()
       .collection("rooms")
       .doc(state.user.room_id.value)
@@ -71,7 +71,7 @@ function GamePlayComponent() {
           console.log("No such document!");
         }
       });
-  }, [firebase, state.user.room_id.value, state.user.uid]);
+  }, [firebaseApp, state.user.room_id.value, state.user.uid]);
 
   React.useEffect(() => {
     function getUserType(participants) {
@@ -87,7 +87,7 @@ function GamePlayComponent() {
       }
     }
 
-    const unsubscribe = firebase
+    const unsubscribe = firebaseApp
       .firestore()
       .collection("rooms")
       .doc(state.user.room_id.value)
@@ -105,17 +105,17 @@ function GamePlayComponent() {
       });
 
     return () => unsubscribe();
-  }, [firebase, state.user.room_id.value, state.user.uid]);
+  }, [firebaseApp, state.user.room_id.value, state.user.uid]);
 
   const onSendMessage = (e) => {
     e.preventDefault();
     if (messageText) {
-      firebase
+      firebaseApp
         .firestore()
         .collection("rooms")
         .doc(state.user.room_id.value)
         .update({
-          conversation: firebase.firestore.FieldValue.arrayUnion({
+          conversation: firebaseApp.firestore.FieldValue.arrayUnion({
             text: messageText,
             uid: state.user.uid,
             name: state.user.name.value,
@@ -156,11 +156,7 @@ function GamePlayComponent() {
           <Col className="p-0">
             <div style={{ width: "100vw" }} className="d-flex flex-fill">
               {roomData.participants && roomData.participants.master ? (
-                <MasterUser
-                  firebase={firebase}
-                  roomData={roomData}
-                  ownType={ownType}
-                />
+                <MasterUser roomData={roomData} ownType={ownType} />
               ) : (
                 <div className="d-flex flex-column pl-2">
                   <div
@@ -202,11 +198,7 @@ function GamePlayComponent() {
               </div>
 
               {roomData.participants && roomData.participants.player ? (
-                <PlayerUser
-                  roomData={roomData}
-                  firebase={firebase}
-                  ownType={ownType}
-                />
+                <PlayerUser roomData={roomData} ownType={ownType} />
               ) : (
                 <div className="d-flex flex-column pr-2">
                   <div

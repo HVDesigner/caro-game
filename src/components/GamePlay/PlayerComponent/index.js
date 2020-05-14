@@ -1,11 +1,13 @@
 import React from "react";
 import { Badge } from "react-bootstrap";
-import AppContext from "./../../../context/";
+import { useFirebaseApp } from "reactfire";
 
 import CounterConponent from "./../Counter/";
+import AppContext from "./../../../context/";
 import UserSVG from "./../../../assets/Dashboard/user.svg";
 
-function PlayerComponent({ roomData, firebase, ownType }) {
+function PlayerComponent({ roomData, ownType }) {
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
   const [thisUser, setThisUser] = React.useState({
@@ -24,7 +26,7 @@ function PlayerComponent({ roomData, firebase, ownType }) {
         coin: state.user.coin,
       });
     } else {
-      firebase
+      firebaseApp
         .firestore()
         .collection("users")
         .doc(roomData.participants.player.id)
@@ -48,7 +50,7 @@ function PlayerComponent({ roomData, firebase, ownType }) {
           }
         });
 
-      var unsubscribe = firebase
+      var unsubscribe = firebaseApp
         .firestore()
         .collection("users")
         .doc(roomData.participants.player.id)
@@ -74,7 +76,7 @@ function PlayerComponent({ roomData, firebase, ownType }) {
       return () => unsubscribe();
     }
   }, [
-    firebase,
+    firebaseApp,
     roomData.participants.player.id,
     roomData,
     state.user.coin,

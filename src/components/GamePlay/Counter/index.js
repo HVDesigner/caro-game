@@ -1,12 +1,11 @@
 import React from "react";
 import { Badge } from "react-bootstrap";
-
-import { FirebaseContext } from "./../../../Firebase/index";
+import { useFirebaseApp } from "reactfire";
 import AppContext from "./../../../context/";
 
 function Counter({ time, roomData, userType, ownType }) {
   const [counter, setCounter] = React.useState(time);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
   React.useEffect(() => {
@@ -29,7 +28,7 @@ function Counter({ time, roomData, userType, ownType }) {
       updateRoom[`game.status.ready`] = 0;
       updateRoom[`game.player`] = {};
 
-      firebase
+      firebaseApp
         .firestore()
         .collection("rooms")
         .doc(state.user.room_id.value)
@@ -39,7 +38,7 @@ function Counter({ time, roomData, userType, ownType }) {
     return () => clearInterval(timer);
   }, [
     counter,
-    firebase,
+    firebaseApp,
     userType,
     roomData.bet,
     roomData.participants,

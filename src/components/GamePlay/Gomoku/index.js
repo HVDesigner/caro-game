@@ -1,6 +1,9 @@
 import React from "react";
-import { Row, Col } from "react-bootstrap";
 import "./../GamePlay.css";
+import { Row, Col } from "react-bootstrap";
+import { useFirebaseApp } from "reactfire";
+
+// Functions
 import { winAction } from "./../../../functions/";
 
 // Game Core
@@ -13,11 +16,10 @@ import Numeric from "./Numeric/";
 import ReadyComponent from "./../ReadyComponent/";
 
 // Contexts
-import { FirebaseContext } from "./../../../Firebase/";
 import AppContext from "./../../../context/";
 
 function GamePlayComponent({ roomData, ownType }) {
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
   const [caroTable, setCaroTable] = React.useState([
@@ -99,7 +101,7 @@ function GamePlayComponent({ roomData, ownType }) {
         ownType,
         roomId: state.user.room_id.value,
       },
-      firebase
+      firebaseApp
     );
   };
 
@@ -217,7 +219,7 @@ function GamePlayComponent({ roomData, ownType }) {
       }
     }
   }, [
-    firebase,
+    firebaseApp,
     state.user.room_id.value,
     roomData.game.player,
     roomData.rule,
@@ -228,7 +230,7 @@ function GamePlayComponent({ roomData, ownType }) {
   ]);
 
   const changeTurn = () => {
-    const RoomsCollection = firebase.firestore().collection("rooms");
+    const RoomsCollection = firebaseApp.firestore().collection("rooms");
 
     /**
      * ---------------------------------------------------------------------------------
@@ -356,12 +358,12 @@ function GamePlayComponent({ roomData, ownType }) {
                *
                * Lưu lịch sử mới lên database.
                */
-              firebase
+              firebaseApp
                 .firestore()
                 .collection("rooms")
                 .doc(state.user.room_id.value)
                 .update({
-                  "game.history": firebase.firestore.FieldValue.arrayUnion({
+                  "game.history": firebaseApp.firestore.FieldValue.arrayUnion({
                     row: rowkey,
                     col: colkey,
                     value: roomData.game.player[roomData.game.turn.uid].value,
@@ -420,9 +422,9 @@ function GamePlayComponent({ roomData, ownType }) {
   /**
    * -------------------------------------------------------------------------------------
    * Chức năng cập nhật vị trí đã đánh trên bàn chơi.
-   * 
-   * @param {number} rowkey 
-   * @param {number} colkey 
+   *
+   * @param {number} rowkey
+   * @param {number} colkey
    */
   const updatePosition = (rowkey, colkey) => {
     let _caroTableLocal = caroTable;

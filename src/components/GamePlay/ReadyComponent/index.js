@@ -1,5 +1,6 @@
 import React from "react";
 import "./index.css";
+import { useFirebaseApp } from "reactfire";
 
 // Functions
 import { leaveRoom } from "./../../../functions/";
@@ -9,11 +10,10 @@ import WatcherList from "./WatcherList/";
 
 // Context
 import AppContext from "./../../../context/";
-import { FirebaseContext } from "./../../../Firebase/";
 
 function ReadyComponent({ roomData, ownType, setStatusGame }) {
   const { state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
 
   const [showLoadingExitBtn, setShowLoadingExitBtn] = React.useState(true);
 
@@ -34,7 +34,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
           userId: state.user.uid,
           userType: ownType,
         },
-        firebase
+        firebaseApp
       )
         .then()
         .catch((error) => {
@@ -42,13 +42,13 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
           setShowLoadingExitBtn(true);
         });
     } else if (roomData.type === "quick-play") {
-      let roomRef = firebase
+      let roomRef = firebaseApp
         .firestore()
         .collection("rooms")
         .doc(state.user.room_id.value);
-      let userCollection = firebase.firestore().collection("users");
+      let userCollection = firebaseApp.firestore().collection("users");
 
-      firebase.firestore().runTransaction(function (transaction) {
+      firebaseApp.firestore().runTransaction(function (transaction) {
         return transaction.get(roomRef).then(function (sfDoc) {
           if (!sfDoc.exists) {
             console.log("Document does not exist!");
@@ -65,7 +65,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                   }
                 );
                 transaction.update(roomRef, {
-                  "participants.master": firebase.firestore.FieldValue.delete(),
+                  "participants.master": firebaseApp.firestore.FieldValue.delete(),
                   "game.turn.uid": sfDoc.data().participants.player.id,
                 });
               } else {
@@ -99,7 +99,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                   }
                 );
                 transaction.update(roomRef, {
-                  "participants.player": firebase.firestore.FieldValue.delete(),
+                  "participants.player": firebaseApp.firestore.FieldValue.delete(),
                   "game.turn.uid": sfDoc.data().participants.master.id,
                 });
               } else {
@@ -130,7 +130,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 room_id: { type: "none", value: 0 },
               });
               transaction.update(roomRef, {
-                "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
+                "participants.watcher": firebaseApp.firestore.FieldValue.arrayRemove(
                   state.user.uid
                 ),
               });
@@ -142,7 +142,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
   };
 
   const onReadyPlay = () => {
-    const readyAction = firebase
+    const readyAction = firebaseApp
       .app()
       .functions("asia-east2")
       .httpsCallable("readyAction");
@@ -169,9 +169,9 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
     roomUpdate[`game.status.ready`] = roomData.game.status.ready - 1;
     roomUpdate[
       `game.player.${state.user.uid}`
-    ] = firebase.firestore.FieldValue.delete();
+    ] = firebaseApp.firestore.FieldValue.delete();
 
-    firebase
+    firebaseApp
       .firestore()
       .collection("rooms")
       .doc(state.user.room_id.value)

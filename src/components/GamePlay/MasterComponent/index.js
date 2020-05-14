@@ -1,5 +1,6 @@
 import React from "react";
 import { Badge } from "react-bootstrap";
+import { useFirebaseApp } from "reactfire";
 
 // SVGs
 import UserSVG from "./../../../assets/Dashboard/user.svg";
@@ -10,7 +11,8 @@ import AppContext from "./../../../context/";
 // Components
 import CounterConponent from "./../Counter/";
 
-function MasterComponent({ roomData, firebase, ownType }) {
+function MasterComponent({ roomData, ownType }) {
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
   const [thisUser, setThisUser] = React.useState({
     imageUrl: "",
@@ -28,7 +30,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
         coin: state.user.coin,
       });
     } else {
-      firebase
+      firebaseApp
         .firestore()
         .collection("users")
         .doc(roomData.participants.master.id)
@@ -47,7 +49,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
           }
         });
 
-      var unsubscribe = firebase
+      var unsubscribe = firebaseApp
         .firestore()
         .collection("users")
         .doc(roomData.participants.master.id)
@@ -67,7 +69,7 @@ function MasterComponent({ roomData, firebase, ownType }) {
       return () => unsubscribe();
     }
   }, [
-    firebase,
+    firebaseApp,
     roomData.participants.master.id,
     roomData,
     state.user.coin,
