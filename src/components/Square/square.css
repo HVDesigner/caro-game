@@ -5,3 +5,7 @@
 .bg-box-game {
   background-color: #f9da7f !important;
 }
+
+.bg-current-step {
+  background-color: #000000 !important;
+}

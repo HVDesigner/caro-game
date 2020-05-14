@@ -53,6 +53,7 @@ export const leaveRoom = async (data, firebase) => {
               "game.turn.uid": playerID,
               "game.player": {},
               "game.history": [],
+              "game.current-step": {},
               "game.status.ready": 0,
             });
           } else if (
@@ -79,6 +80,7 @@ export const leaveRoom = async (data, firebase) => {
               "game.turn.uid": watcherId,
               "game.player": {},
               "game.history": [],
+              "game.current-step": {},
               "game.status.ready": 0,
             });
           } else {
@@ -105,6 +107,7 @@ export const leaveRoom = async (data, firebase) => {
             "game.turn.uid": doc.data().participants.master.id,
             "game.player": {},
             "game.history": [],
+            "game.current-step": {},
             "game.status.ready": 0,
           });
 

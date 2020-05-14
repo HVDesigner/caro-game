@@ -28,6 +28,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
 
   const onLeaveRoom = () => {
     setShowLoadingExitBtn(false);
+
     if (roomData.type === "room") {
       leaveRoom(
         {

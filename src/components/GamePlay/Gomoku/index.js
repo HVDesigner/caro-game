@@ -132,7 +132,7 @@ function GamePlayComponent({ roomData, ownType }) {
     /**
      * ---------------------------------------------------------------------------
      *
-     * Cập nhật những ô đã đánh trên bàn cờ, qua  dữ liệu đã lưu.
+     * Cập nhật những ô đã đánh trên bàn cờ, qua dữ liệu đã lưu.
      *
      * @param {number} rowkey
      * @param {number} colkey
@@ -222,6 +222,7 @@ function GamePlayComponent({ roomData, ownType }) {
   }, [
     firebaseApp,
     state.user.room_id.value,
+    roomData.rid,
     roomData.game.player,
     roomData.rule,
     roomData.game.history,
@@ -369,6 +370,10 @@ function GamePlayComponent({ roomData, ownType }) {
                     col: colkey,
                     value: roomData.game.player[roomData.game.turn.uid].value,
                   }),
+                  "game.current-step": {
+                    row: rowkey,
+                    col: colkey,
+                  },
                 });
 
               /**
@@ -487,6 +492,7 @@ function GamePlayComponent({ roomData, ownType }) {
                     <Alphabet rowkey={rowkey} />
                     {rowValue.map((colValue, colkey) => (
                       <Square
+                        roomData={roomData}
                         key={colkey}
                         rowkey={rowkey}
                         colkey={colkey}

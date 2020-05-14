@@ -44,7 +44,6 @@ function GlobalState(props) {
 
   /**
    *
-   * ----------------------------------------------------------------------------------
    * Chức năng chuyển trang.
    *
    * @param {string} path
@@ -81,7 +80,6 @@ function GlobalState(props) {
 
   /**
    *
-   * ----------------------------------------------------------------------------------
    * Chức năng lấy vị trí của con trỏ chuột trên bàn cờ.
    *
    * @param {boolean} status
@@ -96,7 +94,7 @@ function GlobalState(props) {
   };
 
   /**
-   * ----------------------------------------------------------------------------------
+   *
    * Trả về một Context Provider.
    */
   return (

@@ -28,8 +28,6 @@ function WinnerModal({ roomData, ownType }) {
       .collection("rooms")
       .doc(state.user.room_id.value)
       .update(roomUpdate);
-
-    // nextAction({ roomType: state.room.type, roomId: state.room.id });
   };
 
   React.useEffect(() => {
