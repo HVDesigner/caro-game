@@ -1,13 +1,16 @@
 import React from "react";
 import { Row, Nav } from "react-bootstrap";
-import AppContext from "./../../../context/";
-import { FirebaseContext } from "./../../../Firebase/";
+import { useFirebaseApp } from "reactfire";
 
+// Contexts
+import AppContext from "./../../../context/";
+
+// Action Types
 import { TOGGLE_FIND_ROOM_MODAL } from "./../../../context/ActionTypes";
 
 function FooterComponent() {
+  const firebaseApp = useFirebaseApp();
   const { changeRoute, state, dispatch } = React.useContext(AppContext);
-  const [firebase] = React.useState(React.useContext(FirebaseContext));
 
   const findRoom = () => {
     dispatch({
@@ -17,7 +20,7 @@ function FooterComponent() {
   };
 
   const exitLooby = () => {
-    firebase
+    firebaseApp
       .firestore()
       .collection("users")
       .doc(state.user.uid)

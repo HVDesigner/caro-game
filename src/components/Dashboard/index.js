@@ -1,5 +1,7 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
+import numeral from "numeral";
+import { useFirebaseApp } from "reactfire";
 
 // Styles
 import "./Dashboard.css";
@@ -19,16 +21,14 @@ import AddCoinSVG from "./../../assets/Dashboard/add_coin.svg";
 import TopTenSVG from "./../../assets/Dashboard/top10.svg";
 import UserSVG from "./../../assets/Dashboard/user.svg";
 
-import numeral from "numeral";
-
 // Contexts
 import AppContext from "./../../context/";
-import { FirebaseContext } from "./../../Firebase/index";
 
 function Dashboard() {
   const GlobalState = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
   const { state, changeRoute } = GlobalState;
+
+  const firebaseApp = useFirebaseApp();
 
   return (
     <div
@@ -107,7 +107,7 @@ function Dashboard() {
                 alt="rooms"
                 className="wood-btn"
                 onClick={() => {
-                  firebase
+                  firebaseApp
                     .firestore()
                     .collection("users")
                     .doc(state.user.uid)

@@ -6,7 +6,6 @@ import * as serviceWorker from "./serviceWorker";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import GlobalState from "./context/GlobalState";
-// import FirebaseProvider from "./Firebase/";
 
 import { FirebaseAppProvider, SuspenseWithPerf } from "reactfire";
 import Loading from "./components/Loading/";

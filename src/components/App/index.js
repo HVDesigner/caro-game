@@ -1,16 +1,19 @@
 import React from "react";
 import "./App.css";
-import LoadingComponent from "./../Loading/";
 import Sound from "react-sound";
+import { useFirebaseApp } from "reactfire";
 
+// Sounds
 import BackgroundSound from "./../../assets/sound/background-music.mp3";
+
+// Components
+import LoadingComponent from "./../Loading/";
 
 // Constants
 import { SET_USER_DATA } from "./../../context/ActionTypes";
 
 // Contexts
 import AppContext from "./../../context/";
-import { FirebaseContext } from "./../../Firebase/";
 
 const Dashboard = React.lazy(() => import("./../Dashboard/"));
 const Setting = React.lazy(() => import("./../Setting/"));
@@ -23,8 +26,8 @@ const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
 const TopList = React.lazy(() => import("./../TopList/"));
 
 function App() {
+  const firebaseApp = useFirebaseApp();
   const { state, dispatch } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
   const [loading, setLoading] = React.useState(true);
 
   const [userInfo, setUserInfo] = React.useState({
@@ -66,9 +69,9 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    if (process.env.NODE_ENV === "production") {
-      const userCollection = firebase.firestore().collection("users");
+    const userCollectionFirestore = firebaseApp.firestore().collection("users");
 
+    if (process.env.NODE_ENV === "production") {
       function doGet(doc) {
         if (doc.exists) {
           dispatch({
@@ -107,11 +110,11 @@ function App() {
             on_queue: false,
             room_id: { value: 0, type: "none" },
             "game-type-select": { value: "gomoku" },
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: firebaseApp.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebaseApp.firestore.FieldValue.serverTimestamp(),
           };
 
-          userCollection
+          userCollectionFirestore
             .doc(userInfo.playerId)
             .set(newUserdata)
             .then(function () {
@@ -131,7 +134,7 @@ function App() {
       }
 
       if (userInfo.playerId) {
-        userCollection
+        userCollectionFirestore
           .doc(userInfo.playerId)
           .get()
           .then(doGet)
@@ -141,7 +144,7 @@ function App() {
       }
     }
   }, [
-    firebase,
+    firebaseApp,
     userInfo.playerId,
     userInfo.platform,
     userInfo.playerLocale,
@@ -151,33 +154,33 @@ function App() {
   ]);
 
   React.useEffect(() => {
-    // let unsubscribe;
+    const userCollectionFirestore = firebaseApp.firestore().collection("users");
+
+    let unsubscribe;
 
     if (state.user.uid) {
-      // unsubscribe = firebase
-      //   .firestore()
-      //   .collection("users")
-      //   .doc(state.user.uid)
-      //   .onSnapshot(function (querySnapshot) {
-      //     if (querySnapshot.exists) {
-      //       dispatch({
-      //         type: SET_USER_DATA,
-      //         payload: {
-      //           ...querySnapshot.data(),
-      //           uid: state.user.uid,
-      //           platform: userInfo.platform,
-      //         },
-      //       });
-      //     }
-      //   });
+      unsubscribe = userCollectionFirestore
+        .doc(state.user.uid)
+        .onSnapshot(function (querySnapshot) {
+          if (querySnapshot.exists) {
+            dispatch({
+              type: SET_USER_DATA,
+              payload: {
+                ...querySnapshot.data(),
+                uid: state.user.uid,
+                platform: userInfo.platform,
+              },
+            });
+          }
+        });
     }
 
     return () => {
-      // if (state.user.uid) {
-      //   return unsubscribe();
-      // }
+      if (state.user.uid) {
+        return unsubscribe();
+      }
     };
-  }, [dispatch, firebase, state.user.uid, userInfo.platform]);
+  }, [dispatch, state.user.uid, userInfo.platform, firebaseApp]);
 
   const PageShow = (path) => {
     switch (path) {

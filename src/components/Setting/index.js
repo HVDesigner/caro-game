@@ -2,16 +2,18 @@ import React from "react";
 import "./Setting.css";
 import { Container, Row, Col } from "react-bootstrap";
 
-import AppContext from "./../../context/";
+import firebase from "firebase/app";
+
+// SVGs
 import Exit from "./../../assets/Exit.svg";
 import CheckButton from "./../CheckButton/";
 import SaveSVG from "./../../assets/save.svg";
 
-import { FirebaseContext } from "./../../Firebase/";
+// Contexts
+import AppContext from "./../../context/";
 
 function Setting() {
   const StateGlobal = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
   const { changeRoute, state } = StateGlobal;
 
   // true Open

@@ -1,17 +1,17 @@
 import React from "react";
 import numeral from "numeral";
 import { Row, Nav } from "react-bootstrap";
+import { useFirebaseApp } from "reactfire";
 
 // SVGs
 import CoinSVG from "./../../../assets/Dashboard/Coin.svg";
 
 // Contexts
 import AppContext from "./../../../context/";
-import { FirebaseContext } from "./../../../Firebase/";
 
 function MenuComponent() {
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
 
   const [countFreeGomoku, setCountFreeGomoku] = React.useState(0);
   const [countPlayingGomoku, setCountPlayingGomoku] = React.useState(0);
@@ -20,29 +20,30 @@ function MenuComponent() {
   const [countPlayingBlockHead, setCountPlayingBlockHead] = React.useState(0);
 
   React.useEffect(() => {
-    const userCollection = firebase.firestore().collection("users");
-    let unsubscribeFreeGomoku = userCollection
+    const userCollection = firebaseApp.firestore().collection("users");
+
+    const unsubscribeFreeGomoku = userCollection
       .where("location.path", "==", "lobby")
       .where("game-type-select.value", "==", "gomoku")
       .onSnapshot((doc) => {
         setCountFreeGomoku(doc.size);
       });
 
-    let unsubscribePlayingGomoku = userCollection
+    const unsubscribePlayingGomoku = userCollection
       .where("location.path", "==", "room")
       .where("room_id.type", "==", "gomoku")
       .onSnapshot((doc) => {
         setCountPlayingGomoku(doc.size);
       });
 
-    let unsubscribeFreeBlockHead = userCollection
+    const unsubscribeFreeBlockHead = userCollection
       .where("location.path", "==", "lobby")
       .where("game-type-select.value", "==", "block-head")
       .onSnapshot((doc) => {
         setCountFreeBlockHead(doc.size);
       });
 
-    let unsubscribePlayingBlockHead = userCollection
+    const unsubscribePlayingBlockHead = userCollection
       .where("location.path", "==", "room")
       .where("room_id.type", "==", "block-head")
       .onSnapshot((doc) => {
@@ -55,10 +56,10 @@ function MenuComponent() {
       unsubscribeFreeBlockHead();
       unsubscribePlayingBlockHead();
     };
-  }, [firebase, state.user.uid]);
+  }, [state.user.uid, firebaseApp]);
 
   const changGameType = (type) => {
-    firebase.firestore().collection("users").doc(state.user.uid).update({
+    firebaseApp.firestore().collection("users").doc(state.user.uid).update({
       "game-type-select.value": type,
     });
   };

@@ -1,6 +1,7 @@
 import React from "react";
 import "./index.css";
 import { Container, Row, Col } from "react-bootstrap";
+import { useFirebaseApp } from "reactfire";
 
 // components
 import Room from "./Room/";
@@ -10,12 +11,11 @@ import FindRoomModal from "./FindRoom/";
 
 // contexts
 import AppContext from "./../../context/";
-import { FirebaseContext } from "./../../Firebase/";
 
 function Lobby() {
-  // const firebase = React.useContext(FirebaseContext);
   const { state } = React.useContext(AppContext);
 
+  console.log("render");
   return (
     <React.Fragment>
       {state.modal["find-room"] ? <FindRoomModal /> : ""}
@@ -38,12 +38,12 @@ function Lobby() {
 export default Lobby;
 
 function GomokuRoomsComponent() {
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const [loading, setLoading] = React.useState(true);
   const [listRoom, setListRoom] = React.useState([]);
 
   React.useEffect(() => {
-    firebase
+    firebaseApp
       .firestore()
       .collection("rooms")
       .where("game-play", "==", "gomoku")
@@ -62,7 +62,7 @@ function GomokuRoomsComponent() {
         console.log("Error getting document:", error);
       });
 
-    const unsubscribe = firebase
+    const unsubscribe = firebaseApp
       .firestore()
       .collection("rooms")
       .where("game-play", "==", "gomoku")
@@ -77,7 +77,7 @@ function GomokuRoomsComponent() {
       });
 
     return () => unsubscribe();
-  }, [firebase]);
+  }, [firebaseApp]);
 
   if (loading)
     return (
@@ -102,12 +102,12 @@ function GomokuRoomsComponent() {
 }
 
 function BlockHeadRoomsComponent() {
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const [loading, setLoading] = React.useState(true);
   const [listRoom, setListRoom] = React.useState([]);
 
   React.useEffect(() => {
-    firebase
+    firebaseApp
       .firestore()
       .collection("rooms")
       .where("game-play", "==", "block-head")
@@ -126,7 +126,7 @@ function BlockHeadRoomsComponent() {
         console.log("Error getting document:", error);
       });
 
-    const unsubscribe = firebase
+    const unsubscribe = firebaseApp
       .firestore()
       .collection("rooms")
       .where("game-play", "==", "block-head")
@@ -141,7 +141,8 @@ function BlockHeadRoomsComponent() {
       });
 
     return () => unsubscribe();
-  }, [firebase]);
+  }, [firebaseApp]);
+
   if (loading)
     return (
       <Row>

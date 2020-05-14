@@ -1,13 +1,14 @@
 import React from "react";
 import "./index.css";
 import AppContext from "./../../../context/";
-import { FirebaseContext } from "./../../../Firebase/";
 import { TOGGLE_FIND_ROOM_MODAL } from "./../../../context/ActionTypes";
 import { loginRoom } from "./../../../functions/";
+import { useFirebaseApp } from "reactfire";
 
 function FindRoom() {
   const { dispatch, state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
+
   const [roomId, setRoomId] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
@@ -24,7 +25,7 @@ function FindRoom() {
       e.preventDefault();
     }
 
-    firebase
+    firebaseApp
       .firestore()
       .collection("rooms")
       .doc(roomId.toString())
@@ -33,12 +34,12 @@ function FindRoom() {
         if (doc.exists) {
           if (!doc.data().password.status) {
             if (doc.data().type === "room") {
-              const roomWithIdRef = firebase
+              const roomWithIdRef = firebaseApp
                 .firestore()
                 .collection("rooms")
                 .doc(roomId.toString());
 
-              return firebase.firestore().runTransaction((transaction) => {
+              return firebaseApp.firestore().runTransaction((transaction) => {
                 return transaction
                   .get(roomWithIdRef)
                   .then((tranDoc) => {
@@ -50,7 +51,7 @@ function FindRoom() {
                     if (tranDoc.data().participants.player) {
                       roomUpdates[
                         "participants.watcher"
-                      ] = firebase.firestore.FieldValue.arrayUnion(
+                      ] = firebaseApp.firestore.FieldValue.arrayUnion(
                         state.user.uid
                       );
                     } else {
@@ -62,7 +63,7 @@ function FindRoom() {
                     return transaction.update(roomWithIdRef, roomUpdates);
                   })
                   .then(async () => {
-                    return await firebase
+                    return await firebaseApp
                       .firestore()
                       .collection("users")
                       .doc(state.user.uid)
@@ -77,16 +78,16 @@ function FindRoom() {
                   });
               });
             } else {
-              const roomByIdDoc = firebase
+              const roomByIdDoc = firebaseApp
                 .firestore()
                 .collection("rooms")
                 .doc(roomId.toString());
-              const userDoc = firebase
+              const userDoc = firebaseApp
                 .firestore()
                 .collection("users")
                 .doc(state.user.uid);
 
-              const batch = firebase.firestore().batch();
+              const batch = firebaseApp.firestore().batch();
               batch.update(userDoc, {
                 room_id: {
                   type: doc.data()["game-play"],
@@ -95,7 +96,7 @@ function FindRoom() {
                 "location.path": "room",
               });
               batch.update(roomByIdDoc, {
-                "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
+                "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
                   state.user.uid
                 ),
               });
@@ -110,7 +111,7 @@ function FindRoom() {
                 rid: roomId.toString(),
                 rawText: password,
               },
-              firebase
+              firebaseApp
             )
               .then(() => {
                 closeModal();

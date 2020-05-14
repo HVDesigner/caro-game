@@ -2,11 +2,10 @@ import React from "react";
 import AppContext from "./index";
 import { reducer } from "./Reducers";
 import { GET_SQUARE_POSITION } from "./ActionTypes";
-import { FirebaseContext } from "./../Firebase/";
+import { useFirestore } from "reactfire";
+import firebase from "firebase/app";
 
 function GlobalState(props) {
-  const firebase = React.useContext(FirebaseContext);
-
   const [state, dispatch] = React.useReducer(reducer, {
     modal: {
       "find-room": false,
@@ -50,27 +49,26 @@ function GlobalState(props) {
    * @param {number} id
    * @param {string} type
    */
+  const userCollectionFirestore = useFirestore().collection("users");
+
   const changeRoute = (path, id = 0, type = "") => {
     if (state.user.uid && state.user.location.path !== path) {
-      const userDoc = firebase
-        .firestore()
-        .collection("users")
-        .doc(state.user.uid);
+      const userDocFirestore = userCollectionFirestore.doc(state.user.uid);
 
       firebase.firestore().runTransaction((transaction) => {
-        return transaction.get(userDoc).then((doc) => {
+        return transaction.get(userDocFirestore).then((doc) => {
           if (!doc.exists) {
             return { message: "changeRoute error" };
           }
 
           if (path === "room" && doc.data().location.path !== path) {
-            transaction.update(userDoc, {
+            transaction.update(userDocFirestore, {
               "location.path": path,
               "room_id.value": id,
               "room_id.type": type,
             });
           } else {
-            transaction.update(userDoc, {
+            transaction.update(userDocFirestore, {
               "location.path": path,
             });
           }
