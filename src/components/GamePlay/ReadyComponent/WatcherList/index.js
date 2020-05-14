@@ -2,8 +2,7 @@ import React from "react";
 import "./index.css";
 import { Container, Row, Col } from "react-bootstrap";
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
-
-import { FirebaseContext } from "./../../../../Firebase/";
+import { useFirebaseApp } from "reactfire";
 
 function WatcherList({ roomData }) {
   const [listWatcher, setListWatcher] = React.useState([]);
@@ -35,14 +34,14 @@ function WatcherList({ roomData }) {
 export default WatcherList;
 
 function WatcherDetail({ uid }) {
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const [userData, setUserData] = React.useState({
     name: "",
     imageUrl: "",
   });
 
   React.useEffect(() => {
-    firebase
+    firebaseApp
       .firestore()
       .collection(`users`)
       .doc(uid)
@@ -60,7 +59,7 @@ function WatcherDetail({ uid }) {
           });
         }
       });
-  }, [firebase, uid]);
+  }, [firebaseApp, uid]);
 
   return (
     <div className="d-flex watcher-detail">

@@ -1,20 +1,25 @@
 import React from "react";
 import "./PlayNow.css";
-import AppContext from "./../../context/";
-import Exit from "./../../assets/Exit.svg";
-import FindSVG from "./../../assets/find_enemy.svg";
-import CheckButton from "./../CheckButton/";
 import { Spinner } from "react-bootstrap";
+import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
+// Contexts
+import AppContext from "./../../context/";
+
+// Components
+import CheckButton from "./../CheckButton/";
+
+// SVGs
+import Exit from "./../../assets/Exit.svg";
+import CancelSVG from "./../../assets/cancel.svg";
+import FindSVG from "./../../assets/find_enemy.svg";
 import UserSVG from "./../../assets/Dashboard/user.svg";
 import DefaultSVG from "./../../assets/default-btn.svg";
-import CancelSVG from "./../../assets/cancel.svg";
-
-import { FirebaseContext } from "./../../Firebase/";
 
 function PlayNow() {
   const { changeRoute, state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
 
   // true gomoku
   // false block-head
@@ -101,42 +106,51 @@ function PlayNow() {
     const finalData = {};
     finalData[`${state.user.uid}`] = data;
 
-    const queueDoc = firebase
+    const queueDoc = firebaseApp
       .firestore()
       .collection("quick-play-queue")
       .doc("user-list");
-    const batch = firebase.firestore().batch();
+    const batch = firebaseApp.firestore().batch();
     batch.update(queueDoc, finalData);
-    batch.update(firebase.firestore().collection("users").doc(state.user.uid), {
-      on_queue: true,
-    });
+    batch.update(
+      firebaseApp.firestore().collection("users").doc(state.user.uid),
+      {
+        on_queue: true,
+      }
+    );
 
     batch.commit();
   };
 
   const cancelFindPlay = () => {
-    const batch = firebase.firestore().batch();
+    const batch = firebaseApp.firestore().batch();
 
     let updateQueue = {};
     updateQueue[`${state.user.uid}`] = firebase.firestore.FieldValue.delete();
 
     batch.update(
-      firebase.firestore().collection("quick-play-queue").doc("user-list"),
+      firebaseApp.firestore().collection("quick-play-queue").doc("user-list"),
       updateQueue
     );
-    batch.update(firebase.firestore().collection("users").doc(state.user.uid), {
-      on_queue: false,
-    });
+    batch.update(
+      firebaseApp.firestore().collection("users").doc(state.user.uid),
+      {
+        on_queue: false,
+      }
+    );
 
     batch.commit();
   };
 
   const updateMatchingByElo = (status) => {
-    const batch = firebase.firestore().batch();
+    const batch = firebaseApp.firestore().batch();
 
-    batch.update(firebase.firestore().collection("users").doc(state.user.uid), {
-      "setting.matchingByElo": status,
-    });
+    batch.update(
+      firebaseApp.firestore().collection("users").doc(state.user.uid),
+      {
+        "setting.matchingByElo": status,
+      }
+    );
 
     batch.commit();
   };

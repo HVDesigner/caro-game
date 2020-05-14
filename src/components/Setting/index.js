@@ -2,7 +2,7 @@ import React from "react";
 import "./Setting.css";
 import { Container, Row, Col } from "react-bootstrap";
 
-import firebase from "firebase/app";
+import { useFirebaseApp } from "reactfire";
 
 // SVGs
 import Exit from "./../../assets/Exit.svg";
@@ -13,8 +13,8 @@ import SaveSVG from "./../../assets/save.svg";
 import AppContext from "./../../context/";
 
 function Setting() {
-  const StateGlobal = React.useContext(AppContext);
-  const { changeRoute, state } = StateGlobal;
+  const { changeRoute, state } = React.useContext(AppContext);
+  const firebaseApp = useFirebaseApp();
 
   // true Open
   // false Off
@@ -136,7 +136,7 @@ function Setting() {
                 onClick={() => {
                   setMessage("");
 
-                  firebase
+                  firebaseApp
                     .firestore()
                     .collection("users")
                     .doc(state.user.uid)

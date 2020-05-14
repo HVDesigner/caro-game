@@ -1,11 +1,12 @@
 import React from "react";
 import "./index.css";
 import AppContext from "./../../../context/";
-import { FirebaseContext } from "./../../../Firebase/";
+import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 function WinnerModal({ roomData, ownType }) {
   const { state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
 
   const [win, setWin] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -22,7 +23,7 @@ function WinnerModal({ roomData, ownType }) {
     }
     roomUpdate[`participants.${ownType}.status`] = "waiting";
 
-    firebase
+    firebaseApp
       .firestore()
       .collection("rooms")
       .doc(state.user.room_id.value)

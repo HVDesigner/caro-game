@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import Sound from "react-sound";
 import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 // Sounds
 import BackgroundSound from "./../../assets/sound/background-music.mp3";
@@ -110,8 +111,8 @@ function App() {
             on_queue: false,
             room_id: { value: 0, type: "none" },
             "game-type-select": { value: "gomoku" },
-            createdAt: firebaseApp.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebaseApp.firestore.FieldValue.serverTimestamp(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           };
 
           userCollectionFirestore

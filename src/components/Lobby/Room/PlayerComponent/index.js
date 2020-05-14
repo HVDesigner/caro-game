@@ -1,11 +1,12 @@
 import React from "react";
+import { useFirebaseApp } from "reactfire";
+
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
 import AppContext from "./../../../../context/";
-import { FirebaseContext } from "./../../../../Firebase/";
 
 function PlayerInRoom({ roomData }) {
   const { state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
 
   const [name, setName] = React.useState("");
   const [elo, setElo] = React.useState(0);
@@ -17,7 +18,7 @@ function PlayerInRoom({ roomData }) {
       setElo(state.user.elo);
       setImageUrl(state.user.image_url);
     } else {
-      firebase
+      firebaseApp
         .firestore()
         .collection("users")
         .doc(roomData.participants.player.id)
@@ -33,7 +34,7 @@ function PlayerInRoom({ roomData }) {
         });
     }
   }, [
-    firebase,
+    firebaseApp,
     roomData.participants.player.id,
     state.user.elo,
     state.user.image_url,

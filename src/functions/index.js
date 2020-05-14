@@ -1,11 +1,12 @@
 import bcrypt from "bcryptjs";
+import firebaseApp from "firebase/app";
 
 /**
  *
  * Chức năng trời khỏi bàn chơi.
  *
  * @param {({roomId, userId})} data
- * @param {firebase} firebase
+ * @param {firebaseApp} firebase
  */
 export const leaveRoom = async (data, firebase) => {
   const { roomId, userId } = data;
@@ -48,7 +49,7 @@ export const leaveRoom = async (data, firebase) => {
               "participants.master.id": playerID,
               "participants.master.status": "waiting",
               "participants.master.win": 0,
-              "participants.player": firebase.firestore.FieldValue.delete(),
+              "participants.player": firebaseApp.firestore.FieldValue.delete(),
               "game.turn.uid": playerID,
               "game.player": {},
               "game.history": [],
@@ -72,7 +73,7 @@ export const leaveRoom = async (data, firebase) => {
               "participants.master.id": watcherId,
               "participants.master.status": "waiting",
               "participants.master.win": 0,
-              "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
+              "participants.watcher": firebaseApp.firestore.FieldValue.arrayRemove(
                 watcherId
               ),
               "game.turn.uid": watcherId,
@@ -108,14 +109,14 @@ export const leaveRoom = async (data, firebase) => {
           });
 
           transaction.update(docRooms, {
-            "participants.player": firebase.firestore.FieldValue.delete(),
+            "participants.player": firebaseApp.firestore.FieldValue.delete(),
           });
         } else {
           // if watcher leave room
 
           // remove watcher in participants list
           transaction.update(docRooms, {
-            "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
+            "participants.watcher": firebaseApp.firestore.FieldValue.arrayRemove(
               userId
             ),
           });
@@ -217,7 +218,7 @@ export const loginRoom = (data, firebase) => {
             // Nếu có player thì thêm vào watcher
             roomUpdates[
               "participants.watcher"
-            ] = firebase.firestore.FieldValue.arrayUnion(data.uid);
+            ] = firebaseApp.firestore.FieldValue.arrayUnion(data.uid);
           } else {
             // Nếu không có player thì thêm vào player
             roomUpdates["participants.player.id"] = data.uid;

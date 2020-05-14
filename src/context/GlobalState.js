@@ -3,9 +3,11 @@ import AppContext from "./index";
 import { reducer } from "./Reducers";
 import { GET_SQUARE_POSITION } from "./ActionTypes";
 import { useFirestore } from "reactfire";
-import firebase from "firebase/app";
+import { useFirebaseApp } from "reactfire";
 
 function GlobalState(props) {
+  const firebaseApp = useFirebaseApp();
+
   const [state, dispatch] = React.useReducer(reducer, {
     modal: {
       "find-room": false,
@@ -55,7 +57,7 @@ function GlobalState(props) {
     if (state.user.uid && state.user.location.path !== path) {
       const userDocFirestore = userCollectionFirestore.doc(state.user.uid);
 
-      firebase.firestore().runTransaction((transaction) => {
+      firebaseApp.firestore().runTransaction((transaction) => {
         return transaction.get(userDocFirestore).then((doc) => {
           if (!doc.exists) {
             return { message: "changeRoute error" };

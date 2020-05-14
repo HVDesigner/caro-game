@@ -2,6 +2,7 @@ import React from "react";
 import "./../GamePlay.css";
 import { Row, Col } from "react-bootstrap";
 import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 // Functions
 import { winAction } from "./../../../functions/";
@@ -363,7 +364,7 @@ function GamePlayComponent({ roomData, ownType }) {
                 .collection("rooms")
                 .doc(state.user.room_id.value)
                 .update({
-                  "game.history": firebaseApp.firestore.FieldValue.arrayUnion({
+                  "game.history": firebase.firestore.FieldValue.arrayUnion({
                     row: rowkey,
                     col: colkey,
                     value: roomData.game.player[roomData.game.turn.uid].value,

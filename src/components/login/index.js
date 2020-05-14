@@ -10,8 +10,7 @@ import AppContext from "./../../context/";
 import { SET_USER_DATA } from "./../../context/ActionTypes";
 
 function Login() {
-  const StateGlobal = React.useContext(AppContext);
-  const { dispatch } = StateGlobal;
+  const { dispatch } = React.useContext(AppContext);
 
   const [idState, setIDState] = React.useState("");
   const [name, setName] = React.useState("");

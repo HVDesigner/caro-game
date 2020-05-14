@@ -3,24 +3,27 @@ import LockSVG from "./../../../../assets/Rooms/lock.svg";
 import MoreSVG from "./../../../../assets/Rooms/more.svg";
 import MasterComponent from "./../MasterComponent/";
 import PlayerComponent from "./../PlayerComponent/";
+import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
+// SVGs
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
 
-import { FirebaseContext } from "./../../../../Firebase/";
+// Contexts
 import AppContext from "./../../../../context/";
 
 function BodyComponent({ roomData, setShowFooter, showFooter }) {
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
   const onJoinRoomSubmit = () => {
     if (roomData.type === "room") {
-      const roomWithIdRef = firebase
+      const roomWithIdRef = firebaseApp
         .firestore()
         .collection("rooms")
         .doc(roomData.rid);
 
-      return firebase.firestore().runTransaction((transaction) => {
+      return firebaseApp.firestore().runTransaction((transaction) => {
         return transaction
           .get(roomWithIdRef)
           .then((tranDoc) => {
@@ -42,7 +45,7 @@ function BodyComponent({ roomData, setShowFooter, showFooter }) {
             return transaction.update(roomWithIdRef, roomUpdates);
           })
           .then(async () => {
-            return await firebase
+            return await firebaseApp
               .firestore()
               .collection("users")
               .doc(state.user.uid)
@@ -57,16 +60,16 @@ function BodyComponent({ roomData, setShowFooter, showFooter }) {
           });
       });
     } else {
-      const roomByIdDoc = firebase
+      const roomByIdDoc = firebaseApp
         .firestore()
         .collection("rooms")
         .doc(roomData.rid);
-      const userDoc = firebase
+      const userDoc = firebaseApp
         .firestore()
         .collection("users")
         .doc(state.user.uid);
 
-      const batch = firebase.firestore().batch();
+      const batch = firebaseApp.firestore().batch();
       batch.update(userDoc, {
         room_id: {
           type: roomData["game-play"],

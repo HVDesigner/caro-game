@@ -1,15 +1,20 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import AppContext from "./../../context/";
-import { FirebaseContext } from "./../../Firebase/";
 import "./toplist.css";
-import UserSVG from "./../../assets/Dashboard/user.svg";
+import { useFirebaseApp } from "reactfire";
 
+// Functions
 import { filterElo } from "./../../functions/index";
+
+// Contexts
+import AppContext from "./../../context/";
+
+// SVGs
+import UserSVG from "./../../assets/Dashboard/user.svg";
 
 function TopList() {
   const { changeRoute } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
 
   // true gomoku
   // false block-head
@@ -21,7 +26,7 @@ function TopList() {
     setLoading(true);
     let path = `elo.${gameType ? "gomoku" : "block-head"}`;
 
-    firebase
+    firebaseApp
       .firestore()
       .collection("users")
       .where(path, ">=", 1600)
@@ -38,7 +43,7 @@ function TopList() {
         setListTop(arr);
         setLoading(false);
       });
-  }, [firebase, gameType]);
+  }, [firebaseApp, gameType]);
 
   return (
     <Container fluid className="toplist-main">

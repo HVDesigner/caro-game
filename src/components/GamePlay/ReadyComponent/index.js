@@ -1,6 +1,7 @@
 import React from "react";
 import "./index.css";
 import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 // Functions
 import { leaveRoom } from "./../../../functions/";
@@ -65,7 +66,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                   }
                 );
                 transaction.update(roomRef, {
-                  "participants.master": firebaseApp.firestore.FieldValue.delete(),
+                  "participants.master": firebase.firestore.FieldValue.delete(),
                   "game.turn.uid": sfDoc.data().participants.player.id,
                 });
               } else {
@@ -99,7 +100,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                   }
                 );
                 transaction.update(roomRef, {
-                  "participants.player": firebaseApp.firestore.FieldValue.delete(),
+                  "participants.player": firebase.firestore.FieldValue.delete(),
                   "game.turn.uid": sfDoc.data().participants.master.id,
                 });
               } else {
@@ -130,7 +131,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 room_id: { type: "none", value: 0 },
               });
               transaction.update(roomRef, {
-                "participants.watcher": firebaseApp.firestore.FieldValue.arrayRemove(
+                "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
                   state.user.uid
                 ),
               });
@@ -141,8 +142,10 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
     }
   };
 
+  // const readyAction = useFunctions();
+
   const onReadyPlay = () => {
-    const readyAction = firebaseApp
+    const readyAction = firebase
       .app()
       .functions("asia-east2")
       .httpsCallable("readyAction");
@@ -169,7 +172,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
     roomUpdate[`game.status.ready`] = roomData.game.status.ready - 1;
     roomUpdate[
       `game.player.${state.user.uid}`
-    ] = firebaseApp.firestore.FieldValue.delete();
+    ] = firebase.firestore.FieldValue.delete();
 
     firebaseApp
       .firestore()

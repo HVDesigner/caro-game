@@ -1,17 +1,17 @@
 import React from "react";
+import { useFirebaseApp } from "reactfire";
 
 // SVGs
 import LeftSVG from "./../../../../assets/chevron-left.svg";
 
 // Contexts
-import { FirebaseContext } from "./../../../../Firebase/";
 import AppContext from "./../../../../context/";
 
 // Functions
 import { loginRoom } from "./../../../../functions/";
 
 function PasswordInput({ roomData }) {
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
   const [pass, setPass] = React.useState("");
@@ -27,7 +27,10 @@ function PasswordInput({ roomData }) {
       setLoginInProcess(true);
       setPassError({ status: false, text: "" });
 
-      loginRoom({ uid: state.user.uid, ...roomData, rawText: pass }, firebase)
+      loginRoom(
+        { uid: state.user.uid, ...roomData, rawText: pass },
+        firebaseApp
+      )
         .then()
         .catch(() => {
           setLoginInProcess(false);

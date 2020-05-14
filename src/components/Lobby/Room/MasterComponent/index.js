@@ -1,11 +1,15 @@
 import React from "react";
+import { useFirebaseApp } from "reactfire";
+
+// SVGs
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
+
+// Contexts
 import AppContext from "./../../../../context/";
-import { FirebaseContext } from "./../../../../Firebase/";
 
 function MasterInRoom({ roomData }) {
   const { state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
 
   const [name, setName] = React.useState("");
   const [elo, setElo] = React.useState(0);
@@ -17,7 +21,7 @@ function MasterInRoom({ roomData }) {
       setElo(state.user.elo[roomData["game-play"]]);
       setImageUrl(state.user.image_url);
     } else {
-      firebase
+      firebaseApp
         .firestore()
         .collection("users")
         .doc(roomData.participants.master.id)
@@ -33,7 +37,7 @@ function MasterInRoom({ roomData }) {
         });
     }
   }, [
-    firebase,
+    firebaseApp,
     roomData.participants.master.id,
     roomData,
     state.user.uid,

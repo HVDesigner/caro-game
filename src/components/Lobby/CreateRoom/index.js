@@ -2,17 +2,18 @@ import React from "react";
 import "./CreateRoom.css";
 import { Form, Container, Row, Col, Nav } from "react-bootstrap";
 import bcrypt from "bcryptjs";
+import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 // Components
 import CheckButton from "./../../CheckButton/";
 
 // Contexts
 import AppContext from "./../../../context/";
-import { FirebaseContext } from "./../../../Firebase/";
 
 function CreateRoom() {
   const { changeRoute, state } = React.useContext(AppContext);
-  const firebase = React.useContext(FirebaseContext);
+  const firebaseApp = useFirebaseApp();
   const [creating, setCreating] = React.useState(false);
 
   const [name, setName] = React.useState("");
@@ -74,7 +75,7 @@ function CreateRoom() {
   const getRndInteger = (min = 100000, max = 999999) => {
     const num = Math.floor(Math.random() * (max - min + 1)) + min;
 
-    return firebase
+    return firebaseApp
       .firestore()
       .collection("rooms")
       .doc(num.toString())
@@ -128,7 +129,7 @@ function CreateRoom() {
       };
 
       getRndInteger().then((num) => {
-        firebase
+        firebaseApp
           .firestore()
           .collection(`rooms`)
           .doc(num)

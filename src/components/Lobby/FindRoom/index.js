@@ -4,6 +4,7 @@ import AppContext from "./../../../context/";
 import { TOGGLE_FIND_ROOM_MODAL } from "./../../../context/ActionTypes";
 import { loginRoom } from "./../../../functions/";
 import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 function FindRoom() {
   const { dispatch, state } = React.useContext(AppContext);
@@ -51,7 +52,7 @@ function FindRoom() {
                     if (tranDoc.data().participants.player) {
                       roomUpdates[
                         "participants.watcher"
-                      ] = firebaseApp.firestore.FieldValue.arrayUnion(
+                      ] = firebase.firestore.FieldValue.arrayUnion(
                         state.user.uid
                       );
                     } else {
@@ -96,7 +97,7 @@ function FindRoom() {
                 "location.path": "room",
               });
               batch.update(roomByIdDoc, {
-                "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
+                "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
                   state.user.uid
                 ),
               });

@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "./GamePlay.css";
 import { useFirebaseApp } from "reactfire";
+import firebase from "firebase/app";
 
 // SVGs
 import UserSVG from "./../../assets/Dashboard/user.svg";
@@ -115,7 +116,7 @@ function GamePlayComponent() {
         .collection("rooms")
         .doc(state.user.room_id.value)
         .update({
-          conversation: firebaseApp.firestore.FieldValue.arrayUnion({
+          conversation: firebase.firestore.FieldValue.arrayUnion({
             text: messageText,
             uid: state.user.uid,
             name: state.user.name.value,
