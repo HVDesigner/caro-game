@@ -97,48 +97,56 @@ function CreateRoom() {
     setShowErrorBet({ ...showErrorBet, status: false });
 
     if (bet) {
-      setCreating(true);
+      if (parseInt(state.user.coin) >= parseInt(bet)) {
+        setCreating(true);
 
-      let createRoom = {
-        bet,
-        password: {
-          status: password ? true : false,
-          text: password ? bcrypt.hashSync(password, 10) : "",
-        },
-        game: {
-          "current-step": {},
-          player: {},
-          history: [],
-          status: { ready: 0 },
-          turn: { uid: state.user.uid },
-        },
-        rule: rule ? "6-win" : "6-no-win",
-        time: getTime().type,
-        title: name ? name : `Phòng của ${state.user.name.value}`,
-        type: "room",
-        conversation: [],
-        participants: {
-          master: {
-            id: state.user.uid,
-            status: "waiting",
-            win: 0,
+        let createRoom = {
+          bet,
+          password: {
+            status: password ? true : false,
+            text: password ? bcrypt.hashSync(password, 10) : "",
           },
-        },
-        "game-play": gamePlay ? "gomoku" : "block-head",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      };
+          game: {
+            "current-step": {},
+            player: {},
+            history: [],
+            status: { ready: 0 },
+            turn: { uid: state.user.uid },
+          },
+          rule: rule ? "6-win" : "6-no-win",
+          time: getTime().type,
+          title: name ? name : `Phòng của ${state.user.name.value}`,
+          type: "room",
+          conversation: [],
+          participants: {
+            master: {
+              id: state.user.uid,
+              status: "waiting",
+              win: 0,
+            },
+          },
+          "game-play": gamePlay ? "gomoku" : "block-head",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        };
 
-      getRndInteger().then((num) => {
-        firebaseApp
-          .firestore()
-          .collection(`rooms`)
-          .doc(num)
-          .set(createRoom)
-          .then(() => {
-            changeRoute("room", num, gamePlay ? "gomoku" : "block-head");
-          });
-      });
+        getRndInteger().then((num) => {
+          firebaseApp
+            .firestore()
+            .collection(`rooms`)
+            .doc(num)
+            .set(createRoom)
+            .then(() => {
+              changeRoute("room", num, gamePlay ? "gomoku" : "block-head");
+            });
+        });
+      } else {
+        setShowErrorBet({
+          ...showErrorBet,
+          status: true,
+          text: "Bạn không đủ xu!",
+        });
+      }
     } else {
       setShowErrorBet({ ...showErrorBet, status: true });
     }

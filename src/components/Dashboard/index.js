@@ -84,6 +84,7 @@ function Dashboard() {
           </Col>
         </Row>
       </Container>
+
       <Container style={{ width: "55vw" }}>
         <Row>
           <Col>

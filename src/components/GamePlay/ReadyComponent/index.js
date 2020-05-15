@@ -2,6 +2,7 @@ import React from "react";
 import "./index.css";
 import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
+import { TOGGLE_DIALOG } from "./../../../context/ActionTypes";
 
 // Functions
 import { leaveRoom } from "./../../../functions/";
@@ -13,7 +14,7 @@ import WatcherList from "./WatcherList/";
 import AppContext from "./../../../context/";
 
 function ReadyComponent({ roomData, ownType, setStatusGame }) {
-  const { state } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
   const firebaseApp = useFirebaseApp();
 
   const [showLoadingExitBtn, setShowLoadingExitBtn] = React.useState(true);
@@ -146,26 +147,60 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
   // const readyAction = useFunctions();
 
   const onReadyPlay = () => {
-    const readyAction = firebase
-      .app()
-      .functions("asia-east2")
-      .httpsCallable("readyAction");
+    if (
+      parseInt(state.user.coin) >= parseInt(roomData.bet) &&
+      roomData.type === "room"
+    ) {
+      const readyAction = firebase
+        .app()
+        .functions("asia-east2")
+        .httpsCallable("readyAction");
 
-    readyAction({
-      roomId: state.user.room_id.value,
-      uid: state.user.uid,
-    })
-      .then((result) => {
-        if (result.data.ready === 2) {
-          setStatusGame({
-            isPlay: true,
-            winner: "",
-          });
-        }
+      readyAction({
+        roomId: state.user.room_id.value,
+        uid: state.user.uid,
       })
-      .catch((error) => {
-        console.log(error);
+        .then((result) => {
+          if (result.data.ready === 2) {
+            setStatusGame({
+              isPlay: true,
+              winner: "",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (roomData.type === "quick-play") {
+      const readyAction = firebase
+        .app()
+        .functions("asia-east2")
+        .httpsCallable("readyAction");
+
+      readyAction({
+        roomId: state.user.room_id.value,
+        uid: state.user.uid,
+      })
+        .then((result) => {
+          if (result.data.ready === 2) {
+            setStatusGame({
+              isPlay: true,
+              winner: "",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      dispatch({
+        type: TOGGLE_DIALOG,
+        payload: {
+          status: true,
+          message: "Bạn không đủ tiền cược!",
+        },
       });
+    }
   };
 
   const onCancelPlay = () => {
