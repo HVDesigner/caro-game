@@ -2,6 +2,8 @@ import {
   SET_USER_DATA,
   GET_SQUARE_POSITION,
   TOGGLE_FIND_ROOM_MODAL,
+  LOADING_OVERLAY,
+  TOGGLE_DIALOG,
 } from "./ActionTypes";
 
 export function reducer(state, action) {
@@ -25,6 +27,18 @@ export function reducer(state, action) {
       return {
         ...state,
         modal: { ...state.modal, "find-room": action.payload },
+      };
+
+    case LOADING_OVERLAY:
+      return {
+        ...state,
+        "loading-overlay": action.payload,
+      };
+
+    case TOGGLE_DIALOG:
+      return {
+        ...state,
+        dialog: { ...state.dialog, ...action.payload },
       };
 
     default:

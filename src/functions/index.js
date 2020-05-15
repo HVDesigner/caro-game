@@ -3,7 +3,7 @@ import firebaseApp from "firebase/app";
 
 /**
  *
- * Chức năng trời khỏi bàn chơi.
+ * Chức năng rời khỏi bàn chơi.
  *
  * @param {({roomId, userId})} data
  * @param {firebaseApp} firebase

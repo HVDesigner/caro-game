@@ -21,7 +21,6 @@ import AppContext from "./../../context/";
 function Lobby() {
   const { state } = React.useContext(AppContext);
 
-  console.log("render");
   return (
     <React.Fragment>
       {state.modal["find-room"] ? <FindRoomModal /> : ""}

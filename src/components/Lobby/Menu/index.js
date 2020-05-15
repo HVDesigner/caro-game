@@ -71,7 +71,7 @@ function MenuComponent() {
           <Nav.Item className="text-white coin_lobby d-flex align-items-center p-2">
             <img src={CoinSVG} alt="logo"></img>
             <h5 className="ml-3 mr-2 mb-0 d-flex align-items-center text-stroke-carotv">
-              {numeral(state.user.coin).format("0.0a")}
+              {`${numeral(state.user.coin).format("0a")} xu`}
             </h5>
           </Nav.Item>
           <Nav.Item className="text-white elo-lobby d-flex align-items-center p-2">

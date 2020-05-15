@@ -1,7 +1,7 @@
 import React from "react";
 import AppContext from "./index";
 import { reducer } from "./Reducers";
-import { GET_SQUARE_POSITION } from "./ActionTypes";
+import { GET_SQUARE_POSITION, LOADING_OVERLAY } from "./ActionTypes";
 import { useFirestore } from "reactfire";
 import { useFirebaseApp } from "reactfire";
 
@@ -35,6 +35,12 @@ function GlobalState(props) {
       uid: "",
       updatedAt: 0,
     },
+    "loading-overlay": false,
+    dialog: {
+      status: false,
+      type: "warning",
+      message: "",
+    },
     "square-position": {
       status: false,
       row: 0,
@@ -54,27 +60,40 @@ function GlobalState(props) {
 
   const changeRoute = (path, id = 0, type = "") => {
     if (state.user.uid && state.user.location.path !== path) {
+      dispatch({
+        type: LOADING_OVERLAY,
+        payload: true,
+      });
+
       const userDocFirestore = userCollectionFirestore.doc(state.user.uid);
 
-      firebaseApp.firestore().runTransaction((transaction) => {
-        return transaction.get(userDocFirestore).then((doc) => {
-          if (!doc.exists) {
-            return { message: "changeRoute error" };
-          }
+      firebaseApp
+        .firestore()
+        .runTransaction((transaction) => {
+          return transaction.get(userDocFirestore).then((doc) => {
+            if (!doc.exists) {
+              return { message: "changeRoute error" };
+            }
 
-          if (path === "room" && doc.data().location.path !== path) {
-            transaction.update(userDocFirestore, {
-              "location.path": path,
-              "room_id.value": id,
-              "room_id.type": type,
-            });
-          } else {
-            transaction.update(userDocFirestore, {
-              "location.path": path,
-            });
-          }
+            if (path === "room" && doc.data().location.path !== path) {
+              transaction.update(userDocFirestore, {
+                "location.path": path,
+                "room_id.value": id,
+                "room_id.type": type,
+              });
+            } else {
+              transaction.update(userDocFirestore, {
+                "location.path": path,
+              });
+            }
+          });
+        })
+        .then(() => {
+          dispatch({
+            type: LOADING_OVERLAY,
+            payload: false,
+          });
         });
-      });
     }
   };
 

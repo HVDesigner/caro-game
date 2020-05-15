@@ -1,5 +1,6 @@
 import React from "react";
 import { useFirebaseApp } from "reactfire";
+import { TOGGLE_DIALOG } from "./../../../../context/ActionTypes";
 
 // SVGs
 import LeftSVG from "./../../../../assets/chevron-left.svg";
@@ -12,7 +13,7 @@ import { loginRoom } from "./../../../../functions/";
 
 function PasswordInput({ roomData }) {
   const firebaseApp = useFirebaseApp();
-  const { state } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
 
   const [pass, setPass] = React.useState("");
   const [loginInProcess, setLoginInProcess] = React.useState(false);
@@ -23,7 +24,18 @@ function PasswordInput({ roomData }) {
       e.preventDefault();
     }
 
-    if (pass) {
+    if (
+      parseInt(roomData.bet) > parseInt(state.user.coin) &&
+      roomData.type === "room"
+    ) {
+      dispatch({
+        type: TOGGLE_DIALOG,
+        payload: {
+          status: true,
+          message: "bạn không đủ xu!",
+        },
+      });
+    } else if (pass) {
       setLoginInProcess(true);
       setPassError({ status: false, text: "" });
 

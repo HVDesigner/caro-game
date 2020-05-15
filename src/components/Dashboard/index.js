@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import numeral from "numeral";
 import { useFirebaseApp } from "reactfire";
+import { LOADING_OVERLAY } from "./../../context/ActionTypes";
 
 // Styles
 import "./Dashboard.css";
@@ -25,8 +26,7 @@ import UserSVG from "./../../assets/Dashboard/user.svg";
 import AppContext from "./../../context/";
 
 function Dashboard() {
-  const GlobalState = React.useContext(AppContext);
-  const { state, changeRoute } = GlobalState;
+  const { state, changeRoute, dispatch } = React.useContext(AppContext);
 
   const firebaseApp = useFirebaseApp();
 
@@ -52,7 +52,7 @@ function Dashboard() {
               <li className="nav-item text-white pl-2 pr-2 pb-2 pt-2 coin_dashboard">
                 <img src={CoinSVG} alt="logo"></img>
                 <h5 className="ml-3 mr-3 mb-0">
-                  {numeral(state.user.coin).format("0.0a")}
+                  {`${numeral(state.user.coin).format("0a")} xu`}
                 </h5>
                 <img src={AddCoinSVG} alt="logo" className="m-0 wood-btn"></img>
               </li>
@@ -107,6 +107,11 @@ function Dashboard() {
                 alt="rooms"
                 className="wood-btn"
                 onClick={() => {
+                  dispatch({
+                    type: LOADING_OVERLAY,
+                    payload: true,
+                  });
+
                   firebaseApp
                     .firestore()
                     .collection("users")

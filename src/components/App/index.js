@@ -9,6 +9,8 @@ import BackgroundSound from "./../../assets/sound/background-music.mp3";
 
 // Components
 import LoadingComponent from "./../Loading/";
+import LoadingOverlay from "./../LoadingOverlay/";
+import DialogComponent from "./../Dialog/";
 
 // Constants
 import { SET_USER_DATA } from "./../../context/ActionTypes";
@@ -269,7 +271,9 @@ function App() {
     );
 
   return (
-    <React.Fragment>
+    <div className="position-relative">
+      {state.dialog.status ? <DialogComponent /> : ""}
+      {state["loading-overlay"] ? <LoadingOverlay /> : ""}
       {state.user.setting.sound ? (
         <Sound
           url={BackgroundSound}
@@ -280,7 +284,7 @@ function App() {
         ""
       )}
       {PageShow(state.user.location.path)}
-    </React.Fragment>
+    </div>
   );
 }
 

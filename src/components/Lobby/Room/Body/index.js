@@ -5,6 +5,7 @@ import MasterComponent from "./../MasterComponent/";
 import PlayerComponent from "./../PlayerComponent/";
 import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
+import { TOGGLE_DIALOG } from "./../../../../context/ActionTypes";
 
 // SVGs
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
@@ -14,7 +15,7 @@ import AppContext from "./../../../../context/";
 
 function BodyComponent({ roomData, setShowFooter, showFooter }) {
   const firebaseApp = useFirebaseApp();
-  const { state } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
 
   const onJoinRoomSubmit = () => {
     if (roomData.type === "room") {
@@ -86,6 +87,7 @@ function BodyComponent({ roomData, setShowFooter, showFooter }) {
       batch.commit();
     }
   };
+
   return (
     <div className="d-flex room-item-body p-2">
       {roomData.participants.master ? (
@@ -120,7 +122,22 @@ function BodyComponent({ roomData, setShowFooter, showFooter }) {
             alt="moreSVG"
             className="wood-btn"
             onClick={() => {
-              onJoinRoomSubmit();
+              if (
+                parseInt(roomData.bet) <= parseInt(state.user.coin) &&
+                roomData.type === "room"
+              ) {
+                onJoinRoomSubmit();
+              } else if (roomData.type === "quick-play") {
+                onJoinRoomSubmit();
+              } else {
+                dispatch({
+                  type: TOGGLE_DIALOG,
+                  payload: {
+                    status: true,
+                    message: "Bạn không đủ xu!",
+                  },
+                });
+              }
             }}
           />
         </div>
