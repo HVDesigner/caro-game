@@ -194,7 +194,7 @@ function RuleTour({ setShowDetail }) {
           hòa 2-2 thì ai là người thắng với ít quân cờ nhất và nghĩ ít thời gian
           hơn trên tổng 2 ván thắng của mỗi người sẽ là người chiến thắng)
         </p>
-        <p className="text-white text-stroke-carotv">
+        <p className="text-white text-stroke-carotv mb-2">
           - <strong>Trận chung kết:</strong> Thi đấu 6 ván nếu hòa 3-3 thì cũng
           phân bại bằng số quân cờ và số thời gian nghĩ như bên trên
         </p>

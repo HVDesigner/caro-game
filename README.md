@@ -43,3 +43,14 @@ Task
 - Create Room
 
   - Check coin limit
+
+- Tournament
+  -
+
+- Game play
+ - Auto hide
+
+- On / Off âm thanh.
+- Màu chat.
+- Màu quân cờ.
+- Cầu hòa.

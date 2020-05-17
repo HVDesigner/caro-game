@@ -26,114 +26,118 @@ function FindRoom() {
       e.preventDefault();
     }
 
-    firebaseApp
-      .firestore()
-      .collection("rooms")
-      .doc(roomId.toString())
-      .get()
-      .then(function (doc) {
-        if (doc.exists) {
-          if (!doc.data().password.status) {
-            if (doc.data().type === "room") {
-              const roomWithIdRef = firebaseApp
-                .firestore()
-                .collection("rooms")
-                .doc(roomId.toString());
+    if (roomId) {
+      firebaseApp
+        .firestore()
+        .collection("rooms")
+        .doc(roomId.toString())
+        .get()
+        .then(function (doc) {
+          if (doc.exists) {
+            if (!doc.data().password.status) {
+              if (doc.data().type === "room") {
+                const roomWithIdRef = firebaseApp
+                  .firestore()
+                  .collection("rooms")
+                  .doc(roomId.toString());
 
-              return firebaseApp.firestore().runTransaction((transaction) => {
-                return transaction
-                  .get(roomWithIdRef)
-                  .then((tranDoc) => {
-                    if (!tranDoc.exists) {
-                      console.log("Document does not exist!");
-                    }
+                return firebaseApp.firestore().runTransaction((transaction) => {
+                  return transaction
+                    .get(roomWithIdRef)
+                    .then((tranDoc) => {
+                      if (!tranDoc.exists) {
+                        console.log("Document does not exist!");
+                      }
 
-                    const roomUpdates = {};
-                    if (tranDoc.data().participants.player) {
-                      roomUpdates[
-                        "participants.watcher"
-                      ] = firebase.firestore.FieldValue.arrayUnion(
-                        state.user.uid
-                      );
-                    } else {
-                      roomUpdates["participants.player.id"] = state.user.uid;
-                      roomUpdates["participants.player.status"] = "waiting";
-                      roomUpdates["participants.player.win"] = 0;
-                    }
+                      const roomUpdates = {};
+                      if (tranDoc.data().participants.player) {
+                        roomUpdates[
+                          "participants.watcher"
+                        ] = firebase.firestore.FieldValue.arrayUnion(
+                          state.user.uid
+                        );
+                      } else {
+                        roomUpdates["participants.player.id"] = state.user.uid;
+                        roomUpdates["participants.player.status"] = "waiting";
+                        roomUpdates["participants.player.win"] = 0;
+                      }
 
-                    return transaction.update(roomWithIdRef, roomUpdates);
-                  })
-                  .then(async () => {
-                    return await firebaseApp
-                      .firestore()
-                      .collection("users")
-                      .doc(state.user.uid)
-                      .update({
-                        "room_id.type": doc.data()["game-play"],
-                        "room_id.value": roomId.toString(),
-                        "location.path": "room",
-                      });
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
-              });
-            } else {
-              const roomByIdDoc = firebaseApp
-                .firestore()
-                .collection("rooms")
-                .doc(roomId.toString());
-              const userDoc = firebaseApp
-                .firestore()
-                .collection("users")
-                .doc(state.user.uid);
+                      return transaction.update(roomWithIdRef, roomUpdates);
+                    })
+                    .then(async () => {
+                      return await firebaseApp
+                        .firestore()
+                        .collection("users")
+                        .doc(state.user.uid)
+                        .update({
+                          "room_id.type": doc.data()["game-play"],
+                          "room_id.value": roomId.toString(),
+                          "location.path": "room",
+                        });
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                });
+              } else {
+                const roomByIdDoc = firebaseApp
+                  .firestore()
+                  .collection("rooms")
+                  .doc(roomId.toString());
+                const userDoc = firebaseApp
+                  .firestore()
+                  .collection("users")
+                  .doc(state.user.uid);
 
-              const batch = firebaseApp.firestore().batch();
-              batch.update(userDoc, {
-                room_id: {
-                  type: doc.data()["game-play"],
-                  value: roomId.toString(),
+                const batch = firebaseApp.firestore().batch();
+                batch.update(userDoc, {
+                  room_id: {
+                    type: doc.data()["game-play"],
+                    value: roomId.toString(),
+                  },
+                  "location.path": "room",
+                });
+                batch.update(roomByIdDoc, {
+                  "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
+                    state.user.uid
+                  ),
+                });
+
+                batch.commit();
+              }
+            } else if (doc.data().password.status && password !== "") {
+              loginRoom(
+                {
+                  uid: state.user.uid,
+                  ...doc.data(),
+                  rid: roomId.toString(),
+                  rawText: password,
                 },
-                "location.path": "room",
-              });
-              batch.update(roomByIdDoc, {
-                "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
-                  state.user.uid
-                ),
-              });
-
-              batch.commit();
+                firebaseApp
+              )
+                .then(() => {
+                  closeModal();
+                })
+                .catch((error) => {
+                  if (error.value === false) {
+                    setError(error.text);
+                  } else {
+                    setError("Không thể vào bàn!");
+                  }
+                });
+            } else {
+              setError("Bàn có mật khẩu!");
             }
-          } else if (doc.data().password.status && password !== "") {
-            loginRoom(
-              {
-                uid: state.user.uid,
-                ...doc.data(),
-                rid: roomId.toString(),
-                rawText: password,
-              },
-              firebaseApp
-            )
-              .then(() => {
-                closeModal();
-              })
-              .catch((error) => {
-                if (error.value === false) {
-                  setError(error.text);
-                } else {
-                  setError("Không thể vào bàn!");
-                }
-              });
           } else {
-            setError("Bàn có mật khẩu!");
+            setError("Bàn không tồn tại");
           }
-        } else {
-          setError("Bàn không tồn tại");
-        }
-      })
-      .catch(function (error) {
-        console.log("Error getting document:", error);
-      });
+        })
+        .catch(function (error) {
+          console.log("Error getting document:", error);
+        });
+    } else {
+      setError("Chưa nhập số bàn!");
+    }
   };
 
   return (

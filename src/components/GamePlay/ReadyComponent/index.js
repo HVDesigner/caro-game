@@ -144,8 +144,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
     }
   };
 
-  // const readyAction = useFunctions();
-
   const onReadyPlay = () => {
     if (
       parseInt(state.user.coin) >= parseInt(roomData.bet) &&
@@ -193,6 +191,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
           console.log(error);
         });
     } else {
+      setLoadingReady(false);
       dispatch({
         type: TOGGLE_DIALOG,
         payload: {
