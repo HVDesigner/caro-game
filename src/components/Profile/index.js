@@ -42,13 +42,17 @@ function ProfileComponent() {
           <ListGroup className="statistic shadow mb-3">
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">ELO Gomoku</span>
+                <span className="text-warning title text-stroke-carotv">
+                  ELO Gomoku
+                </span>
                 <span className="text-white">{state.user.elo.gomoku}</span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">ELO Chặn 2 đầu</span>
+                <span className="text-warning title text-stroke-carotv">
+                  ELO Chặn 2 đầu
+                </span>
                 <span className="text-white">
                   {state.user.elo["block-head"]}
                 </span>
@@ -56,7 +60,9 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Cấp độ Gomoku</span>
+                <span className="text-warning title text-stroke-carotv">
+                  Cấp độ Gomoku
+                </span>
                 <span className="text-white">
                   {filterElo(state.user.elo.gomoku)}
                 </span>
@@ -64,7 +70,9 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Cấp độ Chặn 2 đầu</span>
+                <span className="text-warning title text-stroke-carotv">
+                  Cấp độ Chặn 2 đầu
+                </span>
                 <span className="text-white">
                   {filterElo(state.user.elo["block-head"])}
                 </span>
@@ -72,7 +80,9 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Trận thắng</span>
+                <span className="text-warning title text-stroke-carotv">
+                  Trận thắng
+                </span>
                 <span className="text-white">
                   {state.user.game.win.gomoku +
                     state.user.game.win["block-head"]}
@@ -81,7 +91,9 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Trận thua</span>
+                <span className="text-warning title text-stroke-carotv">
+                  Trận thua
+                </span>
                 <span className="text-white">
                   {state.user.game.lost.gomoku +
                     state.user.game.lost["block-head"]}
@@ -90,7 +102,9 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Trận hòa</span>
+                <span className="text-warning title text-stroke-carotv">
+                  Trận hòa
+                </span>
                 <span className="text-white">
                   {state.user.game.tie.gomoku +
                     state.user.game.tie["block-head"]}
@@ -99,7 +113,9 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Tỉ lệ thắng</span>
+                <span className="text-warning title text-stroke-carotv">
+                  Tỉ lệ thắng
+                </span>
                 <span className="text-white">
                   {state.user.game.win > 0
                     ? Math.round(
@@ -116,7 +132,9 @@ function ProfileComponent() {
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
-                <span className="text-warning title">Yêu thích</span>
+                <span className="text-warning title text-stroke-carotv">
+                  Yêu thích
+                </span>
                 <span className="text-white">0</span>
               </h5>
             </ListGroup.Item>

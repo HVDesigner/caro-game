@@ -5,7 +5,7 @@ import firebase from "firebase/app";
 import { TOGGLE_DIALOG } from "./../../../context/ActionTypes";
 
 // Functions
-import { leaveRoom } from "./../../../functions/";
+import { leaveRoom, readyAction } from "./../../../functions/";
 
 // Components
 import WatcherList from "./WatcherList/";
@@ -146,52 +146,11 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
 
   const onReadyPlay = () => {
     if (
-      parseInt(state.user.coin) >= parseInt(roomData.bet) &&
+      parseInt(state.user.coin) < parseInt(roomData.bet) &&
       roomData.type === "room"
     ) {
-      const readyAction = firebase
-        .app()
-        .functions("asia-east2")
-        .httpsCallable("readyAction");
-
-      readyAction({
-        roomId: state.user.room_id.value,
-        uid: state.user.uid,
-      })
-        .then((result) => {
-          if (result.data.ready === 2) {
-            setStatusGame({
-              isPlay: true,
-              winner: "",
-            });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else if (roomData.type === "quick-play") {
-      const readyAction = firebase
-        .app()
-        .functions("asia-east2")
-        .httpsCallable("readyAction");
-
-      readyAction({
-        roomId: state.user.room_id.value,
-        uid: state.user.uid,
-      })
-        .then((result) => {
-          if (result.data.ready === 2) {
-            setStatusGame({
-              isPlay: true,
-              winner: "",
-            });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
       setLoadingReady(false);
+
       dispatch({
         type: TOGGLE_DIALOG,
         payload: {
@@ -199,6 +158,26 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
           message: "Bạn không đủ tiền cược!",
         },
       });
+    } else {
+      readyAction(
+        {
+          roomId: state.user.room_id.value,
+          uid: state.user.uid,
+        },
+        firebaseApp
+      )
+        .then((result) => {
+          setLoadingReady(false);
+          if (result.ready === 2) {
+            setStatusGame({
+              isPlay: true,
+              winner: "",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 
@@ -228,61 +207,59 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
         return (
           <React.Fragment>
             {loadingReady ? (
-              <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
-                <h3 className="mb-0 text-center brown-color">LOADING...</h3>
-              </div>
-            ) : roomData.game.player[state.user.uid] ? (
-              <div
-                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
-                onClick={() => {
-                  setLoadingReady(true);
-                  onCancelPlay();
-                }}
-              >
-                <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
-              </div>
-            ) : roomData.participants.player && roomData.participants.master ? (
-              <div
-                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
-                onClick={() => {
-                  setLoadingReady(true);
-                  onReadyPlay();
-                }}
-              >
-                <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
-              </div>
+              <h3 className="mb-0 text-center">LOADING...</h3>
             ) : (
-              ""
-            )}
-            <div className="d-flex">
-              {loadingReady ? (
-                ""
-              ) : (
-                <React.Fragment>
-                  {roomData.type === "room" ? (
+              <React.Fragment>
+                {roomData.participants.player &&
+                roomData.participants.master &&
+                !roomData.game.player[state.user.uid] ? (
+                  <div
+                    className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                    onClick={() => {
+                      setLoadingReady(true);
+                      onReadyPlay();
+                    }}
+                  >
+                    <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {roomData.game.player[state.user.uid] ? (
+                  <div
+                    className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                    onClick={() => {
+                      setLoadingReady(true);
+                      onCancelPlay();
+                    }}
+                  >
+                    <h3 className="mb-0 text-center brown-color">
+                      HỦY SẴN SÀNG
+                    </h3>
+                  </div>
+                ) : (
+                  <div className="d-flex">
                     <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
                       <h3 className="mb-0 text-center brown-color p-2">
                         Mời chơi
                       </h3>
                     </div>
-                  ) : (
-                    ""
-                  )}
-                  <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
-                    <h3
-                      className="mb-0 text-center brown-color p-2"
-                      onClick={() => {
-                        if (showLoadingExitBtn) {
-                          onLeaveRoom();
-                        }
-                      }}
-                    >
-                      {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
-                    </h3>
+                    <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
+                      <h3
+                        className="mb-0 text-center brown-color p-2"
+                        onClick={() => {
+                          if (showLoadingExitBtn) {
+                            onLeaveRoom();
+                          }
+                        }}
+                      >
+                        {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                      </h3>
+                    </div>
                   </div>
-                </React.Fragment>
-              )}
-            </div>
+                )}
+              </React.Fragment>
+            )}
           </React.Fragment>
         );
 
@@ -290,54 +267,85 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
         return (
           <React.Fragment>
             {loadingReady ? (
-              <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
-                <h3 className="mb-0 text-center brown-color">LOADING...</h3>
-              </div>
-            ) : roomData.game.player[state.user.uid] ? (
-              <div
-                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
-                onClick={() => {
-                  setLoadingReady(true);
-                  onCancelPlay();
-                }}
-              >
-                <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
-              </div>
-            ) : roomData.participants.player && roomData.participants.master ? (
-              <div
-                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
-                onClick={() => {
-                  setLoadingReady(true);
-                  onReadyPlay();
-                }}
-              >
-                <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
-              </div>
+              <h3 className="mb-0 text-center brown-color">LOADING...</h3>
             ) : (
-              ""
+              <React.Fragment>
+                <div
+                  className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                  onClick={() => {
+                    setLoadingReady(true);
+                    onReadyPlay();
+                  }}
+                >
+                  <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
+                </div>
+                <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
+                  <h3
+                    className="mb-0 text-center brown-color p-2"
+                    onClick={() => {
+                      if (showLoadingExitBtn) {
+                        onLeaveRoom();
+                      }
+                    }}
+                  >
+                    {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                  </h3>
+                </div>
+              </React.Fragment>
             )}
-            <div className="d-flex">
-              {loadingReady ? (
-                ""
-              ) : (
-                <React.Fragment>
-                  <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
-                    <h3
-                      className="mb-0 text-center brown-color p-2"
-                      onClick={() => {
-                        if (showLoadingExitBtn) {
-                          onLeaveRoom();
-                        }
-                      }}
-                    >
-                      {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
-                    </h3>
-                  </div>
-                </React.Fragment>
-              )}
-            </div>
           </React.Fragment>
         );
+      // return (
+      //   <React.Fragment>
+      //     {loadingReady ? (
+      //       <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
+      //         <h3 className="mb-0 text-center brown-color">LOADING...</h3>
+      //       </div>
+      //     ) : roomData.game.player[state.user.uid] ? (
+      //       <div
+      //         className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+      //         onClick={() => {
+      //           setLoadingReady(true);
+      //           onCancelPlay();
+      //         }}
+      //       >
+      //         <h3 className="mb-0 text-center brown-color">HỦY SẴN SÀNG</h3>
+      //       </div>
+      //     ) : roomData.participants.player && roomData.participants.master ? (
+      //       <div
+      //         className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+      //         onClick={() => {
+      //           setLoadingReady(true);
+      //           onReadyPlay();
+      //         }}
+      //       >
+      //         <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
+      //       </div>
+      //     ) : (
+      //       ""
+      //     )}
+      //     <div className="d-flex">
+      //       {loadingReady ? (
+      //         ""
+      //       ) : (
+      //         <React.Fragment>
+      //           <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
+      //             <h3
+      //               className="mb-0 text-center brown-color p-2"
+      //               onClick={() => {
+      //                 if (showLoadingExitBtn) {
+      //                   onLeaveRoom();
+      //                 }
+      //               }}
+      //             >
+      //               {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+      //             </h3>
+      //           </div>
+      //         </React.Fragment>
+      //       )}
+      //     </div>
+      //   </React.Fragment>
+      // );
 
       default:
         return (

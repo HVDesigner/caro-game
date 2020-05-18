@@ -196,7 +196,6 @@ export const filterElo = (elo) => {
  * @param {function} firebase
  */
 export const loginRoom = (data, firebase) => {
-  console.log(data);
   // Kiểm tra mật khẩu
   const checkPass = bcrypt.compareSync(data.rawText, data.password.text);
 
@@ -263,4 +262,64 @@ export const loginRoom = (data, firebase) => {
       reject({ value: checkPass, text: "Mật khẩu không chính xác." })
     );
   }
+};
+
+/**
+ * Chức năng sẵn sàng.
+ *
+ * @param { ({roomId, uid}) } data
+ * @param {functions} firebase
+ */
+export const readyAction = (data, firebase) => {
+  const { roomId, uid } = data;
+
+  const room = firebase.firestore().collection("rooms").doc(roomId);
+
+  return firebase.firestore().runTransaction((transaction) => {
+    return transaction.get(room).then((doc) => {
+      if (!doc.exists) {
+        return { message: "Phòng không tồn tại!" };
+      }
+
+      const player = Object.values(doc.data().game.player);
+
+      if (player.length === 1) {
+        // Có một người chơi đã sẵn sàng.
+        const firstUpdateGame = {};
+
+        // Cập nhật lên có 2 người chơi đã sẵn sàng.
+        // Làm rỗng lịch sử.
+        // Thêm người chơi vào game.player với loại cờ X hoặc O.
+        // Cập nhật trạng thái có 2 người chơi, để chuyển hướng.
+        firstUpdateGame[`game.status.ready`] = 2;
+        firstUpdateGame[`game.history`] = [];
+        firstUpdateGame[`game.player.${uid}.value`] =
+          player[0].value === 1 ? 2 : 1;
+        firstUpdateGame[`participants.master.status`] = "playing";
+        firstUpdateGame[`participants.player.status`] = "playing";
+        firstUpdateGame[`game.current-step`] = {};
+
+        // Cập nhật những thông tin trên.
+        transaction.update(room, firstUpdateGame);
+
+        return { ready: 2, message: "second ready" };
+      } else if (player.length === 0) {
+        // Chưa có người chơi sẵn sàng.
+        const secondUpdateGame = {};
+
+        // Cập nhật lên có 1 người chơi đã sẵn sàng.
+        // Thêm người chơi vào game.player với loại cờ X hoặc O.
+        secondUpdateGame[`game.status.ready`] = 1;
+        secondUpdateGame[`game.player.${uid}.value`] =
+          Math.floor(Math.random() * 2) + 1;
+
+        // Cập nhật những thông tin trên.
+        transaction.update(room, secondUpdateGame);
+
+        return { ready: 1, message: "first ready" };
+      } else {
+        return { ready: 1, message: "nothing ready" };
+      }
+    });
+  });
 };
