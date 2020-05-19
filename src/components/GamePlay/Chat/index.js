@@ -1,8 +1,11 @@
 import React from "react";
 import MoreSVG from "./../../../assets/Rooms/more.svg";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function ChatComponent({ roomData, setShowMenu, ownType }) {
   const scrollBox = React.useRef(null);
+  console.log(roomData);
 
   React.useEffect(() => {
     if (scrollBox) {
@@ -29,16 +32,20 @@ function ChatComponent({ roomData, setShowMenu, ownType }) {
           })}
         </div>
         {ownType === "master" || ownType === "player" ? (
-          <div>
+          <div className="d-flex flex-column ml-2">
             <img
               src={MoreSVG}
               alt="more"
               style={{ width: "1.5em" }}
-              className="shadow wood-btn ml-2"
+              className="shadow wood-btn mb-1"
               onClick={() => {
                 setShowMenu(true);
               }}
             />
+            <div className="d-flex align-items-center">
+              <FontAwesomeIcon icon={faEye} className="text-warning mr-1" />
+              <span className="text-stroke-carotv text-white">{roomData.watcher ? roomData.watcher.length : 0} </span>
+            </div>
           </div>
         ) : (
           ""
