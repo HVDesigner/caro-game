@@ -3,6 +3,10 @@ import { Container, Row, Col } from "react-bootstrap";
 import "./GamePlay.css";
 import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
+import Sound from "react-sound";
+
+// Sounds
+import BackgroundSound from "./../../assets/sound/background-music.mp3";
 
 // SVGs
 import UserSVG from "./../../assets/Dashboard/user.svg";
@@ -135,6 +139,15 @@ function GamePlayComponent() {
 
   return (
     <React.Fragment>
+      {state.user.setting.sound ? (
+        <Sound
+          url={BackgroundSound}
+          playStatus={Sound.status.PLAYING}
+          loop={true}
+        />
+      ) : (
+        ""
+      )}
       <MenuModal showMenu={showMenu} setShowMenu={setShowMenu} />
       {(ownStatus === "winner" || ownStatus === "loser") &&
       (ownType === "master" || ownType === "player") ? (

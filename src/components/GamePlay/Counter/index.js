@@ -19,20 +19,20 @@ function Counter({ time, roomData, userType, ownType }) {
       setCounter(0);
       clearInterval(timer);
 
-      const updateRoom = {};
+      // const updateRoom = {};
 
-      updateRoom[`participants.${userType}.status`] = "loser";
-      updateRoom[
-        `participants.${userType === "master" ? "player" : "master"}.status`
-      ] = "winner";
-      updateRoom[`game.status.ready`] = 0;
-      updateRoom[`game.player`] = {};
+      // updateRoom[`participants.${userType}.status`] = "loser";
+      // updateRoom[
+      //   `participants.${userType === "master" ? "player" : "master"}.status`
+      // ] = "winner";
+      // updateRoom[`game.status.ready`] = 0;
+      // updateRoom[`game.player`] = {};
 
-      firebaseApp
-        .firestore()
-        .collection("rooms")
-        .doc(state.user.room_id.value)
-        .update(updateRoom);
+      // firebaseApp
+      //   .firestore()
+      //   .collection("rooms")
+      //   .doc(state.user.room_id.value)
+      //   .update(updateRoom);
     }
 
     return () => clearInterval(timer);

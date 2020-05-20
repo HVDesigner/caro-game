@@ -10,9 +10,7 @@ import AppContext from "./../../context/";
 import { filterElo } from "./../../functions/";
 
 function ProfileComponent() {
-  const StateGlobal = React.useContext(AppContext);
-
-  const { state, changeRoute } = StateGlobal;
+  const { state, changeRoute } = React.useContext(AppContext);
 
   return (
     <Container className="proflie-body">
@@ -117,15 +115,17 @@ function ProfileComponent() {
                   Tỉ lệ thắng
                 </span>
                 <span className="text-white">
-                  {state.user.game.win > 0
-                    ? Math.round(
-                        (state.user.game.win /
-                          (state.user.game.win +
-                            state.user.game.lost +
-                            state.user.game.tie)) *
-                          100
-                      )
-                    : 100}
+                  {Math.round(
+                    ((state.user.game.win.gomoku +
+                      state.user.game.win["block-head"]) /
+                      (state.user.game.win.gomoku +
+                        state.user.game.win["block-head"] +
+                        state.user.game.lost.gomoku +
+                        state.user.game.lost["block-head"] +
+                        state.user.game.tie.gomoku +
+                        state.user.game.tie["block-head"])) *
+                      100
+                  )}
                   %
                 </span>
               </h5>

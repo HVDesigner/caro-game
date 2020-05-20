@@ -1,7 +1,4 @@
 import React from "react";
-// SVGs
-import Circle from "./../../assets/circle-regular.svg";
-import Times from "./../../assets/times-solid.svg";
 import "./square.css";
 
 import AppContext from "./../../context/";
@@ -47,8 +44,8 @@ function Square({ rowkey, colkey, onClickSquare, value, roomData }) {
         }
       }}
     >
-      {value === 1 ? <img src={Times} alt="time" className="" /> : ""}
-      {value === 2 ? <img src={Circle} alt="circle" className="" /> : ""}
+      {value === 1 ? <div className="w-100 h-100 time-box"></div> : ""}
+      {value === 2 ? <div className="w-100 h-100 circle-box"></div> : ""}
     </span>
   );
 }

@@ -239,11 +239,11 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                   </div>
                 ) : (
                   <div className="d-flex">
-                    <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
+                    {/* <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow mr-1">
                       <h3 className="mb-0 text-center brown-color p-2">
                         Mời chơi
                       </h3>
-                    </div>
+                    </div> */}
                     <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
                       <h3
                         className="mb-0 text-center brown-color p-2"
@@ -312,7 +312,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
           </React.Fragment>
         );
 
-      default:
+      case "watcher":
         return (
           <React.Fragment>
             {roomData.participants.player || roomData.type !== "room" ? (
@@ -338,6 +338,9 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
             </div>
           </React.Fragment>
         );
+
+      default:
+        return;
     }
   };
 

@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function ChatComponent({ roomData, setShowMenu, ownType }) {
   const scrollBox = React.useRef(null);
-  console.log(roomData);
 
   React.useEffect(() => {
     if (scrollBox) {
@@ -18,8 +17,8 @@ function ChatComponent({ roomData, setShowMenu, ownType }) {
     <div className="d-flex flex-column h-100 position-absolute w-100">
       <div className="d-flex h-100">
         <div
-          className="overflow-auto bg-white pl-2 pr-2 rounded brown-border flex-fill"
-          style={{ minHeight: "48px" }}
+          className="overflow-auto pl-2 pr-2 rounded brown-border flex-fill"
+          style={{ minHeight: "48px", backgroundColor: "#f9da7f" }}
           ref={scrollBox}
         >
           {roomData.conversation.map((value, key) => {
@@ -44,7 +43,11 @@ function ChatComponent({ roomData, setShowMenu, ownType }) {
             />
             <div className="d-flex align-items-center">
               <FontAwesomeIcon icon={faEye} className="text-warning mr-1" />
-              <span className="text-stroke-carotv text-white">{roomData.watcher ? roomData.watcher.length : 0} </span>
+              <span className="text-stroke-carotv text-white">
+                {roomData.participants.watcher
+                  ? roomData.participants.watcher.length
+                  : 0}{" "}
+              </span>
             </div>
           </div>
         ) : (

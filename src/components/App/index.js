@@ -1,16 +1,13 @@
 import React from "react";
 import "./App.css";
-import Sound from "react-sound";
 import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
-
-// Sounds
-import BackgroundSound from "./../../assets/sound/background-music.mp3";
 
 // Components
 import LoadingComponent from "./../Loading/";
 import LoadingOverlay from "./../LoadingOverlay/";
 import DialogComponent from "./../Dialog/";
+import InfoModal from "./../InfoModal/";
 
 // Constants
 import { SET_USER_DATA } from "./../../context/ActionTypes";
@@ -274,15 +271,7 @@ function App() {
     <div className="position-relative">
       {state.dialog.status ? <DialogComponent /> : ""}
       {state["loading-overlay"] ? <LoadingOverlay /> : ""}
-      {state.user.setting.sound ? (
-        <Sound
-          url={BackgroundSound}
-          playStatus={Sound.status.PLAYING}
-          loop={true}
-        />
-      ) : (
-        ""
-      )}
+      {state.modal["user-info"] ? <InfoModal /> : ""}
       {PageShow(state.user.location.path)}
     </div>
   );

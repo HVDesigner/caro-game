@@ -9,3 +9,16 @@
 .bg-current-step {
   background-color: #c5a650 !important;
 }
+
+.time-box {
+  background-image: url("./../../assets/times-solid.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.circle-box {
+  background-image: url("./../../assets/circle-regular.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 75%;
+}

@@ -1,7 +1,7 @@
 import React from "react";
 import AppContext from "./index";
 import { reducer } from "./Reducers";
-import { GET_SQUARE_POSITION, LOADING_OVERLAY } from "./ActionTypes";
+import { GET_SQUARE_POSITION, LOADING_OVERLAY, TOGGLE_USER_INFO_MODAL } from "./ActionTypes";
 import { useFirestore } from "reactfire";
 import { useFirebaseApp } from "reactfire";
 
@@ -11,6 +11,7 @@ function GlobalState(props) {
   const [state, dispatch] = React.useReducer(reducer, {
     modal: {
       "find-room": false,
+      "user-info": false,
     },
     user: {
       coin: 0,
@@ -112,6 +113,13 @@ function GlobalState(props) {
     });
   };
 
+  const toggleInfoModal = (status) => {
+    return dispatch({
+      type: TOGGLE_USER_INFO_MODAL,
+      payload: status,
+    });
+  };
+
   /**
    *
    * Trả về một Context Provider.
@@ -123,6 +131,7 @@ function GlobalState(props) {
         dispatch,
         changeRoute,
         getPositonSquare,
+        toggleInfoModal,
       }}
     >
       {props.children}

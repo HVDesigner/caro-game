@@ -4,6 +4,7 @@ import {
   TOGGLE_FIND_ROOM_MODAL,
   LOADING_OVERLAY,
   TOGGLE_DIALOG,
+  TOGGLE_USER_INFO_MODAL,
 } from "./ActionTypes";
 
 export function reducer(state, action) {
@@ -33,6 +34,12 @@ export function reducer(state, action) {
       return {
         ...state,
         "loading-overlay": action.payload,
+      };
+
+    case TOGGLE_USER_INFO_MODAL:
+      return {
+        ...state,
+        modal: { ...state.modal, "user-info": action.payload },
       };
 
     case TOGGLE_DIALOG:
