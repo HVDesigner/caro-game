@@ -55,7 +55,7 @@ function MasterInRoom({ roomData }) {
           imageUrl ? "rounded-circle circle-avartar" : ""
         }`}
         onClick={() => {
-          toggleInfoModal(true);
+          toggleInfoModal(true, roomData.participants.master.id);
         }}
       />
       <div className="d-flex flex-column text-white">

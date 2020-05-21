@@ -1,8 +1,20 @@
 import React from "react";
 import "./index.css";
 import UserSVG from "./../../assets/Dashboard/user.svg";
+import AppContext from "./../../context/";
+import { useFirestoreDocDataOnce, useFirestore } from "reactfire";
+import { LANGUAGE_BY_LOCALE } from "./../../locale-constant";
 
 function InfoModal() {
+  const { state, toggleInfoModal } = React.useContext(AppContext);
+
+  const userRef = useFirestore()
+    .collection("users")
+    .doc(state.modal["user-info"].uid.toString());
+
+  const user = useFirestoreDocDataOnce(userRef);
+
+  console.log(user);
   return (
     <div
       className="d-flex position-absolute w-100vw h-100vh justify-content-center align-items-center"
@@ -17,7 +29,10 @@ function InfoModal() {
         </h3>
         <div className="d-flex flex-column justify-content-center align-items-center w-100">
           <img src={UserSVG} alt="user" style={{ maxWidth: "60px" }} />
-          <p className="text-stroke-carotv text-white m-0">Name</p>
+          <p className="text-stroke-carotv text-white m-0">{user.name.value}</p>
+          <p className="text-stroke-carotv text-white">
+            {user.locale ? LANGUAGE_BY_LOCALE[user.locale] : "..."}
+          </p>
         </div>
 
         <div className="overflow-auto h-100 mb-2" style={{ maxHeight: "100%" }}>
@@ -25,13 +40,17 @@ function InfoModal() {
             <tbody>
               <tr>
                 <td className="text-stroke-carotv text-warning">Elo Gomoku</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.elo.gomoku}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-warning">
                   Elo Chặn 2 đầu
                 </td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.elo["block-head"]}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-warning" colSpan="2">
@@ -40,11 +59,15 @@ function InfoModal() {
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-white">Gomoku</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.game.win.gomoku}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-white">Chắn 2 đầu</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.game.win["block-head"]}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-warning" colSpan="2">
@@ -53,11 +76,15 @@ function InfoModal() {
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-white">Gomoku</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.game.lost.gomoku}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-white">Chắn 2 đầu</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.game.lost["block-head"]}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-warning" colSpan="2">
@@ -66,19 +93,35 @@ function InfoModal() {
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-white">Gomoku</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.game.tie.gomoku}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-white">Chắn 2 đầu</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.game.tie["block-head"]}
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-warning">Tỉ lệ thắng</td>
-                <td>100%</td>
+                <td className="text-stroke-carotv text-white">
+                  {Math.round(
+                    ((user.game.win.gomoku + user.game.win["block-head"]) /
+                      (user.game.win.gomoku +
+                        user.game.win["block-head"] +
+                        user.game.lost.gomoku +
+                        user.game.lost["block-head"] +
+                        user.game.tie.gomoku +
+                        user.game.tie["block-head"])) *
+                      100
+                  )}
+                  %
+                </td>
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-warning">Yêu thích</td>
-                <td>0</td>
+                <td className="text-stroke-carotv text-white">0</td>
               </tr>
             </tbody>
           </table>
@@ -94,6 +137,9 @@ function InfoModal() {
           <div
             className="flex-fill text-center brown-border shadow rounded ml-1 bg-gold-wood wood-btn"
             style={{ backgroundSize: "cover" }}
+            onClick={() => {
+              toggleInfoModal(false, "");
+            }}
           >
             Đóng
           </div>

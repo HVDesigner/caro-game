@@ -271,7 +271,7 @@ function App() {
     <div className="position-relative">
       {state.dialog.status ? <DialogComponent /> : ""}
       {state["loading-overlay"] ? <LoadingOverlay /> : ""}
-      {state.modal["user-info"] ? <InfoModal /> : ""}
+      {state.modal["user-info"].status ? <InfoModal /> : ""}
       {PageShow(state.user.location.path)}
     </div>
   );
