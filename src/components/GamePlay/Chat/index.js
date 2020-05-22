@@ -3,7 +3,7 @@ import MoreSVG from "./../../../assets/Rooms/more.svg";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function ChatComponent({ roomData, setShowMenu, ownType }) {
+function ChatComponent({ roomData, setShowMenu, ownType, setShowUserList }) {
   const scrollBox = React.useRef(null);
 
   React.useEffect(() => {
@@ -12,6 +12,24 @@ function ChatComponent({ roomData, setShowMenu, ownType }) {
         scrollBox.current.scrollHeight - scrollBox.current.clientHeight;
     }
   }, [scrollBox, roomData.conversation]);
+
+  const countUserInRoom = () => {
+    let total = 0;
+
+    if (roomData.participants.watcher) {
+      total = roomData.participants.watcher.length + total;
+    }
+
+    if (roomData.participants.player) {
+      total = total + 1;
+    }
+
+    if (roomData.participants.master) {
+      total = total + 1;
+    }
+
+    return total;
+  };
 
   return (
     <div className="d-flex flex-column h-100 position-absolute w-100">
@@ -41,12 +59,16 @@ function ChatComponent({ roomData, setShowMenu, ownType }) {
                 setShowMenu(true);
               }}
             />
-            <div className="d-flex align-items-center">
+            <div
+              className="d-flex align-items-center"
+              onClick={() => {
+                setShowUserList(true);
+              }}
+              style={{ cursor: "pointer" }}
+            >
               <FontAwesomeIcon icon={faEye} className="text-warning mr-1" />
               <span className="text-stroke-carotv text-white">
-                {roomData.participants.watcher
-                  ? roomData.participants.watcher.length
-                  : 0}{" "}
+                {countUserInRoom()}
               </span>
             </div>
           </div>

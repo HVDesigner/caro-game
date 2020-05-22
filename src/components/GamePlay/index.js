@@ -21,6 +21,7 @@ import MasterUser from "./MasterComponent/";
 import PlayerUser from "./PlayerComponent/";
 import MenuModal from "./MenuModal/";
 import PositionPoint from "./PositionPoint/";
+import UserInRoomModal from "./UserInRoomModal/";
 
 // Contexts
 import AppContext from "./../../context/";
@@ -41,6 +42,7 @@ function GamePlayComponent() {
 
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
   const [messageText, setMessageText] = React.useState("");
+  const [showUserList, setShowUserList] = React.useState(false);
 
   React.useEffect(() => {
     function getUserType(participants) {
@@ -155,6 +157,14 @@ function GamePlayComponent() {
       ) : (
         ""
       )}
+      {showUserList ? (
+        <UserInRoomModal
+          setShowUserList={setShowUserList}
+          roomData={roomData}
+        />
+      ) : (
+        ""
+      )}
       <Container
         fluid
         className="game-play position-relative d-flex flex-column"
@@ -207,7 +217,7 @@ function GamePlayComponent() {
 
                 <small className="text-white">
                   <span className="text-warning mr-1">Cược:</span>
-                  {roomData.bet}
+                  {`${roomData.bet} xu`}
                 </small>
               </div>
 
@@ -255,6 +265,7 @@ function GamePlayComponent() {
             roomData={roomData}
             setShowMenu={setShowMenu}
             ownType={ownType}
+            setShowUserList={setShowUserList}
           />
         </div>
         <Row>

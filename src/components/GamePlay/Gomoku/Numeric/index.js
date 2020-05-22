@@ -13,7 +13,7 @@ function Numeric() {
                 textAlign: "center",
                 fontSize: "12px",
               }}
-              className="text-white d-flex flex-fill justify-content-center align-items-center"
+              className="text-white d-flex flex-fill justify-content-center align-items-center "
             ></span>
             {row.map((colValue, colkey) => (
               <span

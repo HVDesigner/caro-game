@@ -17,7 +17,7 @@ function WatcherList({ roomData }) {
 
   return (
     <div>
-      <p className="mb-1">Danh sách người xem:</p>
+      <p className="mb-1 text-white text-stroke-carotv">Danh sách người xem:</p>
       <Container className="brown-border rounded pt-2 mb-2 watcher-list-box overflow-auto shadow">
         <Row>
           {listWatcher.map((value, key) => (
