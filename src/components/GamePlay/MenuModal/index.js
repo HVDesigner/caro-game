@@ -1,10 +1,12 @@
 import React from "react";
 import CheckButton from "./../../CheckButton/";
 import AppContext from "./../../../context/";
+import { useFirebaseApp } from "reactfire";
 
 function MenuModal({ showMenu, setShowMenu }) {
+  const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
-  // console.log(state.user.setting.sound);
+
   // true Bật
   // false Tắt
   const [sound, setSound] = React.useState(true);
@@ -12,6 +14,12 @@ function MenuModal({ showMenu, setShowMenu }) {
   React.useEffect(() => {
     setSound(state.user.setting.sound);
   }, [state.user.setting.sound]);
+
+  const onToggleSound = () => {
+    firebaseApp.firestore().collection("users").doc(state.user.uid).update({
+      "setting.sound": sound,
+    });
+  };
 
   return (
     <React.Fragment>
@@ -42,10 +50,26 @@ function MenuModal({ showMenu, setShowMenu }) {
                   />
                 </div>
               </div>
+              {state.user.setting.sound !== sound ? (
+                <div
+                  className="brown-border bg-gold-wood rounded wood-btn p-1"
+                  onClick={() => {
+                    onToggleSound();
+                  }}
+                >
+                  <h5 className="text-center brown-color mb-0">Áp dụng</h5>
+                </div>
+              ) : (
+                ""
+              )}
             </div>
 
             <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
-              <h5 className="text-center text-white mb-0">Cầu Hòa</h5>
+              <h5 className="text-center brown-color mb-0">Chia sẻ</h5>
+            </span>
+
+            <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
+              <h5 className="text-center brown-color mb-0">Cầu Hòa</h5>
             </span>
 
             <span
@@ -54,7 +78,7 @@ function MenuModal({ showMenu, setShowMenu }) {
                 setShowMenu(false);
               }}
             >
-              <h5 className="text-center text-warning mb-0">Đóng</h5>
+              <h5 className="text-center brown-color mb-0">Đóng</h5>
             </span>
           </div>
         </div>
