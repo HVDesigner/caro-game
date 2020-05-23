@@ -93,9 +93,7 @@ p {
 }
 
 .menu-more .menu-more-content {
-  width: 50vw;
-  background-image: url("./../../assets/backgroung_carotv_2.svg");
-  background-size: 150%;
+  min-width: 50vw;
 }
 
 .others-btn {

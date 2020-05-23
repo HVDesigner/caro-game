@@ -1,17 +1,55 @@
 import React from "react";
+import CheckButton from "./../../CheckButton/";
+import AppContext from "./../../../context/";
 
 function MenuModal({ showMenu, setShowMenu }) {
+  const { state } = React.useContext(AppContext);
+  // console.log(state.user.setting.sound);
+  // true Bật
+  // false Tắt
+  const [sound, setSound] = React.useState(true);
+
+  React.useEffect(() => {
+    setSound(state.user.setting.sound);
+  }, [state.user.setting.sound]);
+
   return (
     <React.Fragment>
       {showMenu ? (
         <div className="menu-more d-flex justify-content-center">
-          <div className="menu-more-content rounded d-flex flex-column justify-content-center align-self-center p-2 brown-border">
-            <h4 className="text-center">MENU</h4>
-            <span className="brown-border rounded wood-btn p-1 mb-2">
-              <h5 className="text-center text-white mb-0">Đầu hàng</h5>
+          <div className="menu-more-content bg-brown-wood rounded d-flex flex-column justify-content-center align-self-center p-2 brown-border">
+            <h4 className="text-center text-white text-stroke-carotv">MENU</h4>
+            <div className="d-flex flex-column mb-2 brown-border rounded p-2">
+              <p className="text-white text-center mb-2">Cài đặt âm thanh</p>
+              <div className="d-flex" style={{ width: "100%" }}>
+                <div className="flex-fill">
+                  <CheckButton
+                    text={"Tắt"}
+                    value={!sound}
+                    func={() => {
+                      setSound(false);
+                    }}
+                  />
+                </div>
+
+                <div className="flex-fill">
+                  <CheckButton
+                    text={"Bật"}
+                    value={sound}
+                    func={() => {
+                      setSound(true);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
+              <h5 className="text-center text-white mb-0">Cầu Hòa</h5>
             </span>
+
             <span
-              className="brown-border rounded wood-btn p-1"
+              className="brown-border bg-gold-wood rounded wood-btn p-1"
               onClick={() => {
                 setShowMenu(false);
               }}
