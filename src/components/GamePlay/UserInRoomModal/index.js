@@ -57,10 +57,10 @@ function MasterUser({ roomData }) {
   return (
     <div className="d-flex align-items-center mb-2">
       <img
-        src={UserSVG}
+        src={user.image_url ? user.image_url : UserSVG}
         alt="user"
-        style={{ height: "50px" }}
-        className="mr-2"
+        style={{ height: "50px", width: "50px" }}
+        className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
       />
       <div className="w-100">
         <p className="text-white text-stroke-carotv mb-0 mr-3">
@@ -83,13 +83,15 @@ function PlayerUser({ roomData }) {
 
   const user = useFirestoreDocDataOnce(userRef);
 
+  console.log(user);
+
   return (
     <div className="d-flex align-items-center mb-2">
       <img
-        src={UserSVG}
+        src={user.image_url ? user.image_url : UserSVG}
         alt="user"
-        style={{ height: "50px" }}
-        className="mr-2"
+        style={{ height: "50px", width: "50px" }}
+        className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
       />
       <div className="w-100">
         <p className="text-white text-stroke-carotv mb-0 mr-3">
@@ -120,10 +122,10 @@ function WatcherUser({ uid }) {
   return (
     <div className="d-flex align-items-center mb-2">
       <img
-        src={UserSVG}
+        src={user.image_url ? user.image_url : UserSVG}
         alt="user"
-        style={{ height: "50px" }}
-        className="mr-2"
+        style={{ height: "50px", width: "50px" }}
+        className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
       />
       <p className="text-white text-stroke-carotv mb-0 mr-3">
         {user.name.value}

@@ -13,7 +13,7 @@ import CounterConponent from "./../Counter/";
 
 function MasterComponent({ roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
-  const { state } = React.useContext(AppContext);
+  const { state, toggleInfoModal } = React.useContext(AppContext);
   const [thisUser, setThisUser] = React.useState({
     imageUrl: "",
     name: "",
@@ -91,6 +91,9 @@ function MasterComponent({ roomData, ownType }) {
             thisUser.imageUrl ? `rounded-circle brown-border shadow` : ""
           }
           style={{ width: "40px", height: "40px" }}
+          onClick={() => {
+            toggleInfoModal(true, roomData.participants.master.id);
+          }}
         ></img>
         <div className="ml-2">
           <p className="text-white">{thisUser.name ? thisUser.name : "..."}</p>

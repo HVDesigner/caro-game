@@ -5,7 +5,7 @@ import UserSVG from "./../../../../assets/Dashboard/user.svg";
 import AppContext from "./../../../../context/";
 
 function PlayerInRoom({ roomData }) {
-  const { state } = React.useContext(AppContext);
+  const { state, toggleInfoModal } = React.useContext(AppContext);
   const firebaseApp = useFirebaseApp();
 
   const [name, setName] = React.useState("");
@@ -60,6 +60,9 @@ function PlayerInRoom({ roomData }) {
         className={`player-inroom-img ml-2 ${
           imageUrl ? "rounded-circle circle-avartar" : ""
         }`}
+        onClick={() => {
+          toggleInfoModal(true, roomData.participants.player.id);
+        }}
       />
     </div>
   );

@@ -48,33 +48,29 @@ function ChatComponent({ roomData, setShowMenu, ownType, setShowUserList }) {
             );
           })}
         </div>
-        {ownType === "master" || ownType === "player" ? (
-          <div className="d-flex flex-column ml-2">
-            <img
-              src={MoreSVG}
-              alt="more"
-              style={{ width: "1.5em" }}
-              className="shadow wood-btn mb-1"
-              onClick={() => {
-                setShowMenu(true);
-              }}
-            />
-            <div
-              className="d-flex align-items-center"
-              onClick={() => {
-                setShowUserList(true);
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <FontAwesomeIcon icon={faEye} className="text-warning mr-1" />
-              <span className="text-stroke-carotv text-white">
-                {countUserInRoom()}
-              </span>
-            </div>
+        <div className="d-flex flex-column ml-2">
+          <img
+            src={MoreSVG}
+            alt="more"
+            style={{ maxWidth: "1.5em", maxHeight: "1.5em" }}
+            className="shadow wood-btn mb-1"
+            onClick={() => {
+              setShowMenu(true);
+            }}
+          />
+          <div
+            className="d-flex align-items-center"
+            onClick={() => {
+              setShowUserList(true);
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <FontAwesomeIcon icon={faEye} className="text-warning mr-1" />
+            <span className="text-stroke-carotv text-white">
+              {countUserInRoom()}
+            </span>
           </div>
-        ) : (
-          ""
-        )}
+        </div>
       </div>
     </div>
   );

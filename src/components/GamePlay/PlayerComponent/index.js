@@ -8,7 +8,7 @@ import UserSVG from "./../../../assets/Dashboard/user.svg";
 
 function PlayerComponent({ roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
-  const { state } = React.useContext(AppContext);
+  const { state, toggleInfoModal } = React.useContext(AppContext);
 
   const [thisUser, setThisUser] = React.useState({
     imageUrl: "",
@@ -108,10 +108,13 @@ function PlayerComponent({ roomData, ownType }) {
           alt="user"
           className={
             thisUser.imageUrl
-              ? `rounded-circle align-items-center brown-border shadow`
+              ? `rounded-circle align-items-center brown-border shadow mt-1`
               : "mt-1"
           }
           style={{ width: "40px", height: "40px" }}
+          onClick={() => {
+            toggleInfoModal(true, roomData.participants.player.id);
+          }}
         ></img>
       </div>
 

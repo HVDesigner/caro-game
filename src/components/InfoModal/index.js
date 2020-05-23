@@ -14,7 +14,6 @@ function InfoModal() {
 
   const user = useFirestoreDocDataOnce(userRef);
 
-  console.log(user);
   return (
     <div
       className="d-flex position-absolute w-100vw h-100vh justify-content-center align-items-center"
@@ -28,7 +27,12 @@ function InfoModal() {
           Thông tin
         </h3>
         <div className="d-flex flex-column justify-content-center align-items-center w-100">
-          <img src={UserSVG} alt="user" style={{ maxWidth: "60px" }} />
+          <img
+            src={user.image_url ? user.image_url : UserSVG}
+            alt="user"
+            style={{ maxWidth: "60px", maxHeight: "60px" }}
+            className={user.image_url ? "rounded-circle brown-border" : ""}
+          />
           <p className="text-stroke-carotv text-white m-0">{user.name.value}</p>
           <p className="text-stroke-carotv text-white">
             {user.locale ? LANGUAGE_BY_LOCALE[user.locale] : "..."}
