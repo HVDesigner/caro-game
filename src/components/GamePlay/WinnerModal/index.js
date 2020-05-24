@@ -1,8 +1,14 @@
-import React from "react";
 import "./index.css";
-import AppContext from "./../../../context/";
-import { useFirebaseApp } from "reactfire";
+import React from "react";
 import firebase from "firebase/app";
+import { useFirebaseApp } from "reactfire";
+import Sound from "react-sound";
+
+import WinSound from "./../../../assets/sound/win-sound.mp3";
+import LostSound from "./../../../assets/sound/lost-sound.mp3";
+
+// Context
+import AppContext from "./../../../context/";
 
 function WinnerModal({ roomData, ownType }) {
   const { state } = React.useContext(AppContext);
@@ -53,6 +59,11 @@ function WinnerModal({ roomData, ownType }) {
           <React.Fragment>
             {win ? (
               <React.Fragment>
+                <Sound
+                  url={WinSound}
+                  playStatus={Sound.status.PLAYING}
+                  loop={false}
+                />
                 <h5 className="text-warning text-stroke-carotv text-center mb-3">
                   Chúc mừng
                 </h5>
@@ -69,6 +80,11 @@ function WinnerModal({ roomData, ownType }) {
               </React.Fragment>
             ) : (
               <React.Fragment>
+                <Sound
+                  url={LostSound}
+                  playStatus={Sound.status.PLAYING}
+                  loop={false}
+                />
                 <h5 className="text-muted text-stroke-carotv text-center mb-3">
                   Rất tiếc
                 </h5>
