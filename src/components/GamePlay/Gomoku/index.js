@@ -3,6 +3,10 @@ import "./../GamePlay.css";
 import { Row, Col } from "react-bootstrap";
 import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
+import Sound from "react-sound";
+
+// Sound
+import TickSound from "./../../../assets/sound/tick-sound.mp3";
 
 // Functions
 import { winAction } from "./../../../functions/";
@@ -22,6 +26,8 @@ import AppContext from "./../../../context/";
 function GamePlayComponent({ roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
+
+  const [soundTick, setSoundTick] = React.useState(Sound.status.STOPPED);
 
   const [caroTable, setCaroTable] = React.useState([
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -246,6 +252,7 @@ function GamePlayComponent({ roomData, ownType }) {
        */
       RoomsCollection.doc(state.user.room_id.value).update({
         "game.turn.uid": roomData.participants.master.id,
+        "game.turn.updatedAt": Date.now(),
       });
     } else if (roomData.participants.master.id === roomData.game.turn.uid) {
       /**
@@ -255,6 +262,7 @@ function GamePlayComponent({ roomData, ownType }) {
        */
       RoomsCollection.doc(state.user.room_id.value).update({
         "game.turn.uid": roomData.participants.player.id,
+        "game.turn.updatedAt": Date.now(),
       });
     }
   };
@@ -331,6 +339,13 @@ function GamePlayComponent({ roomData, ownType }) {
                * Cập nhật trạng thái 1 (X) hoặc 2 (O) cho ô đã chọn.
                */
               setCaroTable(updatePosition(rowkey, colkey));
+
+              /**
+               * Phát ra âm thanh.
+               */
+              if (state.user.setting.sound) {
+                setSoundTick(Sound.status.PLAYING);
+              }
 
               /**
                * ------------------------------------------------------------------------------
@@ -481,6 +496,15 @@ function GamePlayComponent({ roomData, ownType }) {
       ) : (
         ""
       )}
+
+      <Sound
+        url={TickSound}
+        playStatus={soundTick}
+        loop={false}
+        onFinishedPlaying={() => {
+          setSoundTick(Sound.status.STOPPED);
+        }}
+      />
 
       <Row>
         <Col className="p-0" xs="10">

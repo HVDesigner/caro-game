@@ -298,6 +298,7 @@ export const readyAction = (data, firebase) => {
         firstUpdateGame[`participants.master.status`] = "playing";
         firstUpdateGame[`participants.player.status`] = "playing";
         firstUpdateGame[`game.current-step`] = {};
+        firstUpdateGame[`game.turn.updatedAt`] = Date.now();
 
         // Cập nhật những thông tin trên.
         transaction.update(room, firstUpdateGame);

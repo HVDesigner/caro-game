@@ -17,6 +17,7 @@ function WinnerModal({ roomData, ownType }) {
   const [win, setWin] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [loadingNextBtn, setLoadingNextBtn] = React.useState(false);
+  const [soundStatus, setSoundStatus] = React.useState(Sound.status.PLAYING);
 
   const onNextAction = () => {
     setLoadingNextBtn(true);
@@ -52,18 +53,25 @@ function WinnerModal({ roomData, ownType }) {
     <div className="winner-modal d-flex justify-content-center align-items-center">
       <div className="winner-modal-content p-3 brown-border shadow rounded">
         {loading ? (
-          <h5 className="text-warning text-stroke-carotv text-center mb-0">
+          <h5 className="text-warning text-stroke-carotv text-center mb-0 brown-color">
             Loading...
           </h5>
         ) : (
           <React.Fragment>
-            {win ? (
+            {win && roomData.participants[ownType].status === "winner" ? (
               <React.Fragment>
-                <Sound
-                  url={WinSound}
-                  playStatus={Sound.status.PLAYING}
-                  loop={false}
-                />
+                {state.user.setting.sound ? (
+                  <Sound
+                    url={WinSound}
+                    playStatus={soundStatus}
+                    loop={false}
+                    onFinishedPlaying={() => {
+                      setSoundStatus(Sound.status.STOPPED);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
                 <h5 className="text-warning text-stroke-carotv text-center mb-3">
                   Chúc mừng
                 </h5>
@@ -79,12 +87,23 @@ function WinnerModal({ roomData, ownType }) {
                 )}
               </React.Fragment>
             ) : (
+              ""
+            )}
+
+            {!win && roomData.participants[ownType].status === "loser" ? (
               <React.Fragment>
-                <Sound
-                  url={LostSound}
-                  playStatus={Sound.status.PLAYING}
-                  loop={false}
-                />
+                {state.user.setting.sound ? (
+                  <Sound
+                    url={LostSound}
+                    playStatus={soundStatus}
+                    loop={false}
+                    onFinishedPlaying={() => {
+                      setSoundStatus(Sound.status.STOPPED);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
                 <h5 className="text-muted text-stroke-carotv text-center mb-3">
                   Rất tiếc
                 </h5>
@@ -99,6 +118,8 @@ function WinnerModal({ roomData, ownType }) {
                   ""
                 )}
               </React.Fragment>
+            ) : (
+              ""
             )}
 
             <div className="brown-border shadow rounded next-btn wood-btn">
