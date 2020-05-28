@@ -216,17 +216,9 @@ export const loginRoom = (data, firebase) => {
 
           const roomUpdates = {};
 
-          if (tranDoc.data().participants.player) {
-            // Nếu có player thì thêm vào watcher
-            roomUpdates[
-              "participants.watcher"
-            ] = firebaseApp.firestore.FieldValue.arrayUnion(data.uid);
-          } else {
-            // Nếu không có player thì thêm vào player
-            roomUpdates["participants.player.id"] = data.uid;
-            roomUpdates["participants.player.status"] = "waiting";
-            roomUpdates["participants.player.win"] = 0;
-          }
+          roomUpdates["participants.player.id"] = data.uid;
+          roomUpdates["participants.player.status"] = "waiting";
+          roomUpdates["participants.player.win"] = 0;
 
           // Cập nhật thông tin room
           return transaction.update(roomWithIdRef, roomUpdates);
@@ -254,6 +246,60 @@ export const loginRoom = (data, firebase) => {
     // Nếu phòng không cần password
     return doLogin();
   } else if (checkPass) {
+    // Phòng có password và password đúng
+    return doLogin();
+  } else {
+    // Sai mật khẩu
+    return new Promise((_, reject) =>
+      reject({ value: checkPass, text: "Mật khẩu không chính xác." })
+    );
+  }
+};
+
+export const loginWatch = (data, firebase) => {
+  // Kiểm tra mật khẩu
+  const checkPass = bcrypt.compareSync(data.rawText, data.password.text);
+
+  // Chức năng đăng nhập
+  const doLogin = () => {
+    const roomWithIdRef = firebase
+      .firestore()
+      .collection("rooms")
+      .doc(data.rid);
+
+    return firebase.firestore().runTransaction((transaction) => {
+      return transaction
+        .get(roomWithIdRef)
+        .then((tranDoc) => {
+          if (!tranDoc.exists) {
+            console.log("Phòng không tồn tại");
+          }
+
+          const roomUpdates = {};
+
+          roomUpdates[
+            "participants.watcher"
+          ] = firebaseApp.firestore.FieldValue.arrayUnion(data.uid);
+
+          // Cập nhật thông tin room
+          return transaction.update(roomWithIdRef, roomUpdates);
+        })
+        .then(() => {
+          // Chuyển hướng người đăng nhập vào phòng.
+          // Cập nhật thông tin loại phòng và id phòng cho user
+          return firebase.firestore().collection("users").doc(data.uid).update({
+            "room_id.type": data["game-play"],
+            "room_id.value": data.rid,
+            "location.path": "room",
+          });
+        })
+        .catch(() => {
+          return { value: checkPass, text: "Không thể đăng nhập." };
+        });
+    });
+  };
+
+  if (checkPass) {
     // Phòng có password và password đúng
     return doLogin();
   } else {

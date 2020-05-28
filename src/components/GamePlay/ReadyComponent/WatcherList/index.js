@@ -1,8 +1,17 @@
 import React from "react";
 import "./index.css";
+import {
+  useFirestoreDocDataOnce,
+  useFirestore,
+  SuspenseWithPerf,
+} from "reactfire";
 import { Container, Row, Col } from "react-bootstrap";
+
+// Context
+import AppContext from "./../../../../context/";
+
+// SVG
 import UserSVG from "./../../../../assets/Dashboard/user.svg";
-import { useFirebaseApp } from "reactfire";
 
 function WatcherList({ roomData }) {
   const [listWatcher, setListWatcher] = React.useState([]);
@@ -22,7 +31,12 @@ function WatcherList({ roomData }) {
         <Row>
           {listWatcher.map((value, key) => (
             <Col key={key} className="mb-2">
-              <WatcherDetail uid={value} />
+              <SuspenseWithPerf
+                fallback={<p className="m-0 text-white">Loading...</p>}
+                traceId={"load-watcher-user"}
+              >
+                <WatcherDetail uid={value} />
+              </SuspenseWithPerf>
             </Col>
           ))}
         </Row>
@@ -34,43 +48,25 @@ function WatcherList({ roomData }) {
 export default WatcherList;
 
 function WatcherDetail({ uid }) {
-  const firebaseApp = useFirebaseApp();
-  const [userData, setUserData] = React.useState({
-    name: "",
-    imageUrl: "",
-  });
+  const { toggleInfoModal } = React.useContext(AppContext);
 
-  React.useEffect(() => {
-    firebaseApp
-      .firestore()
-      .collection(`users`)
-      .doc(uid)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          setUserData({
-            name: doc.data().name.value,
-            imageUrl: doc.data().image_url,
-          });
-        } else {
-          setUserData({
-            name: "",
-            imageUrl: "",
-          });
-        }
-      });
-  }, [firebaseApp, uid]);
+  const userRef = useFirestore().collection("users").doc(uid);
+
+  const user = useFirestoreDocDataOnce(userRef);
 
   return (
     <div className="d-flex watcher-detail">
       <img
-        src={userData.imageUrl ? userData.imageUrl : UserSVG}
+        src={user.image_url ? user.image_url : UserSVG}
         alt="user"
         className={
-          userData.imageUrl ? `rounded-circle brown-border shadow mr-2` : `mr-2`
+          user.image_url ? `rounded-circle brown-border shadow mr-2` : `mr-2`
         }
+        onClick={() => {
+          toggleInfoModal(true, uid);
+        }}
       />
-      <p className="align-self-center text-white">{userData.name}</p>
+      <p className="align-self-center text-white">{user.name.value}</p>
     </div>
   );
 }
