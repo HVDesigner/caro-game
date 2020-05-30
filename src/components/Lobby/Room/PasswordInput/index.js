@@ -23,7 +23,7 @@ function PasswordInput({ roomData }) {
         type: TOGGLE_DIALOG,
         payload: {
           status: true,
-          message: "bạn không đủ xu!",
+          message: "Bạn không đủ xu!",
         },
       });
     }

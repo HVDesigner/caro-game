@@ -45,7 +45,7 @@ function FooterNormal({ roomData }) {
   const firebaseApp = useFirebaseApp();
   const { state, dispatch } = React.useContext(AppContext);
 
-  const onJoinRoomSubmit = () => {
+  const onJoinRoomSubmit = (userType) => {
     const roomWithIdRef = firebaseApp
       .firestore()
       .collection("rooms")
@@ -53,6 +53,16 @@ function FooterNormal({ roomData }) {
 
     switch (roomData.type) {
       case "room":
+        if (parseInt(roomData.bet) > parseInt(state.user.coin)) {
+          return dispatch({
+            type: TOGGLE_DIALOG,
+            payload: {
+              status: true,
+              message: "Bạn không đủ xu!",
+            },
+          });
+        }
+
         return firebaseApp.firestore().runTransaction((transaction) => {
           return transaction
             .get(roomWithIdRef)
@@ -62,11 +72,14 @@ function FooterNormal({ roomData }) {
               }
 
               const roomUpdates = {};
-              if (tranDoc.data().participants.player) {
+
+              if (userType === "watcher") {
                 roomUpdates[
                   "participants.watcher"
                 ] = firebase.firestore.FieldValue.arrayUnion(state.user.uid);
-              } else {
+              }
+
+              if (userType === "player") {
                 roomUpdates["participants.player.id"] = state.user.uid;
                 roomUpdates["participants.player.status"] = "waiting";
                 roomUpdates["participants.player.win"] = 0;
@@ -96,18 +109,21 @@ function FooterNormal({ roomData }) {
           .doc(state.user.uid);
 
         const batch = firebaseApp.firestore().batch();
-        batch.update(userDoc, {
-          room_id: {
-            type: roomData["game-play"],
-            value: roomData.rid,
-          },
-          "location.path": "room",
-        });
-        batch.update(roomWithIdRef, {
-          "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
-            state.user.uid
-          ),
-        });
+
+        if (userType === "watcher") {
+          batch.update(userDoc, {
+            room_id: {
+              type: roomData["game-play"],
+              value: roomData.rid,
+            },
+            "location.path": "room",
+          });
+          batch.update(roomWithIdRef, {
+            "participants.watcher": firebase.firestore.FieldValue.arrayUnion(
+              state.user.uid
+            ),
+          });
+        }
 
         batch.commit();
         break;
@@ -119,16 +135,25 @@ function FooterNormal({ roomData }) {
 
   return (
     <div className={`room-item-footer pt-2 pl-2 pr-2 d-flex flex-column`}>
-      <div className="d-flex w-100 mt-2">
-        <div
-          className="flex-fill p-1 bg-gold-wood rounded brown-border mr-1 wood-btn"
-          onClick={() => {}}
-        >
-          <p className="m-0 text-center brown-color">VÀO CHƠI</p>
-        </div>
+      <div className="d-flex w-100 mb-2">
+        {roomData.type === "quick-play" || roomData.participants.player ? (
+          ""
+        ) : (
+          <div
+            className="flex-fill p-1 bg-gold-wood rounded brown-border mr-1 wood-btn"
+            onClick={() => {
+              onJoinRoomSubmit("player");
+            }}
+          >
+            <p className="m-0 text-center brown-color">VÀO CHƠI</p>
+          </div>
+        )}
+
         <div
           className="flex-fill p-1 bg-gold-wood rounded brown-border ml-2 wood-btn"
-          onClick={() => {}}
+          onClick={() => {
+            onJoinRoomSubmit("watcher");
+          }}
         >
           <p className="m-0 text-center brown-color">VÀO XEM</p>
         </div>
