@@ -150,7 +150,12 @@ function GamePlayComponent() {
       ) : (
         ""
       )}
-      <MenuModal showMenu={showMenu} setShowMenu={setShowMenu} />
+      <MenuModal
+        showMenu={showMenu}
+        setShowMenu={setShowMenu}
+        roomData={roomData}
+        ownType={ownType}
+      />
       {(ownStatus === "winner" || ownStatus === "loser") &&
       (ownType === "master" || ownType === "player") ? (
         <WinnerModal roomData={roomData} ownType={ownType} />

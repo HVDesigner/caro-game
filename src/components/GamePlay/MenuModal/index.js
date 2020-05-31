@@ -3,7 +3,7 @@ import CheckButton from "./../../CheckButton/";
 import AppContext from "./../../../context/";
 import { useFirebaseApp } from "reactfire";
 
-function MenuModal({ showMenu, setShowMenu }) {
+function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
@@ -68,9 +68,14 @@ function MenuModal({ showMenu, setShowMenu }) {
               <h5 className="text-center brown-color mb-0">Chia sẻ</h5>
             </span>
 
-            <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
-              <h5 className="text-center brown-color mb-0">Cầu Hòa</h5>
-            </span>
+            {(ownType === "master" || ownType === "player") &&
+            roomData.participants[ownType].status === "playing" ? (
+              <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
+                <h5 className="text-center brown-color mb-0">Cầu Hòa</h5>
+              </span>
+            ) : (
+              ""
+            )}
 
             <span
               className="brown-border bg-gold-wood rounded wood-btn p-1"

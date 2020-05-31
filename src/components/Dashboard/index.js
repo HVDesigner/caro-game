@@ -167,7 +167,14 @@ function Dashboard() {
           <Col>
             <div className="d-flex extend mt-1 mb-3">
               <div className="svg_btn">
-                <img src={Chat} alt="chat" className="wood-btn"></img>
+                <img
+                  src={Chat}
+                  alt="chat"
+                  className="wood-btn"
+                  onClick={() => {
+                    changeRoute("serve-chat");
+                  }}
+                ></img>
               </div>
               <div className="svg_btn pl-2 pr-2 m-auto">
                 <img src={Shop} alt="shop" className="wood-btn"></img>

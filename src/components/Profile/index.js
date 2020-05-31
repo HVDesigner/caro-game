@@ -81,9 +81,23 @@ function ProfileComponent() {
                 <span className="text-warning title text-stroke-carotv">
                   Trận thắng
                 </span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-white title text-stroke-carotv">
+                  Gomoku
+                </span>
+                <span className="text-white">{state.user.game.win.gomoku}</span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-white title text-stroke-carotv">
+                  Chặn 2 đầu
+                </span>
                 <span className="text-white">
-                  {state.user.game.win.gomoku +
-                    state.user.game.win["block-head"]}
+                  {state.user.game.win["block-head"]}
                 </span>
               </h5>
             </ListGroup.Item>
@@ -92,9 +106,25 @@ function ProfileComponent() {
                 <span className="text-warning title text-stroke-carotv">
                   Trận thua
                 </span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-white title text-stroke-carotv">
+                  Gomoku
+                </span>
                 <span className="text-white">
-                  {state.user.game.lost.gomoku +
-                    state.user.game.lost["block-head"]}
+                  {state.user.game.lost.gomoku}
+                </span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-white title text-stroke-carotv">
+                  Chặn 2 đầu
+                </span>
+                <span className="text-white">
+                  {state.user.game.lost["block-head"]}
                 </span>
               </h5>
             </ListGroup.Item>
@@ -103,9 +133,23 @@ function ProfileComponent() {
                 <span className="text-warning title text-stroke-carotv">
                   Trận hòa
                 </span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-white title text-stroke-carotv">
+                  Gomoku
+                </span>
+                <span className="text-white">{state.user.game.tie.gomoku}</span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h5 className="m-0 d-flex">
+                <span className="text-white title text-stroke-carotv">
+                  Chặn 2 đầu
+                </span>
                 <span className="text-white">
-                  {state.user.game.tie.gomoku +
-                    state.user.game.tie["block-head"]}
+                  {state.user.game.tie["block-head"]}
                 </span>
               </h5>
             </ListGroup.Item>
