@@ -7,11 +7,11 @@ function ChatComponent({ roomData, setShowMenu, ownType, setShowUserList }) {
   const scrollBox = React.useRef(null);
 
   React.useEffect(() => {
-    if (scrollBox) {
+    if (scrollBox.current) {
       scrollBox.current.scrollTop =
         scrollBox.current.scrollHeight - scrollBox.current.clientHeight;
     }
-  }, [scrollBox, roomData.conversation]);
+  });
 
   const countUserInRoom = () => {
     let total = 0;

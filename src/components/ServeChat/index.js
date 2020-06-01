@@ -6,12 +6,17 @@ import {
   useFirestoreDocDataOnce,
 } from "reactfire";
 import firebase from "firebase/app";
+
+// SVG
 import ExitSVG from "./../../assets/Exit.svg";
+
+// Context
 import AppContext from "./../../context/";
 
 function ServeChat() {
   const { changeRoute, state } = React.useContext(AppContext);
   const [message, setMessage] = React.useState("");
+  const scrollServeChat = React.useRef(null);
 
   const serveChatRef = useFirestore().collection("serve-chat");
 
@@ -21,6 +26,18 @@ function ServeChat() {
   // .limit(3);
 
   const chatContent = useFirestoreCollectionData(getServeChatRef);
+
+  React.useEffect(() => {
+    scrollToMyRef();
+  }, [chatContent]);
+
+  const scrollToMyRef = () => {
+    const scroll =
+      scrollServeChat.current.scrollHeight -
+      scrollServeChat.current.clientHeight;
+
+    scrollServeChat.current.scrollTo(0, scroll);
+  };
 
   const addChatText = () => {
     if (message) {
@@ -51,6 +68,7 @@ function ServeChat() {
           <div
             className="p-2 d-flex flex-column h-100 w-100 brown-border rounded shadow overflow-auto"
             style={{ backgroundColor: "#f9da7f", maxHeight: "100%" }}
+            ref={scrollServeChat}
           >
             {chatContent.map((value, key) => {
               return (
@@ -66,7 +84,7 @@ function ServeChat() {
                     >
                       {value.text}
                     </div>
-                    <small className="m-0 text-right">
+                    <small className="ml-2 text-right">
                       {value.createdAt
                         ? moment(value.createdAt.toDate()).fromNow()
                         : ""}
