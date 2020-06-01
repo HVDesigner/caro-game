@@ -2,10 +2,12 @@ import React from "react";
 import moment from "moment";
 import {
   useFirestore,
-  useFirestoreCollectionData,
+  useFirebaseApp,
+  // useFirestoreCollectionData,
   useFirestoreDocDataOnce,
 } from "reactfire";
 import firebase from "firebase/app";
+// import _ from "lodash";
 
 // SVG
 import ExitSVG from "./../../assets/Exit.svg";
@@ -14,22 +16,40 @@ import ExitSVG from "./../../assets/Exit.svg";
 import AppContext from "./../../context/";
 
 function ServeChat() {
+  const firebaseApp = useFirebaseApp();
   const { changeRoute, state } = React.useContext(AppContext);
   const [message, setMessage] = React.useState("");
-  const scrollServeChat = React.useRef(null);
+  const [messageList, setMessageList] = React.useState([]);
+  const scrollServeChat = React.useRef();
 
   const serveChatRef = useFirestore().collection("serve-chat");
 
-  const getServeChatRef = useFirestore()
-    .collection("serve-chat")
-    .orderBy("createdAt", "asc");
-  // .limit(3);
-
-  const chatContent = useFirestoreCollectionData(getServeChatRef);
+  // const getServeChatRef = useFirestore()
+  //   .collection("serve-chat")
+  //   .orderBy("createdAt", "desc")
+  //   .limit(20);
 
   React.useEffect(() => {
-    scrollToMyRef();
-  }, [chatContent]);
+    var unsubscribe = firebaseApp
+      .firestore()
+      .collection("serve-chat")
+      .orderBy("createdAt", "desc")
+      .limit(20)
+      .onSnapshot((res) => {
+        const finalArr = [];
+
+        res.forEach((value) => {
+          finalArr.unshift({ key: value.id, ...value.data() });
+        });
+
+        setMessageList(finalArr);
+        scrollToMyRef();
+      });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [firebaseApp]);
 
   const scrollToMyRef = () => {
     const scroll =
@@ -49,6 +69,8 @@ function ServeChat() {
       setMessage("");
     }
   };
+
+  console.log(messageList);
 
   return (
     <div
@@ -70,27 +92,32 @@ function ServeChat() {
             style={{ backgroundColor: "#f9da7f", maxHeight: "100%" }}
             ref={scrollServeChat}
           >
-            {chatContent.map((value, key) => {
+            <div className="w-100">
+              <p className="text-center m-0">Xem thêm</p>
+            </div>
+            {messageList.map((value) => {
               return (
-                <React.Fragment key={key}>
-                  <div className="d-flex w-100">
-                    <User uid={value.uid} />
-                    <div
-                      className="d-flex mr-auto"
-                      style={{
-                        wordWrap: "normal",
-                        overflowWrap: "anywhere",
-                      }}
-                    >
-                      {value.text}
-                    </div>
-                    <small className="ml-2 text-right">
-                      {value.createdAt
-                        ? moment(value.createdAt.toDate()).fromNow()
-                        : ""}
-                    </small>
+                <div
+                  className="d-flex w-100"
+                  key={value.key}
+                  style={{ borderBottom: "0.5px solid" }}
+                >
+                  <User uid={value.uid} />
+                  <div
+                    className="d-flex mr-auto"
+                    style={{
+                      wordWrap: "normal",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    {value.text}
                   </div>
-                </React.Fragment>
+                  <small className="ml-2 text-right">
+                    {value.createdAt
+                      ? moment(value.createdAt.toDate()).fromNow()
+                      : ""}
+                  </small>
+                </div>
               );
             })}
           </div>
