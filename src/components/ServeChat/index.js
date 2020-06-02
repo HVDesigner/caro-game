@@ -3,11 +3,11 @@ import moment from "moment";
 import {
   useFirestore,
   useFirebaseApp,
-  // useFirestoreCollectionData,
+  useFirestoreDocOnce,
   useFirestoreDocDataOnce,
 } from "reactfire";
 import firebase from "firebase/app";
-// import _ from "lodash";
+import _ from "lodash";
 
 // SVG
 import ExitSVG from "./../../assets/Exit.svg";
@@ -22,34 +22,61 @@ function ServeChat() {
   const [messageList, setMessageList] = React.useState([]);
   const scrollServeChat = React.useRef();
 
-  const serveChatRef = useFirestore().collection("serve-chat");
-
-  // const getServeChatRef = useFirestore()
-  //   .collection("serve-chat")
-  //   .orderBy("createdAt", "desc")
-  //   .limit(20);
-
   React.useEffect(() => {
-    var unsubscribe = firebaseApp
+    const unsubscribe = firebaseApp
       .firestore()
       .collection("serve-chat")
       .orderBy("createdAt", "desc")
       .limit(20)
       .onSnapshot((res) => {
-        const finalArr = [];
+        if (res.size > messageList.length) {
+          const arr = [];
 
-        res.forEach((value) => {
-          finalArr.unshift({ key: value.id, ...value.data() });
-        });
+          res.docChanges(true).forEach((value) => {
+            arr.unshift({ key: value.doc.id, ...value.doc.data() });
+          });
 
-        setMessageList(finalArr);
-        scrollToMyRef();
+          setMessageList(arr);
+        } else {
+          res.docChanges(true).forEach((value) => {
+            // console.log(value);
+            if (
+              value.type === "added" &&
+              messageList.findIndex((mess) => mess.key === value.doc.id) < 0
+            ) {
+              setMessageList([
+                ...messageList,
+                { key: value.doc.id, ...value.doc.data() },
+              ]);
+
+              scrollToMyRef();
+            }
+
+            // if (
+            //   value.type === "modified" &&
+            //   arr.findIndex((mess) => mess.key === value.doc.id) >= 0
+            // ) {
+            //   const arr = [];
+
+            //   for (let index = 0; index < arr.length; index++) {
+            //     const element = arr[index];
+            //     if (element.key === value.doc.id) {
+            //       arr.push({ key: value.doc.id, ...value.doc.data() });
+            //     } else {
+            //       arr.push(element);
+            //     }
+            //   }
+
+            //   setMessageList(arr);
+            // }
+          });
+        }
       });
 
     return () => {
       unsubscribe();
     };
-  }, [firebaseApp]);
+  }, [firebaseApp, messageList]);
 
   const scrollToMyRef = () => {
     const scroll =
@@ -61,7 +88,7 @@ function ServeChat() {
 
   const addChatText = () => {
     if (message) {
-      serveChatRef.add({
+      firebaseApp.firestore().collection("serve-chat").add({
         text: message,
         uid: state.user.uid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -70,7 +97,7 @@ function ServeChat() {
     }
   };
 
-  console.log(messageList);
+  console.log("render", messageList);
 
   return (
     <div
