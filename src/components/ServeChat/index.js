@@ -3,11 +3,10 @@ import moment from "moment";
 import {
   useFirestore,
   useFirebaseApp,
-  useFirestoreDocOnce,
   useFirestoreDocDataOnce,
 } from "reactfire";
 import firebase from "firebase/app";
-import _ from "lodash";
+// import _ from "lodash";
 
 // SVG
 import ExitSVG from "./../../assets/Exit.svg";
@@ -18,9 +17,10 @@ import AppContext from "./../../context/";
 function ServeChat() {
   const firebaseApp = useFirebaseApp();
   const { changeRoute, state } = React.useContext(AppContext);
+  const scrollServeChat = React.useRef();
+
   const [message, setMessage] = React.useState("");
   const [messageList, setMessageList] = React.useState([]);
-  const scrollServeChat = React.useRef();
 
   React.useEffect(() => {
     const unsubscribe = firebaseApp
@@ -29,6 +29,7 @@ function ServeChat() {
       .orderBy("createdAt", "desc")
       .limit(20)
       .onSnapshot((res) => {
+        console.log(res.size, messageList.length);
         if (res.size > messageList.length) {
           const arr = [];
 
@@ -52,23 +53,23 @@ function ServeChat() {
               scrollToMyRef();
             }
 
-            // if (
-            //   value.type === "modified" &&
-            //   arr.findIndex((mess) => mess.key === value.doc.id) >= 0
-            // ) {
-            //   const arr = [];
+            if (
+              value.type === "modified" &&
+              messageList.findIndex((mess) => mess.key === value.doc.id) >= 0
+            ) {
+              const arr = [];
 
-            //   for (let index = 0; index < arr.length; index++) {
-            //     const element = arr[index];
-            //     if (element.key === value.doc.id) {
-            //       arr.push({ key: value.doc.id, ...value.doc.data() });
-            //     } else {
-            //       arr.push(element);
-            //     }
-            //   }
+              for (let index = 0; index < messageList.length; index++) {
+                const element = messageList[index];
+                if (element.key === value.doc.id) {
+                  arr.push({ key: value.doc.id, ...value.doc.data() });
+                } else {
+                  arr.push(element);
+                }
+              }
 
-            //   setMessageList(arr);
-            // }
+              setMessageList(arr);
+            }
           });
         }
       });
@@ -97,7 +98,7 @@ function ServeChat() {
     }
   };
 
-  console.log("render", messageList);
+  // console.log("render", messageList);
 
   return (
     <div
