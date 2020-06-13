@@ -4,6 +4,7 @@ import UserSVG from "./../../assets/Dashboard/user.svg";
 import AppContext from "./../../context/";
 import { useFirestoreDocDataOnce, useFirestore } from "reactfire";
 import { LANGUAGE_BY_LOCALE } from "./../../locale-constant";
+import { parseInt } from "lodash";
 
 function InfoModal() {
   const { state, toggleInfoModal } = React.useContext(AppContext);
@@ -13,6 +14,24 @@ function InfoModal() {
     .doc(state.modal["user-info"].uid.toString());
 
   const user = useFirestoreDocDataOnce(userRef);
+
+  const winPercent = () => {
+    const { lost, win, tie } = user.game;
+
+    const winTotal = parseInt(win.gomoku) + parseInt(win["block-head"]);
+    const all =
+      winTotal +
+      parseInt(lost.gomoku) +
+      parseInt(lost["block-head"]) +
+      parseInt(tie.gomoku) +
+      parseInt(tie["block-head"]);
+
+    if (winTotal === 0 && all === 0) {
+      return 100;
+    }
+
+    return Math.round((winTotal / all) * 100);
+  };
 
   return (
     <div
@@ -110,17 +129,7 @@ function InfoModal() {
               <tr>
                 <td className="text-stroke-carotv text-warning">Tỉ lệ thắng</td>
                 <td className="text-stroke-carotv text-white">
-                  {Math.round(
-                    ((user.game.win.gomoku + user.game.win["block-head"]) /
-                      (user.game.win.gomoku +
-                        user.game.win["block-head"] +
-                        user.game.lost.gomoku +
-                        user.game.lost["block-head"] +
-                        user.game.tie.gomoku +
-                        user.game.tie["block-head"])) *
-                      100
-                  )}
-                  %
+                  {winPercent()}%
                 </td>
               </tr>
               <tr>

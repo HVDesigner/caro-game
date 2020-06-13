@@ -12,6 +12,24 @@ import { filterElo } from "./../../functions/";
 function ProfileComponent() {
   const { state, changeRoute } = React.useContext(AppContext);
 
+  const winPercent = () => {
+    const { lost, win, tie } = state.user.game;
+
+    const winTotal = parseInt(win.gomoku) + parseInt(win["block-head"]);
+    const all =
+      winTotal +
+      parseInt(lost.gomoku) +
+      parseInt(lost["block-head"]) +
+      parseInt(tie.gomoku) +
+      parseInt(tie["block-head"]);
+
+    if (winTotal === 0 && all === 0) {
+      return 100;
+    }
+
+    return Math.round((winTotal / all) * 100);
+  };
+
   return (
     <Container className="proflie-body">
       <Row>
@@ -158,20 +176,7 @@ function ProfileComponent() {
                 <span className="text-warning title text-stroke-carotv">
                   Tỉ lệ thắng
                 </span>
-                <span className="text-white">
-                  {Math.round(
-                    ((state.user.game.win.gomoku +
-                      state.user.game.win["block-head"]) /
-                      (state.user.game.win.gomoku +
-                        state.user.game.win["block-head"] +
-                        state.user.game.lost.gomoku +
-                        state.user.game.lost["block-head"] +
-                        state.user.game.tie.gomoku +
-                        state.user.game.tie["block-head"])) *
-                      100
-                  )}
-                  %
-                </span>
+                <span className="text-white">{winPercent()}%</span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
