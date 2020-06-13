@@ -57,6 +57,7 @@ function Setting() {
             coin: firebase.firestore.FieldValue.increment(
               -(state.user.name.cost * 2)
             ),
+            "name.status": "changed",
           })
           .then(() => {
             setMessage("Đổi tên thành công");

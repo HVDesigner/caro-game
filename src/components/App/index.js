@@ -76,7 +76,7 @@ function App() {
     if (process.env.NODE_ENV === "production") {
       function doGet(doc) {
         if (doc.exists) {
-          if (doc.data().name.value !== userInfo.playerName) {
+          if (doc.data().name.value !== userInfo.playerName && doc.data().name.status === "original") {
             userCollectionFirestore
               .doc(userInfo.playerId)
               .update({ "name.value": userInfo.playerName });

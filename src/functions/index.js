@@ -144,8 +144,10 @@ export const leaveRoom = async (data, firebase) => {
 export const winAction = async (data, firebase) => {
   const { ownType, roomId } = data;
 
-  const updateRoom = {};
+  const batch = firebase.firestore().batch();
+  const roomRef = firebase.firestore().collection("rooms").doc(roomId);
 
+  const updateRoom = {};
   updateRoom[`participants.${ownType}.status`] = "winner";
   updateRoom[
     `participants.${ownType === "master" ? "player" : "master"}.status`
@@ -153,7 +155,10 @@ export const winAction = async (data, firebase) => {
   updateRoom[`game.status.ready`] = 0;
   updateRoom[`game.player`] = {};
 
-  firebase.firestore().collection("rooms").doc(roomId).update(updateRoom);
+  batch.update(roomRef, updateRoom);
+  batch.commit();
+
+  // firebase.firestore().collection("rooms").doc(roomId).update(updateRoom);
 };
 
 /**

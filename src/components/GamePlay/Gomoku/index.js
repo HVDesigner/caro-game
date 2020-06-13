@@ -487,7 +487,8 @@ function GamePlayComponent({ roomData, ownType }) {
     <div>
       {roomData.participants[ownType] &&
       (roomData.participants[ownType].status === "waiting" ||
-        ownType === "watcher") ? (
+        (ownType === "watcher" &&
+          roomData.participants.master.status !== "playing")) ? (
         <ReadyComponent
           roomData={roomData}
           ownType={ownType}

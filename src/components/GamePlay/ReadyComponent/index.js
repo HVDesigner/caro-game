@@ -1,7 +1,7 @@
 import React from "react";
 import "./index.css";
-import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
+import { useFirebaseApp } from "reactfire";
 import { TOGGLE_DIALOG } from "./../../../context/ActionTypes";
 
 // Functions

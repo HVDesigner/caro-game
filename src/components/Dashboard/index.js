@@ -12,7 +12,6 @@ import Shop from "./../../assets/Dashboard/shopping.svg";
 import Chat from "./../../assets/Dashboard/chat.svg";
 import PlayNowSVG from "./../../assets/Dashboard/playnow.svg";
 import RoomsSVG from "./../../assets/Dashboard/room.svg";
-import TournamentSVG from "./../../assets/Dashboard/tournament.svg";
 import QuestionSVG from "./../../assets/Dashboard/question.svg";
 import LogoSVG from "./../../assets/Dashboard/logo_carotv.svg";
 import PaperSVG from "./../../assets/Dashboard/paper.png";
@@ -123,20 +122,6 @@ function Dashboard() {
                     .then(() => {
                       changeRoute("lobby");
                     });
-                }}
-              ></img>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <div className="svg_btn mb-1">
-              <img
-                src={TournamentSVG}
-                alt="tournament"
-                className="wood-btn"
-                onClick={() => {
-                  changeRoute("tournament");
                 }}
               ></img>
             </div>
