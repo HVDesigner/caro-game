@@ -8,7 +8,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import GlobalState from "./context/GlobalState";
 
 import { FirebaseAppProvider, SuspenseWithPerf } from "reactfire";
-import "firebase/functions";
+import "firebase/messaging";
+import "firebase/database";
 import Loading from "./components/Loading/";
 
 const firebaseConfig = {

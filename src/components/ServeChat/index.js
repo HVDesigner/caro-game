@@ -1,11 +1,13 @@
 import React from "react";
-import moment from "moment";
+// import moment from "moment";
+import useSmoothScroll from "use-smooth-scroll";
 import {
   useFirestore,
   useFirebaseApp,
   useFirestoreDocDataOnce,
+  useDatabase,
 } from "reactfire";
-import firebase from "firebase/app";
+// import firebase from "firebase/app";
 // import _ from "lodash";
 
 // SVG
@@ -17,88 +19,77 @@ import AppContext from "./../../context/";
 function ServeChat() {
   const firebaseApp = useFirebaseApp();
   const { changeRoute, state } = React.useContext(AppContext);
-  const scrollServeChat = React.useRef();
 
   const [message, setMessage] = React.useState("");
   const [messageList, setMessageList] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  const scrollRef = React.useRef(null);
+  const scrollTo = useSmoothScroll("y", scrollRef);
+
+  const getRandomScrollTarget = (node) => node.scrollHeight;
+
+  const scrollToMyRef = React.useCallback(() => {
+    if (scrollRef) {
+      scrollTo(getRandomScrollTarget(scrollRef.current));
+    }
+  }, [scrollTo]);
 
   React.useEffect(() => {
-    const unsubscribe = firebaseApp
-      .firestore()
-      .collection("serve-chat")
-      .orderBy("createdAt", "desc")
-      .limit(20)
-      .onSnapshot((res) => {
-        console.log(res.size, messageList.length);
-        if (res.size > messageList.length) {
-          const arr = [];
+    firebaseApp
+      .database()
+      .ref("serve-chat")
+      .limitToLast(20)
+      .once("value")
+      .then((res) => {
+        const arr = [];
 
-          res.docChanges(true).forEach((value) => {
-            arr.unshift({ key: value.doc.id, ...value.doc.data() });
-          });
+        res.forEach((value) => {
+          arr.push({ key: value.key, ...value.val() });
+        });
 
-          setMessageList(arr);
-        } else {
-          res.docChanges(true).forEach((value) => {
-            // console.log(value);
-            if (
-              value.type === "added" &&
-              messageList.findIndex((mess) => mess.key === value.doc.id) < 0
-            ) {
-              setMessageList([
-                ...messageList,
-                { key: value.doc.id, ...value.doc.data() },
-              ]);
-
-              scrollToMyRef();
-            }
-
-            if (
-              value.type === "modified" &&
-              messageList.findIndex((mess) => mess.key === value.doc.id) >= 0
-            ) {
-              const arr = [];
-
-              for (let index = 0; index < messageList.length; index++) {
-                const element = messageList[index];
-                if (element.key === value.doc.id) {
-                  arr.push({ key: value.doc.id, ...value.doc.data() });
-                } else {
-                  arr.push(element);
-                }
-              }
-
-              setMessageList(arr);
-            }
-          });
-        }
+        setMessageList(arr);
+        setLoading(false);
+        scrollToMyRef();
       });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [firebaseApp, messageList]);
+    return () =>
+      firebaseApp
+        .database()
+        .ref("serve-chat")
+        .limitToLast(20)
+        .off("child_added");
+  }, [firebaseApp, scrollToMyRef]);
 
-  const scrollToMyRef = () => {
-    const scroll =
-      scrollServeChat.current.scrollHeight -
-      scrollServeChat.current.clientHeight;
-
-    scrollServeChat.current.scrollTo(0, scroll);
-  };
+  useDatabase()
+    .ref("serve-chat")
+    .limitToLast(20)
+    .on("child_added", (snapshot) => {
+      if (loading === false) {
+        if (messageList.findIndex((value) => value.key === snapshot.key) < 0) {
+          setMessageList([
+            ...messageList,
+            { key: snapshot.key, ...snapshot.val() },
+          ]);
+          scrollToMyRef();
+        }
+      }
+    });
 
   const addChatText = () => {
     if (message) {
-      firebaseApp.firestore().collection("serve-chat").add({
+      scrollToMyRef();
+
+      firebaseApp.database().ref("serve-chat").push({
         text: message,
         uid: state.user.uid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        // createdAt: firebase.database.FieldValue.serverTimestamp(),
       });
       setMessage("");
     }
   };
 
-  // console.log("render", messageList);
+  console.log("render");
 
   return (
     <div
@@ -117,37 +108,43 @@ function ServeChat() {
         <div className="p-2 position-absolute h-100 w-100">
           <div
             className="p-2 d-flex flex-column h-100 w-100 brown-border rounded shadow overflow-auto"
-            style={{ backgroundColor: "#f9da7f", maxHeight: "100%" }}
-            ref={scrollServeChat}
+            style={{
+              backgroundColor: "#f9da7f",
+              maxHeight: "100%",
+              height: "100%",
+            }}
+            ref={scrollRef}
           >
-            <div className="w-100">
-              <p className="text-center m-0">Xem thêm</p>
-            </div>
-            {messageList.map((value) => {
-              return (
-                <div
-                  className="d-flex w-100"
-                  key={value.key}
-                  style={{ borderBottom: "0.5px solid" }}
-                >
-                  <User uid={value.uid} />
+            <React.Fragment>
+              <div className="w-100 brown-border rounded bg-gold-wood wood-btn">
+                <p className="text-center m-0">Xem thêm</p>
+              </div>
+              {messageList.map((value) => {
+                return (
                   <div
-                    className="d-flex mr-auto"
-                    style={{
-                      wordWrap: "normal",
-                      overflowWrap: "anywhere",
-                    }}
+                    className="d-flex w-100"
+                    key={value.key}
+                    style={{ borderBottom: "0.5px solid" }}
                   >
-                    {value.text}
-                  </div>
-                  <small className="ml-2 text-right">
+                    <User uid={value.uid} />
+                    <div
+                      className="d-flex mr-auto"
+                      style={{
+                        wordWrap: "normal",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      {value.text}
+                    </div>
+                    {/* <small className="ml-2 text-right">
                     {value.createdAt
                       ? moment(value.createdAt.toDate()).fromNow()
                       : ""}
-                  </small>
-                </div>
-              );
-            })}
+                  </small> */}
+                  </div>
+                );
+              })}
+            </React.Fragment>
           </div>
         </div>
       </div>

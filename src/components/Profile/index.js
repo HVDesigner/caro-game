@@ -12,6 +12,10 @@ import { filterElo } from "./../../functions/";
 function ProfileComponent() {
   const { state, changeRoute } = React.useContext(AppContext);
 
+  // gameType true gomoku
+  // gameType false block-head
+  const [gameType, setGameType] = React.useState(true);
+
   const winPercent = () => {
     const { lost, win, tie } = state.user.game;
 
@@ -55,42 +59,64 @@ function ProfileComponent() {
       </Row>
       <Row>
         <Col>
+          <ListGroup horizontal className="statistic shadow mb-3">
+            <ListGroup.Item
+              className={`flex-fill ${gameType ? "bg-success" : ""}`}
+              onClick={() => {
+                setGameType(true);
+              }}
+            >
+              <h5 className="m-0 text-center">
+                <span
+                  className="text-warning title text-stroke-carotv"
+                  style={gameType ? { textDecoration: "underline" } : {}}
+                >
+                  Gomoku
+                </span>
+              </h5>
+            </ListGroup.Item>
+            <ListGroup.Item
+              className={`flex-fill ${gameType ? "" : "bg-success"}`}
+              onClick={() => {
+                setGameType(false);
+              }}
+            >
+              <h5 className="m-0 text-center">
+                <span
+                  className="text-warning title text-stroke-carotv"
+                  style={gameType ? {} : { textDecoration: "underline" }}
+                >
+                  Chặn 2 đầu
+                </span>
+              </h5>
+            </ListGroup.Item>
+          </ListGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
           <ListGroup className="statistic shadow mb-3">
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
-                  ELO Gomoku
-                </span>
-                <span className="text-white">{state.user.elo.gomoku}</span>
-              </h5>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-warning title text-stroke-carotv">
-                  ELO Chặn 2 đầu
+                  ELO
                 </span>
                 <span className="text-white">
-                  {state.user.elo["block-head"]}
+                  {gameType
+                    ? state.user.elo.gomoku
+                    : state.user.elo["block-head"]}
                 </span>
               </h5>
             </ListGroup.Item>
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
-                  Cấp độ Gomoku
+                  Cấp độ
                 </span>
                 <span className="text-white">
-                  {filterElo(state.user.elo.gomoku)}
-                </span>
-              </h5>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-warning title text-stroke-carotv">
-                  Cấp độ Chặn 2 đầu
-                </span>
-                <span className="text-white">
-                  {filterElo(state.user.elo["block-head"])}
+                  {gameType
+                    ? filterElo(state.user.elo.gomoku)
+                    : filterElo(state.user.elo["block-head"])}
                 </span>
               </h5>
             </ListGroup.Item>
@@ -99,23 +125,10 @@ function ProfileComponent() {
                 <span className="text-warning title text-stroke-carotv">
                   Trận thắng
                 </span>
-              </h5>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-white title text-stroke-carotv">
-                  Gomoku
-                </span>
-                <span className="text-white">{state.user.game.win.gomoku}</span>
-              </h5>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-white title text-stroke-carotv">
-                  Chặn 2 đầu
-                </span>
                 <span className="text-white">
-                  {state.user.game.win["block-head"]}
+                  {gameType
+                    ? state.user.game.win.gomoku
+                    : state.user.game.win["block-head"]}
                 </span>
               </h5>
             </ListGroup.Item>
@@ -124,53 +137,32 @@ function ProfileComponent() {
                 <span className="text-warning title text-stroke-carotv">
                   Trận thua
                 </span>
-              </h5>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-white title text-stroke-carotv">
-                  Gomoku
-                </span>
                 <span className="text-white">
-                  {state.user.game.lost.gomoku}
+                  {gameType
+                    ? state.user.game.lost.gomoku
+                    : state.user.game.lost["block-head"]}
                 </span>
               </h5>
             </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-white title text-stroke-carotv">
-                  Chặn 2 đầu
-                </span>
-                <span className="text-white">
-                  {state.user.game.lost["block-head"]}
-                </span>
-              </h5>
-            </ListGroup.Item>
+
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
                   Trận hòa
                 </span>
-              </h5>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-white title text-stroke-carotv">
-                  Gomoku
-                </span>
-                <span className="text-white">{state.user.game.tie.gomoku}</span>
-              </h5>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <h5 className="m-0 d-flex">
-                <span className="text-white title text-stroke-carotv">
-                  Chặn 2 đầu
-                </span>
                 <span className="text-white">
-                  {state.user.game.tie["block-head"]}
+                  {gameType
+                    ? state.user.game.tie.gomoku
+                    : state.user.game.tie["block-head"]}
                 </span>
               </h5>
             </ListGroup.Item>
+          </ListGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <ListGroup className="statistic shadow mb-3">
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
