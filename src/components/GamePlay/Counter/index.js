@@ -1,13 +1,13 @@
 import React from "react";
 import { Badge } from "react-bootstrap";
 import { useFirebaseApp } from "reactfire";
-import Sound from "react-sound";
+// import Sound from "react-sound";
 
 // Context
 import AppContext from "./../../../context/";
 
 // Sound
-import SecondSound from "./../../../assets/sound/second-sound.mp3";
+// import SecondSound from "./../../../assets/sound/second-sound.mp3";
 
 function Counter({ time, roomData, userType, ownType }) {
   const firebaseApp = useFirebaseApp();
@@ -34,7 +34,7 @@ function Counter({ time, roomData, userType, ownType }) {
     }
 
     timer = setInterval(() => {
-      const t = parseInt(Date.now()) - parseInt(roomData.game.turn.updatedAt);
+      let t = parseInt(Date.now()) - parseInt(roomData.game.turn.updatedAt);
 
       const calHour = Math.floor(
         (t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
@@ -80,7 +80,7 @@ function Counter({ time, roomData, userType, ownType }) {
       style={{ width: "100%" }}
       className="d-flex justify-content-center align-items-center p-1"
     >
-      {state.user.setting.sound ? (
+      {/* {state.user.setting.sound ? (
         <Sound
           url={SecondSound}
           playStatus={Sound.status.PLAYING}
@@ -88,7 +88,7 @@ function Counter({ time, roomData, userType, ownType }) {
         />
       ) : (
         ""
-      )}
+      )} */}
       <Badge pill variant="success">
         <p className="text-white roboto-font" style={{ fontSize: "13px" }}>
           {counter}s

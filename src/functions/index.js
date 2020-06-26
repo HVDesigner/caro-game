@@ -318,8 +318,8 @@ export const loginWatch = (data, firebase) => {
 /**
  * Chức năng sẵn sàng.
  *
- * @param { ({roomId, uid}) } data
- * @param {functions} firebase
+ * @param { {roomId, uid} } data
+ * @param {*} firebase
  */
 export const readyAction = (data, firebase) => {
   const { roomId, uid } = data;
@@ -371,6 +371,67 @@ export const readyAction = (data, firebase) => {
         return { ready: 1, message: "first ready" };
       } else {
         return { ready: 1, message: "nothing ready" };
+      }
+    });
+  });
+};
+
+/**
+ * Chức năng chuyển sang ngồi xem.
+ *
+ * @param { {roomId, uid} } data
+ * @param {*} firebase
+ */
+export const changeToWatch = (data, firebase) => {
+  const { roomId, uid } = data;
+
+  const room = firebase.firestore().collection("rooms").doc(roomId);
+
+  return firebase.firestore().runTransaction((transaction) => {
+    return transaction.get(room).then((doc) => {
+      if (!doc.exists) {
+        return Promise.reject({ message: "Phòng không tồn tại!" });
+      }
+
+      transaction.update(room, {
+        "game.status.ready": 0,
+        "game.player": {},
+        "game.turn": { uid: doc.data().participants.master.id },
+        "participants.player": firebaseApp.firestore.FieldValue.delete(),
+        "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
+          uid
+        ),
+      });
+    });
+  });
+};
+
+/**
+ * Chức năng chuyển sang ngồi chơi.
+ *
+ * @param { {roomId, uid} } data
+ * @param {*} firebase
+ */
+export const changeToPlay = (data, firebase) => {
+  const { roomId, uid } = data;
+
+  const room = firebase.firestore().collection("rooms").doc(roomId);
+
+  return firebase.firestore().runTransaction((transaction) => {
+    return transaction.get(room).then((doc) => {
+      if (!doc.exists) {
+        return Promise.reject({ message: "Phòng không tồn tại!" });
+      }
+
+      if (doc.data().participants.player) {
+        return Promise.reject({ message: "Đã có người chơi!" });
+      } else {
+        transaction.update(room, {
+          "participants.player": { id: uid, status: "waiting", win: 0 },
+          "participants.watcher": firebaseApp.firestore.FieldValue.arrayRemove(
+            uid
+          ),
+        });
       }
     });
   });

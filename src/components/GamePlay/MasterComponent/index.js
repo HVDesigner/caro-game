@@ -48,7 +48,7 @@ function MasterComponent({ roomData, ownType }) {
           }
         });
 
-      var unsubscribe = firebaseApp
+      const unsubscribe = firebaseApp
         .firestore()
         .collection("users")
         .doc(roomData.participants.master.id)
@@ -144,7 +144,15 @@ function MasterComponent({ roomData, ownType }) {
           className="d-flex justify-content-center align-items-center p-1"
         >
           {roomData.type === "room" ? (
-            <Badge pill variant="success" className="shadow">
+            <Badge
+              pill
+              variant={
+                roomData.participants.master.id === state.user.uid
+                  ? "success"
+                  : "secondary"
+              }
+              className="shadow"
+            >
               <p
                 className="text-white roboto-font"
                 style={{ fontSize: "12px" }}
@@ -155,7 +163,15 @@ function MasterComponent({ roomData, ownType }) {
           ) : (
             ""
           )}
-          <Badge pill variant="success" className="shadow ml-1">
+          <Badge
+            pill
+            variant={
+              roomData.participants.master.id === state.user.uid
+                ? "success"
+                : "secondary"
+            }
+            className="shadow ml-1"
+          >
             <p className="text-white roboto-font" style={{ fontSize: "12px" }}>
               {roomData.participants.master.win
                 ? roomData.participants.master.win

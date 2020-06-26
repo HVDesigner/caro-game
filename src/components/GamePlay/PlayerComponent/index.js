@@ -150,7 +150,14 @@ function PlayerComponent({ roomData, ownType }) {
           style={{ width: "100%" }}
           className="d-flex justify-content-center align-items-center p-1"
         >
-          <Badge pill variant="success">
+          <Badge
+            pill
+            variant={
+              roomData.participants.player.id === state.user.uid
+                ? "success"
+                : "secondary"
+            }
+          >
             <p className="text-white roboto-font" style={{ fontSize: "12px" }}>
               {roomData.participants.player.win
                 ? roomData.participants.player.win

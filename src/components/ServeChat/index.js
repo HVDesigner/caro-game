@@ -5,6 +5,7 @@ import {
   useFirestore,
   useFirebaseApp,
   useFirestoreDocDataOnce,
+  useFirestoreDocData,
   useDatabase,
 } from "reactfire";
 // import firebase from "firebase/app";
@@ -61,6 +62,12 @@ function ServeChat() {
         .off("child_added");
   }, [firebaseApp, scrollToMyRef]);
 
+  const serverChatCount = useFirestore()
+    .collection("server-chat-property")
+    .doc("count");
+
+  const countTotalMessage = useFirestoreDocData(serverChatCount);
+
   useDatabase()
     .ref("serve-chat")
     .limitToLast(20)
@@ -89,7 +96,27 @@ function ServeChat() {
     }
   };
 
-  console.log("render");
+  const loadMore = () => {
+    firebaseApp
+      .database()
+      .ref("serve-chat")
+      .orderByKey()
+      .endAt(messageList[0].key)
+      .limitToLast(20)
+      .once("value")
+      .then((snapshot) => {
+        const arr = [];
+
+        snapshot.forEach((value) => {
+          if (value.key !== messageList[0].key) {
+            arr.push({ key: value.key, ...value.val() });
+          }
+        });
+
+        setMessageList([...arr, ...messageList]);
+      })
+      .catch((err) => {});
+  };
 
   return (
     <div
@@ -115,36 +142,49 @@ function ServeChat() {
             }}
             ref={scrollRef}
           >
-            <React.Fragment>
-              <div className="w-100 brown-border rounded bg-gold-wood wood-btn">
-                <p className="text-center m-0">Xem thêm</p>
-              </div>
-              {messageList.map((value) => {
-                return (
+            {loading ? (
+              <p className="text-center m-0">Loading...</p>
+            ) : (
+              <React.Fragment>
+                {countTotalMessage.message > messageList.length ? (
                   <div
-                    className="d-flex w-100"
-                    key={value.key}
-                    style={{ borderBottom: "0.5px solid" }}
+                    className="w-100 brown-border rounded bg-gold-wood wood-btn"
+                    onClick={() => {
+                      loadMore();
+                    }}
                   >
-                    <User uid={value.uid} />
+                    <p className="text-center m-0">Xem thêm</p>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {messageList.map((value) => {
+                  return (
                     <div
-                      className="d-flex mr-auto"
-                      style={{
-                        wordWrap: "normal",
-                        overflowWrap: "anywhere",
-                      }}
+                      className="d-flex w-100"
+                      key={value.key}
+                      style={{ borderBottom: "0.5px solid" }}
                     >
-                      {value.text}
-                    </div>
-                    {/* <small className="ml-2 text-right">
+                      <User uid={value.uid} />
+                      <div
+                        className="d-flex mr-auto"
+                        style={{
+                          wordWrap: "normal",
+                          overflowWrap: "anywhere",
+                        }}
+                      >
+                        {value.text}
+                      </div>
+                      {/* <small className="ml-2 text-right">
                     {value.createdAt
                       ? moment(value.createdAt.toDate()).fromNow()
                       : ""}
                   </small> */}
-                  </div>
-                );
-              })}
-            </React.Fragment>
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            )}
           </div>
         </div>
       </div>

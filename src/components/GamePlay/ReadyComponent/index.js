@@ -5,7 +5,12 @@ import { useFirebaseApp } from "reactfire";
 import { TOGGLE_DIALOG } from "./../../../context/ActionTypes";
 
 // Functions
-import { leaveRoom, readyAction } from "./../../../functions/";
+import {
+  leaveRoom,
+  readyAction,
+  changeToPlay,
+  changeToWatch,
+} from "./../../../functions/";
 
 // Components
 import WatcherList from "./WatcherList/";
@@ -293,17 +298,33 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                     >
                       <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
                     </div>
-                    <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow">
-                      <h3
-                        className="mb-0 text-center brown-color p-2"
+                    <div className="d-flex">
+                      <div
+                        className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
                         onClick={() => {
-                          if (showLoadingExitBtn) {
-                            onLeaveRoom();
-                          }
+                          changeToWatch(
+                            {
+                              roomId: state.user.room_id.value,
+                              uid: state.user.uid,
+                            },
+                            firebaseApp
+                          );
                         }}
                       >
-                        {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
-                      </h3>
+                        <h3 className="mb-0 text-center brown-color">Xem</h3>
+                      </div>
+                      <div className="brown-border others-btn wood-btn flex-fill rounded-pill shadow ml-2">
+                        <h3
+                          className="mb-0 text-center brown-color p-2"
+                          onClick={() => {
+                            if (showLoadingExitBtn) {
+                              onLeaveRoom();
+                            }
+                          }}
+                        >
+                          {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                        </h3>
+                      </div>
                     </div>
                   </React.Fragment>
                 )}
@@ -318,7 +339,15 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
             {roomData.participants.player || roomData.type !== "room" ? (
               ""
             ) : (
-              <div className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn">
+              <div
+                className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                onClick={() => {
+                  changeToPlay(
+                    { roomId: state.user.room_id.value, uid: state.user.uid },
+                    firebaseApp
+                  );
+                }}
+              >
                 <h3 className="mb-0 text-center brown-color">NGỒI CHƠI</h3>
               </div>
             )}
@@ -349,7 +378,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
         {showReadyBtnFunc()}
       </div>
-      <WatcherList roomData={roomData} />
+      {ownType === "watcher" ? "" : <WatcherList roomData={roomData} />}
     </div>
   );
 }

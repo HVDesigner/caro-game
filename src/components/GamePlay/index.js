@@ -173,7 +173,12 @@ function GamePlayComponent() {
       <Container
         fluid
         className="game-play position-relative d-flex flex-column"
-        style={{ maxHeight: "100vh", minHeight: "100vh", width: "100vw" }}
+        style={{
+          maxHeight: "100vh",
+          height: "100vh",
+          minHeight: "100vh",
+          width: "100vw",
+        }}
         onMouseMove={(e) => {
           if (state.user.platform === "web") {
             setMousePosition({ x: e.clientX, y: e.clientY });
@@ -216,13 +221,15 @@ function GamePlayComponent() {
                 </p>
 
                 <small className="text-white">
-                  <span className="text-warning mr-1">id:</span>
+                  <span className="text-warning mr-1 text-stroke-carotv">
+                    id:
+                  </span>
                   {state.user.room_id.value}
                 </small>
 
-                <small className="text-white">
-                  <span className="text-warning mr-1">Cược:</span>
-                  {`${roomData.bet} xu`}
+                <small className="text-warning text-stroke-carotv">
+                  {`${roomData.bet} xu`} - {roomData.time}s -{" "}
+                  {roomData.rule === "6-win" ? "6 thắng" : "Chỉ 5 quân"}
                 </small>
               </div>
 
@@ -265,29 +272,32 @@ function GamePlayComponent() {
           )}
         </div>
 
-        <div className="flex-fill position-relative">
+        <div
+          className="flex-fill d-flex flex-column h-100 w-100"
+          style={{ maxHeight: "100%" }}
+        >
           <Chat
             roomData={roomData}
             setShowMenu={setShowMenu}
             ownType={ownType}
             setShowUserList={setShowUserList}
           />
+          <Row>
+            <Col>
+              <div className="p-1 rounded">
+                <form onSubmit={onSendMessage}>
+                  <input
+                    className="input-carotv-2 text-white text-left w-100"
+                    placeholder="Nhập tin nhắn..."
+                    type="text"
+                    onChange={(e) => setMessageText(e.target.value)}
+                    value={messageText}
+                  />
+                </form>
+              </div>
+            </Col>
+          </Row>
         </div>
-        <Row>
-          <Col>
-            <div className="p-1 rounded">
-              <form onSubmit={onSendMessage}>
-                <input
-                  className="input-carotv-2 text-white text-left w-100"
-                  placeholder="Nhập tin nhắn..."
-                  type="text"
-                  onChange={(e) => setMessageText(e.target.value)}
-                  value={messageText}
-                />
-              </form>
-            </div>
-          </Col>
-        </Row>
       </Container>
     </React.Fragment>
   );
