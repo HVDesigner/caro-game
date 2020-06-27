@@ -8,7 +8,7 @@ import Sound from "react-sound";
 // Sounds
 import BackgroundSound from "./../../assets/sound/background-music.mp3";
 
-// SVGs
+// SVG
 import UserSVG from "./../../assets/Dashboard/user.svg";
 
 // Components

@@ -23,7 +23,8 @@
     "react-scripts": "3.4.1",
     "react-sound": "^1.2.0",
     "reactfire": "^2.0.3",
-    "use-smooth-scroll": "^1.1.1"
+    "use-smooth-scroll": "^1.1.1",
+    "use-sound": "^1.0.2"
   },
   "scripts": {
     "start": "set PORT=4300 && react-scripts start",

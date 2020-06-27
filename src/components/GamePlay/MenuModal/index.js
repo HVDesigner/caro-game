@@ -2,7 +2,7 @@ import React from "react";
 import CheckButton from "./../../CheckButton/";
 import AppContext from "./../../../context/";
 import { useFirebaseApp } from "reactfire";
-import { leaveRoom } from "./../../../functions/";
+import { leaveRoom, winAction } from "./../../../functions/";
 
 function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
@@ -20,6 +20,17 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
     firebaseApp.firestore().collection("users").doc(state.user.uid).update({
       "setting.sound": sound,
     });
+  };
+
+  const IamLoser = () => {
+    winAction(
+      {
+        ownType: ownType === "master" ? "player" : "master",
+        roomId: state.user.room_id.value,
+      },
+      firebaseApp
+    );
+    setShowMenu(false);
   };
 
   return (
@@ -68,9 +79,20 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
             <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
               <h5 className="text-center brown-color mb-0">Chia sẻ</h5>
             </span>
-            <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
-              <h5 className="text-center brown-color mb-0">Xin thua</h5>
-            </span>
+
+            {(ownType === "master" || ownType === "player") &&
+            roomData.participants[ownType].status === "playing" ? (
+              <span
+                className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2"
+                onClick={() => {
+                  IamLoser();
+                }}
+              >
+                <h5 className="text-center brown-color mb-0">Xin thua</h5>
+              </span>
+            ) : (
+              ""
+            )}
 
             {(ownType === "master" || ownType === "player") &&
             roomData.participants[ownType].status === "playing" ? (

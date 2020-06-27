@@ -37,7 +37,7 @@ function ChatComponent({ roomData, setShowMenu, ownType, setShowUserList }) {
         className="overflow-auto pl-2 pr-2 rounded brown-border flex-fill"
         style={{
           minHeight: "48px",
-          backgroundColor: "#f9da7f",
+          backgroundColor: "#fff3d0",
         }}
         ref={scrollBox}
       >

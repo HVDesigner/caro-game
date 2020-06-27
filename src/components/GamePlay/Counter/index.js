@@ -1,19 +1,22 @@
 import React from "react";
 import { Badge } from "react-bootstrap";
 import { useFirebaseApp } from "reactfire";
-// import Sound from "react-sound";
+import useSound from "use-sound";
 
 // Context
 import AppContext from "./../../../context/";
 
 // Sound
-// import SecondSound from "./../../../assets/sound/second-sound.mp3";
+import FiveSecondLastSound from "./../../../assets/sound/second-sound.mp3";
+import OneSecondLastSound from "./../../../assets/sound/one-second-last.mp3";
 
 function Counter({ time, roomData, userType, ownType }) {
   const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
   const [counter, setCounter] = React.useState(time);
+  const [playFive, { stop: stopFive }] = useSound(FiveSecondLastSound);
+  const [playOne, { stop: stopOne }] = useSound(OneSecondLastSound);
 
   React.useEffect(() => {
     let timer = setInterval(() => {}, 1000);
@@ -75,20 +78,24 @@ function Counter({ time, roomData, userType, ownType }) {
     time,
   ]);
 
+  React.useEffect(() => {
+    if (state.user.setting.sound && counter <= 5 && counter >= 0) {
+      playFive();
+    }
+    if (state.user.setting.sound && counter <= 1 && counter >= 0) {
+      playOne();
+    }
+    return () => {
+      stopFive();
+      stopOne();
+    };
+  }, [counter, stopFive, playOne, stopOne, playFive, state.user.setting.sound]);
+
   return (
     <div
       style={{ width: "100%" }}
       className="d-flex justify-content-center align-items-center p-1"
     >
-      {/* {state.user.setting.sound ? (
-        <Sound
-          url={SecondSound}
-          playStatus={Sound.status.PLAYING}
-          loop={true}
-        />
-      ) : (
-        ""
-      )} */}
       <Badge pill variant="success">
         <p className="text-white roboto-font" style={{ fontSize: "13px" }}>
           {counter}s

@@ -2,7 +2,7 @@ import "./index.css";
 import React from "react";
 import firebase from "firebase/app";
 import { useFirebaseApp } from "reactfire";
-import Sound from "react-sound";
+import useSound from "use-sound";
 
 import WinSound from "./../../../assets/sound/win-sound.mp3";
 import LostSound from "./../../../assets/sound/lost-sound.mp3";
@@ -14,10 +14,7 @@ function WinnerModal({ roomData, ownType }) {
   const { state } = React.useContext(AppContext);
   const firebaseApp = useFirebaseApp();
 
-  const [win, setWin] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
   const [loadingNextBtn, setLoadingNextBtn] = React.useState(false);
-  const [soundStatus, setSoundStatus] = React.useState(Sound.status.PLAYING);
 
   const onNextAction = () => {
     setLoadingNextBtn(true);
@@ -25,7 +22,7 @@ function WinnerModal({ roomData, ownType }) {
     roomUpdate[
       `game.player.${state.user.uid}`
     ] = firebase.firestore.FieldValue.delete();
-    if (win) {
+    if (roomData.participants[ownType].status === "winner") {
       roomUpdate[`game.turn.uid`] = state.user.uid;
     }
     roomUpdate[`participants.${ownType}.status`] = "waiting";
@@ -37,110 +34,100 @@ function WinnerModal({ roomData, ownType }) {
       .update(roomUpdate);
   };
 
-  React.useEffect(() => {
-    if (
-      roomData.participants[ownType] &&
-      roomData.participants[ownType].status === "winner"
-    ) {
-      setWin(true);
-    } else {
-      setWin(false);
-    }
-    setLoading(false);
-  }, [roomData.participants, ownType, state.user.uid]);
-
   return (
     <div className="winner-modal d-flex justify-content-center align-items-center">
       <div className="winner-modal-content p-3 brown-border shadow rounded">
-        {loading ? (
-          <h5 className="text-warning text-stroke-carotv text-center mb-0 brown-color">
-            Loading...
-          </h5>
-        ) : (
-          <React.Fragment>
-            {win && roomData.participants[ownType].status === "winner" ? (
-              <React.Fragment>
-                {state.user.setting.sound ? (
-                  <Sound
-                    url={WinSound}
-                    playStatus={soundStatus}
-                    loop={false}
-                    onFinishedPlaying={() => {
-                      setSoundStatus(Sound.status.STOPPED);
-                    }}
-                  />
-                ) : (
-                  ""
-                )}
-                <h5 className="text-warning text-stroke-carotv text-center mb-3">
-                  Chúc mừng
-                </h5>
-                <h1 className="text-warning text-stroke-carotv mb-0">
-                  BẠN THẮNG
-                </h1>
-                {roomData.type === "room" ? (
-                  <h5 className="text-warning text-stroke-carotv text-center">
-                    + {roomData.bet} xu
-                  </h5>
-                ) : (
-                  ""
-                )}
-              </React.Fragment>
-            ) : (
-              ""
-            )}
+        <React.Fragment>
+          {roomData.participants[ownType] &&
+          roomData.participants[ownType].status === "winner" ? (
+            <WinnerContent roomData={roomData} />
+          ) : (
+            ""
+          )}
 
-            {!win && roomData.participants[ownType].status === "loser" ? (
-              <React.Fragment>
-                {state.user.setting.sound ? (
-                  <Sound
-                    url={LostSound}
-                    playStatus={soundStatus}
-                    loop={false}
-                    onFinishedPlaying={() => {
-                      setSoundStatus(Sound.status.STOPPED);
-                    }}
-                  />
-                ) : (
-                  ""
-                )}
-                <h5 className="text-muted text-stroke-carotv text-center mb-3">
-                  Rất tiếc
-                </h5>
-                <h1 className="text-secondary text-stroke-carotv mb-0">
-                  BẠN THUA
-                </h1>
-                {roomData.type === "room" ? (
-                  <h5 className="text-secondary text-stroke-carotv text-center">
-                    - {roomData.bet} xu
-                  </h5>
-                ) : (
-                  ""
-                )}
-              </React.Fragment>
-            ) : (
-              ""
-            )}
+          {roomData.participants[ownType] &&
+          roomData.participants[ownType].status === "loser" ? (
+            <LoserContent roomData={roomData} />
+          ) : (
+            ""
+          )}
 
-            <div className="brown-border shadow rounded next-btn wood-btn">
-              {loadingNextBtn ? (
-                <h5 className="text-center mt-2 mb-2 text-white">Loading...</h5>
-              ) : (
-                <h5
-                  className="text-center mt-2 mb-2 text-white"
-                  onClick={() => {
-                    onNextAction();
-                  }}
-                >
-                  Tiếp tục
-                </h5>
-              )}
-            </div>
-          </React.Fragment>
-        )}
+          <div className="brown-border shadow rounded next-btn wood-btn">
+            {loadingNextBtn ? (
+              <h5 className="text-center mt-2 mb-2 text-white">Loading...</h5>
+            ) : (
+              <h5
+                className="text-center mt-2 mb-2 text-white"
+                onClick={() => {
+                  onNextAction();
+                }}
+              >
+                Tiếp tục
+              </h5>
+            )}
+          </div>
+        </React.Fragment>
       </div>
     </div>
   );
 }
 
 export default WinnerModal;
+
+function WinnerContent({ roomData }) {
+  const { state } = React.useContext(AppContext);
+  const [play, { stop }] = useSound(WinSound);
+
+  React.useEffect(() => {
+    if (state.user.setting.sound) {
+      play();
+    } else {
+      stop();
+    }
+  }, [play, stop, state.user.setting.sound]);
+
+  return (
+    <React.Fragment>
+      <h5 className="text-warning text-stroke-carotv text-center mb-3">
+        Chúc mừng
+      </h5>
+      <h1 className="text-warning text-stroke-carotv mb-0">BẠN THẮNG</h1>
+      {roomData.type === "room" ? (
+        <h5 className="text-warning text-stroke-carotv text-center">
+          + {roomData.bet} xu
+        </h5>
+      ) : (
+        ""
+      )}
+    </React.Fragment>
+  );
+}
+
+function LoserContent({ roomData }) {
+  const { state } = React.useContext(AppContext);
+  const [play, { stop }] = useSound(LostSound);
+
+  React.useEffect(() => {
+    if (state.user.setting.sound) {
+      play();
+    } else {
+      stop();
+    }
+  }, [play, stop, state.user.setting.sound]);
+
+  return (
+    <React.Fragment>
+      <h5 className="text-muted text-stroke-carotv text-center mb-3">
+        Rất tiếc
+      </h5>
+      <h1 className="text-secondary text-stroke-carotv mb-0">BẠN THUA</h1>
+      {roomData.type === "room" ? (
+        <h5 className="text-secondary text-stroke-carotv text-center">
+          - {roomData.bet} xu
+        </h5>
+      ) : (
+        ""
+      )}
+    </React.Fragment>
+  );
+}
