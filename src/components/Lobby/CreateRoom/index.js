@@ -112,6 +112,7 @@ function CreateRoom() {
             history: [],
             status: { ready: 0 },
             turn: { uid: state.user.uid },
+            "tie-request": [],
           },
           rule: rule ? "6-win" : "6-no-win",
           time: getTime().type,

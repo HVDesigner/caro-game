@@ -55,6 +55,7 @@ export const leaveRoom = async (data, firebase) => {
               "game.history": [],
               "game.current-step": {},
               "game.status.ready": 0,
+              "game.tie-request": [],
             });
           } else if (
             doc.data().participants.watcher &&
@@ -82,6 +83,7 @@ export const leaveRoom = async (data, firebase) => {
               "game.history": [],
               "game.current-step": {},
               "game.status.ready": 0,
+              "game.tie-request": [],
             });
           } else {
             // if only have master in room
@@ -109,6 +111,7 @@ export const leaveRoom = async (data, firebase) => {
             "game.history": [],
             "game.current-step": {},
             "game.status.ready": 0,
+            "game.tie-request": [],
           });
 
           transaction.update(docRooms, {
@@ -154,11 +157,10 @@ export const winAction = async (data, firebase) => {
   ] = "loser";
   updateRoom[`game.status.ready`] = 0;
   updateRoom[`game.player`] = {};
+  updateRoom["game.tie-request"] = [];
 
   batch.update(roomRef, updateRoom);
   batch.commit();
-
-  // firebase.firestore().collection("rooms").doc(roomId).update(updateRoom);
 };
 
 /**
@@ -346,10 +348,11 @@ export const readyAction = (data, firebase) => {
         firstUpdateGame[`game.history`] = [];
         firstUpdateGame[`game.player.${uid}.value`] =
           player[0].value === 1 ? 2 : 1;
-        firstUpdateGame[`participants.master.status`] = "playing";
-        firstUpdateGame[`participants.player.status`] = "playing";
         firstUpdateGame[`game.current-step`] = {};
         firstUpdateGame[`game.turn.updatedAt`] = Date.now();
+        firstUpdateGame["game.tie-request"] = [];
+        firstUpdateGame[`participants.master.status`] = "playing";
+        firstUpdateGame[`participants.player.status`] = "playing";
 
         // Cập nhật những thông tin trên.
         transaction.update(room, firstUpdateGame);
@@ -397,6 +400,7 @@ export const changeToWatch = (data, firebase) => {
         "game.status.ready": 0,
         "game.player": {},
         "game.turn": { uid: doc.data().participants.master.id },
+        "game.tie-request": [],
         "participants.player": firebaseApp.firestore.FieldValue.delete(),
         "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
           uid
@@ -432,6 +436,54 @@ export const changeToPlay = (data, firebase) => {
             uid
           ),
         });
+      }
+    });
+  });
+};
+
+/**
+ *
+ * @param {{roomId, uid}} data
+ * @param {*} firebase
+ */
+export const GetTie = (data, firebase) => {
+  const { roomId, uid } = data;
+
+  const room = firebase.firestore().collection("rooms").doc(roomId);
+
+  return firebase.firestore().runTransaction((transaction) => {
+    return transaction.get(room).then((doc) => {
+      if (!doc.exists) {
+        return { message: "Phòng không tồn tại!" };
+      }
+
+      const tieRequest = doc.data().game["tie-request"];
+
+      // Nếu tie-request.length == 0 thì thêm uid vào tie-request và thêm vào conversation 1 đoạn tin nhắn "Xin cầu hòa."
+      if (tieRequest.length === 0) {
+        // Có một người chơi đã sẵn sàng.
+        const firstUpdateGame = {};
+
+        firstUpdateGame[
+          "game.tie-request"
+        ] = firebaseApp.firestore.FieldValue.arrayUnion(uid);
+        firstUpdateGame[
+          "conversation"
+        ] = firebaseApp.firestore.FieldValue.arrayUnion({
+          text: "Xin cầu hòa.",
+          uid,
+          type: "tie-message",
+          createAt: Date.now(),
+        });
+
+        // Cập nhật những thông tin trên.
+        transaction.update(room, firstUpdateGame);
+
+        return { tie: 1, message: "Xin cầu hòa" };
+      }
+
+      // Nếu tie-request.length == 1 thì reset phòng chơi và tăng trận hòa cho user.
+      else {
       }
     });
   });

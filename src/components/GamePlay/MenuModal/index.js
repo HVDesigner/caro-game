@@ -1,8 +1,14 @@
 import React from "react";
-import CheckButton from "./../../CheckButton/";
-import AppContext from "./../../../context/";
 import { useFirebaseApp } from "reactfire";
-import { leaveRoom, winAction } from "./../../../functions/";
+
+// Components
+import CheckButton from "./../../CheckButton/";
+
+// Contexts
+import AppContext from "./../../../context/";
+
+// Functions
+import { leaveRoom, winAction, GetTie } from "./../../../functions/";
 
 function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
@@ -31,6 +37,16 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
       firebaseApp
     );
     setShowMenu(false);
+  };
+
+  const WeTie = () => {
+    GetTie(
+      {
+        roomId: state.user.room_id.value,
+        uid: state.user.uid,
+      },
+      firebaseApp
+    );
   };
 
   return (
@@ -96,12 +112,18 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
 
             {(ownType === "master" || ownType === "player") &&
             roomData.participants[ownType].status === "playing" ? (
-              <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
+              <span
+                className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2"
+                onClick={() => {
+                  WeTie();
+                }}
+              >
                 <h5 className="text-center brown-color mb-0">Cầu Hòa</h5>
               </span>
             ) : (
               ""
             )}
+
             {ownType === "watcher" ? (
               <span
                 className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2"

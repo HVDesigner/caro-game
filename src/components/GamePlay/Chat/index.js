@@ -2,6 +2,7 @@ import React from "react";
 import MoreSVG from "./../../../assets/Rooms/more.svg";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useFirestoreDocData, useFirestore, SuspenseWithPerf } from "reactfire";
 
 function ChatComponent({ roomData, setShowMenu, ownType, setShowUserList }) {
   const scrollBox = React.useRef(null);
@@ -32,19 +33,34 @@ function ChatComponent({ roomData, setShowMenu, ownType, setShowUserList }) {
   };
 
   return (
-    <div className="d-flex h-100">
+    <div className="d-flex h-100" style={{ minHeight: "48px" }}>
       <div
         className="overflow-auto pl-2 pr-2 rounded brown-border flex-fill"
         style={{
           minHeight: "48px",
           backgroundColor: "#fff3d0",
+          maxHeight: "100%",
         }}
         ref={scrollBox}
       >
         {roomData.conversation.map((value, key) => {
           return (
-            <p key={key}>
-              <strong className="mr-2 ">{value.name}:</strong>
+            <p
+              className={
+                value.type === "tie-message"
+                  ? "text-danger font-weight-bold"
+                  : ""
+              }
+              key={key}
+            >
+              <SuspenseWithPerf
+                fallback={
+                  <strong className="mr-2 text-dark">loading...</strong>
+                }
+                traceId={"load-user-name"}
+              >
+                <Name uid={value.uid} />
+              </SuspenseWithPerf>
               {value.text}
             </p>
           );
@@ -78,3 +94,10 @@ function ChatComponent({ roomData, setShowMenu, ownType, setShowUserList }) {
 }
 
 export default ChatComponent;
+
+function Name({ uid }) {
+  const userRef = useFirestore().collection("users").doc(uid);
+  const user = useFirestoreDocData(userRef);
+
+  return <strong className="mr-2 text-dark">{user.name.value}:</strong>;
+}

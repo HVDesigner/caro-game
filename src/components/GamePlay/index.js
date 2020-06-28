@@ -44,6 +44,10 @@ function GamePlayComponent() {
   const [messageText, setMessageText] = React.useState("");
   const [showUserList, setShowUserList] = React.useState(false);
 
+  // Refs
+  const chatContainer = React.useRef(null);
+  const chatInputContainer = React.useRef(null);
+
   React.useEffect(() => {
     function getUserType(participants) {
       if (participants.master && participants.master.id === state.user.uid) {
@@ -125,7 +129,7 @@ function GamePlayComponent() {
           conversation: firebase.firestore.FieldValue.arrayUnion({
             text: messageText,
             uid: state.user.uid,
-            name: state.user.name.value,
+            type: "generic",
             createAt: Date.now(),
           }),
         })
@@ -138,6 +142,18 @@ function GamePlayComponent() {
   if (loading) {
     return <Loading />;
   }
+
+  console.log(
+    chatContainer.current && chatInputContainer.current
+      ? {
+          height:
+            chatContainer.current.clientHeight -
+            chatInputContainer.current.clientHeight,
+        }
+      : {
+          height: 0,
+        }
+  );
 
   return (
     <React.Fragment>
@@ -275,16 +291,31 @@ function GamePlayComponent() {
         <div
           className="flex-fill d-flex flex-column h-100 w-100"
           style={{ maxHeight: "100%" }}
+          ref={chatContainer}
         >
-          <Chat
-            roomData={roomData}
-            setShowMenu={setShowMenu}
-            ownType={ownType}
-            setShowUserList={setShowUserList}
-          />
+          <div
+            style={
+              chatContainer.current && chatInputContainer.current
+                ? {
+                    height:
+                      chatContainer.current.clientHeight -
+                      chatInputContainer.current.clientHeight,
+                  }
+                : {
+                    height: 0,
+                  }
+            }
+          >
+            <Chat
+              roomData={roomData}
+              setShowMenu={setShowMenu}
+              ownType={ownType}
+              setShowUserList={setShowUserList}
+            />
+          </div>
           <Row>
             <Col>
-              <div className="p-1 rounded">
+              <div className="p-1 rounded" ref={chatInputContainer}>
                 <form onSubmit={onSendMessage}>
                   <input
                     className="input-carotv-2 text-white text-left w-100"

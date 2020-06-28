@@ -3,6 +3,10 @@ import "./index.css";
 import firebase from "firebase/app";
 import { useFirebaseApp } from "reactfire";
 import { TOGGLE_DIALOG } from "./../../../context/ActionTypes";
+import useSound from "use-sound";
+
+// Sounds
+import ReadySound from "./../../../assets/sound/ready-sound.mp3";
 
 // Functions
 import {
@@ -25,6 +29,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
   const [showLoadingExitBtn, setShowLoadingExitBtn] = React.useState(true);
 
   const [loadingReady, setLoadingReady] = React.useState(false);
+  const [play] = useSound(ReadySound);
 
   React.useEffect(() => {
     if (roomData.game.player && roomData.game.player[state.user.uid]) {
@@ -164,6 +169,9 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
         },
       });
     } else {
+      if (state.user.setting.sound) {
+        play();
+      }
       readyAction(
         {
           roomId: state.user.room_id.value,
