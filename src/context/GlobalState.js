@@ -117,6 +117,12 @@ function GlobalState(props) {
     });
   };
 
+  /**
+   * Chức năng tắt bật modal thông tin người chơi.
+   *
+   * @param {boolean} status
+   * @param {string} uid
+   */
   const toggleInfoModal = (status, uid) => {
     return dispatch({
       type: TOGGLE_USER_INFO_MODAL,

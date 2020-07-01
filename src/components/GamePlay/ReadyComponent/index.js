@@ -169,7 +169,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
         },
       });
     } else {
-      if (state.user.setting.sound) {
+      if (state.user.setting.music.effect) {
         play();
       }
       readyAction(

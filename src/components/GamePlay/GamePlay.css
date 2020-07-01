@@ -58,8 +58,8 @@ p {
 .game-play {
   background-image: url("./../../assets/matching_background.svg");
   background-size: 50%;
-  max-height: 100vh;
-  overflow: auto;
+  /* max-height: 100vh; */
+  /* overflow: auto; */
 }
 
 .number-bottom {

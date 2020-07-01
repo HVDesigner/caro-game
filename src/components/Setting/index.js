@@ -20,7 +20,8 @@ function Setting() {
 
   // true Open
   // false Off
-  const [sound, setSound] = React.useState(true);
+  const [musicBackground, setMusicBackground] = React.useState(true);
+  const [soundEffect, setSoundEffect] = React.useState(true);
 
   // true vn
   // false en
@@ -32,11 +33,13 @@ function Setting() {
 
   React.useEffect(() => {
     setLanguage(state.user.setting.language.value === "vn" ? true : false);
-    setSound(state.user.setting.sound);
+    setSoundEffect(state.user.setting.music.effect);
+    setMusicBackground(state.user.setting.music.background);
     setMatchingByElo(state.user.setting.matchingByElo);
   }, [
     state.user.setting.language.value,
-    state.user.setting.sound,
+    state.user.setting.music.background,
+    state.user.setting.music.effect,
     state.user.setting.matchingByElo,
   ]);
 
@@ -80,14 +83,15 @@ function Setting() {
           <div className="d-flex flex-column">
             <div className="setting-game">
               <h4 className="text-white text-center mt-2">Cài đặt âm thanh</h4>
-              <div className="d-flex mt-2">
+              <div className="d-flex flex-column mt-2">
                 <div className="d-flex" style={{ width: "100%" }}>
+                  <p className="text-white flex-fill m-0">Nhạc nền</p>
                   <div className="flex-fill">
                     <CheckButton
                       text={"Tắt"}
-                      value={!sound}
+                      value={!musicBackground}
                       func={() => {
-                        setSound(false);
+                        setMusicBackground(false);
                       }}
                     />
                   </div>
@@ -95,9 +99,31 @@ function Setting() {
                   <div className="flex-fill">
                     <CheckButton
                       text={"Bật"}
-                      value={sound}
+                      value={musicBackground}
                       func={() => {
-                        setSound(true);
+                        setMusicBackground(true);
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="d-flex" style={{ width: "100%" }}>
+                  <p className="text-white flex-fill m-0">Hiệu ứng</p>
+                  <div className="flex-fill">
+                    <CheckButton
+                      text={"Tắt"}
+                      value={!soundEffect}
+                      func={() => {
+                        setSoundEffect(false);
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex-fill">
+                    <CheckButton
+                      text={"Bật"}
+                      value={soundEffect}
+                      func={() => {
+                        setSoundEffect(true);
                       }}
                     />
                   </div>
@@ -164,7 +190,8 @@ function Setting() {
                     .doc(state.user.uid)
                     .update({
                       "setting.matchingByElo": matchingByElo,
-                      "setting.sound": sound,
+                      "setting.music.background": musicBackground,
+                      "setting.music.effect": soundEffect,
                     })
                     .then(() => {
                       setMessage("Áp dụng thành công!");

@@ -52,6 +52,13 @@ function WinnerModal({ roomData, ownType }) {
             ""
           )}
 
+          {roomData.participants[ownType] &&
+          roomData.participants[ownType].status === "tie" ? (
+            <TieContent roomData={roomData} />
+          ) : (
+            ""
+          )}
+
           <div className="brown-border shadow rounded next-btn wood-btn">
             {loadingNextBtn ? (
               <h5 className="text-center mt-2 mb-2 text-white">Loading...</h5>
@@ -79,12 +86,12 @@ function WinnerContent({ roomData }) {
   const [play, { stop }] = useSound(WinSound);
 
   React.useEffect(() => {
-    if (state.user.setting.sound) {
+    if (state.user.setting.music.effect) {
       play();
     } else {
       stop();
     }
-  }, [play, stop, state.user.setting.sound]);
+  }, [play, stop, state.user.setting.music.effect]);
 
   return (
     <React.Fragment>
@@ -108,12 +115,12 @@ function LoserContent({ roomData }) {
   const [play, { stop }] = useSound(LostSound);
 
   React.useEffect(() => {
-    if (state.user.setting.sound) {
+    if (state.user.setting.music.effect) {
       play();
     } else {
       stop();
     }
-  }, [play, stop, state.user.setting.sound]);
+  }, [play, stop, state.user.setting.music.effect]);
 
   return (
     <React.Fragment>
@@ -128,6 +135,17 @@ function LoserContent({ roomData }) {
       ) : (
         ""
       )}
+    </React.Fragment>
+  );
+}
+
+function TieContent({ roomData }) {
+  return (
+    <React.Fragment>
+      <h5 className="text-warning text-stroke-carotv text-center mb-3">
+        Chúc mừng
+      </h5>
+      <h1 className="text-warning text-stroke-carotv mb-2">TRẬN HÒA</h1>
     </React.Fragment>
   );
 }

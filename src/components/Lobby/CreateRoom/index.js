@@ -113,6 +113,13 @@ function CreateRoom() {
             status: { ready: 0 },
             turn: { uid: state.user.uid },
             "tie-request": [],
+            "no-soft": {
+              status: false,
+              gamePlay: "",
+              rowString: "",
+              row: 0,
+              col: 0,
+            },
           },
           rule: rule ? "6-win" : "6-no-win",
           time: getTime().type,

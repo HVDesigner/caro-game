@@ -62,7 +62,7 @@ function Login() {
       name: { value: name, status: "original", cost: 500 },
       room_id: { value: 0, type: "none" },
       setting: {
-        sound: true,
+        music: { background: true, effect: true },
         matchingByElo: true,
         language: { status: "original", value: "vn" },
       },
@@ -73,6 +73,7 @@ function Login() {
         tie: { gomoku: 0, "block-head": 0 },
       },
       on_queue: false,
+      like: [],
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };

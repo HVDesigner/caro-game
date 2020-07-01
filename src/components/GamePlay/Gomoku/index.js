@@ -342,7 +342,7 @@ function GamePlayComponent({ roomData, ownType }) {
               /**
                * Phát ra âm thanh.
                */
-              if (state.user.setting.sound) {
+              if (state.user.setting.music.effect) {
                 play();
               }
 

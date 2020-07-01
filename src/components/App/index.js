@@ -76,7 +76,10 @@ function App() {
     if (process.env.NODE_ENV === "production") {
       function doGet(doc) {
         if (doc.exists) {
-          if (doc.data().name.value !== userInfo.playerName && doc.data().name.status === "original") {
+          if (
+            doc.data().name.value !== userInfo.playerName &&
+            doc.data().name.status === "original"
+          ) {
             userCollectionFirestore
               .doc(userInfo.playerId)
               .update({ "name.value": userInfo.playerName });
@@ -101,7 +104,7 @@ function App() {
             },
             locale: userInfo.playerLocale,
             setting: {
-              sound: true,
+              music: { background: true, effect: true },
               language: {
                 status: "original",
                 value: userInfo.playerLocale === "vi_VN" ? "vn" : "en",
@@ -119,6 +122,7 @@ function App() {
             on_queue: false,
             room_id: { value: 0, type: "none" },
             "game-type-select": { value: "gomoku" },
+            like: [],
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           };

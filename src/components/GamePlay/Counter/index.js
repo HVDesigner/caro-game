@@ -79,17 +79,24 @@ function Counter({ time, roomData, userType, ownType }) {
   ]);
 
   React.useEffect(() => {
-    if (state.user.setting.sound && counter <= 5 && counter >= 0) {
+    if (state.user.setting.music.effect && counter <= 5 && counter >= 0) {
       playFive();
     }
-    if (state.user.setting.sound && counter <= 1 && counter >= 0) {
+    if (state.user.setting.music.effect && counter <= 1 && counter >= 0) {
       playOne();
     }
     return () => {
       stopFive();
       stopOne();
     };
-  }, [counter, stopFive, playOne, stopOne, playFive, state.user.setting.sound]);
+  }, [
+    counter,
+    stopFive,
+    playOne,
+    stopOne,
+    playFive,
+    state.user.setting.music.effect,
+  ]);
 
   return (
     <div

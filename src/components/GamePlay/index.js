@@ -143,21 +143,9 @@ function GamePlayComponent() {
     return <Loading />;
   }
 
-  console.log(
-    chatContainer.current && chatInputContainer.current
-      ? {
-          height:
-            chatContainer.current.clientHeight -
-            chatInputContainer.current.clientHeight,
-        }
-      : {
-          height: 0,
-        }
-  );
-
   return (
     <React.Fragment>
-      {state.user.setting.sound ? (
+      {state.user.setting.music.background ? (
         <Sound
           url={BackgroundSound}
           playStatus={Sound.status.PLAYING}
@@ -172,7 +160,9 @@ function GamePlayComponent() {
         roomData={roomData}
         ownType={ownType}
       />
-      {(ownStatus === "winner" || ownStatus === "loser") &&
+      {(ownStatus === "winner" ||
+        ownStatus === "loser" ||
+        ownStatus === "tie") &&
       (ownType === "master" || ownType === "player") ? (
         <WinnerModal roomData={roomData} ownType={ownType} />
       ) : (
@@ -190,8 +180,7 @@ function GamePlayComponent() {
         fluid
         className="game-play position-relative d-flex flex-column"
         style={{
-          maxHeight: "100vh",
-          height: "100vh",
+          height: "100%",
           minHeight: "100vh",
           width: "100vw",
         }}

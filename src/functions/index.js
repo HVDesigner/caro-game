@@ -442,6 +442,7 @@ export const changeToPlay = (data, firebase) => {
 };
 
 /**
+ * Chức năng cầu hòa.
  *
  * @param {{roomId, uid}} data
  * @param {*} firebase
@@ -479,12 +480,75 @@ export const GetTie = (data, firebase) => {
         // Cập nhật những thông tin trên.
         transaction.update(room, firstUpdateGame);
 
-        return { tie: 1, message: "Xin cầu hòa" };
+        return { tie: [uid], message: "Xin cầu hòa" };
       }
 
       // Nếu tie-request.length == 1 thì reset phòng chơi và tăng trận hòa cho user.
       else {
+        // Nếu có thì lớn hơn -1, nếu không thì bằng -1.
+        const check = tieRequest.findIndex((value) => value === uid);
+        if (check >= 0) {
+          const firstUpdateGame = {};
+
+          firstUpdateGame[
+            "conversation"
+          ] = firebaseApp.firestore.FieldValue.arrayUnion({
+            text: "Xin cầu hòa.",
+            uid,
+            type: "tie-message",
+            createAt: Date.now(),
+          });
+
+          // Cập nhật những thông tin trên.
+          transaction.update(room, firstUpdateGame);
+
+          return { tie: [uid], message: "Xin cầu hòa" };
+        } else {
+          const updateRoom = {};
+          updateRoom[`participants.master.status`] = "tie";
+          updateRoom[`participants.player.status`] = "tie";
+          updateRoom[`game.status.ready`] = 0;
+          updateRoom[`game.player`] = {};
+          updateRoom["game.tie-request"] = [];
+
+          // Cập nhật những thông tin trên.
+          transaction.update(room, updateRoom);
+
+          return { message: "Hòa" };
+        }
       }
     });
+  });
+};
+
+/**
+ * Chức năng bấm yêu thích.
+ *
+ * @param { {ownId, uid} } data
+ * @param {*} firebase
+ */
+export const LikeFunc = (data, firebase) => {
+  const { ownId, uid } = data;
+
+  const user = firebase.firestore().collection("users").doc(uid);
+
+  user.update({
+    like: firebaseApp.firestore.FieldValue.arrayUnion(ownId),
+  });
+};
+
+/**
+ * Chức năng bỏ yêu thích.
+ *
+ * @param { {ownId, uid} } data
+ * @param {*} firebase
+ */
+export const UnLikeFunc = (data, firebase) => {
+  const { ownId, uid } = data;
+
+  const user = firebase.firestore().collection("users").doc(uid);
+
+  user.update({
+    like: firebaseApp.firestore.FieldValue.arrayRemove(ownId),
   });
 };

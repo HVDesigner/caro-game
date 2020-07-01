@@ -1,19 +1,33 @@
 import React from "react";
 import "./index.css";
-import UserSVG from "./../../assets/Dashboard/user.svg";
-import AppContext from "./../../context/";
-import { useFirestoreDocDataOnce, useFirestore } from "reactfire";
-import { LANGUAGE_BY_LOCALE } from "./../../locale-constant";
 import { parseInt } from "lodash";
+import { useFirestoreDocData, useFirestore, useFirebaseApp } from "reactfire";
+
+// SVG
+import UserSVG from "./../../assets/Dashboard/user.svg";
+
+// Contexts
+import AppContext from "./../../context/";
+
+// Locales
+import { LANGUAGE_BY_LOCALE } from "./../../locale-constant";
+
+// Functions
+import { LikeFunc, UnLikeFunc } from "./../../functions/";
 
 function InfoModal() {
+  const firebaseApp = useFirebaseApp();
   const { state, toggleInfoModal } = React.useContext(AppContext);
+
+  // true Gomoku
+  // false Block-head
+  const [gameType, setGameType] = React.useState(true);
 
   const userRef = useFirestore()
     .collection("users")
     .doc(state.modal["user-info"].uid.toString());
 
-  const user = useFirestoreDocDataOnce(userRef);
+  const user = useFirestoreDocData(userRef);
 
   const winPercent = () => {
     const { lost, win, tie } = user.game;
@@ -40,7 +54,12 @@ function InfoModal() {
     >
       <div
         className="brown-border shadow bg-brown-wood p-2 rounded d-flex flex-column"
-        style={{ maxWidth: "80vw", maxHeight: "80vh", height: "80vh" }}
+        style={{
+          width: "80vw",
+          maxWidth: "80vw",
+          maxHeight: "80vh",
+          height: "80vh",
+        }}
       >
         <h3 className="text-stroke-carotv text-warning text-center">
           Thông tin
@@ -58,74 +77,69 @@ function InfoModal() {
           </p>
         </div>
 
+        <table className="table table-bordered m-0 table-info-modal mb-2">
+          <tbody>
+            <tr>
+              <td
+                className={`text-stroke-carotv text-center text-warning ${
+                  gameType ? "bg-success" : ""
+                }`}
+                onClick={() => {
+                  setGameType(true);
+                }}
+              >
+                Gomoku
+              </td>
+              <td
+                className={`text-stroke-carotv text-center text-warning ${
+                  gameType ? "" : "bg-success"
+                }`}
+                onClick={() => {
+                  setGameType(false);
+                }}
+              >
+                Chặn 2 đầu
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <div className="overflow-auto h-100 mb-2" style={{ maxHeight: "100%" }}>
           <table className="table table-bordered h-100 m-0 table-info-modal">
             <tbody>
               <tr>
-                <td className="text-stroke-carotv text-warning">Elo Gomoku</td>
+                <td className="text-stroke-carotv text-warning">Elo</td>
                 <td className="text-stroke-carotv text-white">
-                  {user.elo.gomoku}
+                  {gameType ? user.elo.gomoku : user.elo["block-head"]}
                 </td>
               </tr>
+
               <tr>
-                <td className="text-stroke-carotv text-warning">
-                  Elo Chặn 2 đầu
-                </td>
+                <td className="text-stroke-carotv text-warning">Thắng</td>
                 <td className="text-stroke-carotv text-white">
-                  {user.elo["block-head"]}
+                  {gameType
+                    ? user.game.win.gomoku
+                    : user.game.win["block-head"]}
                 </td>
               </tr>
+
               <tr>
-                <td className="text-stroke-carotv text-warning" colSpan="2">
-                  Thắng
-                </td>
-              </tr>
-              <tr>
-                <td className="text-stroke-carotv text-white">Gomoku</td>
+                <td className="text-stroke-carotv text-warning">Thua</td>
                 <td className="text-stroke-carotv text-white">
-                  {user.game.win.gomoku}
+                  {gameType
+                    ? user.game.lost.gomoku
+                    : user.game.lost["block-head"]}
                 </td>
               </tr>
+
               <tr>
-                <td className="text-stroke-carotv text-white">Chắn 2 đầu</td>
+                <td className="text-stroke-carotv text-warning">Hòa</td>
                 <td className="text-stroke-carotv text-white">
-                  {user.game.win["block-head"]}
+                  {gameType
+                    ? user.game.tie.gomoku
+                    : user.game.tie["block-head"]}
                 </td>
               </tr>
-              <tr>
-                <td className="text-stroke-carotv text-warning" colSpan="2">
-                  Thua
-                </td>
-              </tr>
-              <tr>
-                <td className="text-stroke-carotv text-white">Gomoku</td>
-                <td className="text-stroke-carotv text-white">
-                  {user.game.lost.gomoku}
-                </td>
-              </tr>
-              <tr>
-                <td className="text-stroke-carotv text-white">Chắn 2 đầu</td>
-                <td className="text-stroke-carotv text-white">
-                  {user.game.lost["block-head"]}
-                </td>
-              </tr>
-              <tr>
-                <td className="text-stroke-carotv text-warning" colSpan="2">
-                  Hòa
-                </td>
-              </tr>
-              <tr>
-                <td className="text-stroke-carotv text-white">Gomoku</td>
-                <td className="text-stroke-carotv text-white">
-                  {user.game.tie.gomoku}
-                </td>
-              </tr>
-              <tr>
-                <td className="text-stroke-carotv text-white">Chắn 2 đầu</td>
-                <td className="text-stroke-carotv text-white">
-                  {user.game.tie["block-head"]}
-                </td>
-              </tr>
+
               <tr>
                 <td className="text-stroke-carotv text-warning">Tỉ lệ thắng</td>
                 <td className="text-stroke-carotv text-white">
@@ -134,19 +148,48 @@ function InfoModal() {
               </tr>
               <tr>
                 <td className="text-stroke-carotv text-warning">Yêu thích</td>
-                <td className="text-stroke-carotv text-white">0</td>
+                <td className="text-stroke-carotv text-white">
+                  {user.like.length}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div className="d-flex w-100">
-          <div
-            className="flex-fill text-center brown-border shadow rounded bg-gold-wood wood-btn"
-            style={{ backgroundSize: "cover" }}
-          >
-            Yêu thích
-          </div>
+          {user.like.findIndex((value) => value === state.user.uid) < 0 ? (
+            <div
+              className="flex-fill text-center brown-border shadow rounded bg-gold-wood wood-btn"
+              style={{ backgroundSize: "cover" }}
+              onClick={() => {
+                LikeFunc(
+                  {
+                    ownId: state.user.uid,
+                    uid: state.modal["user-info"].uid.toString(),
+                  },
+                  firebaseApp
+                );
+              }}
+            >
+              Yêu thích
+            </div>
+          ) : (
+            <div
+              className="flex-fill text-center brown-border shadow rounded bg-gold-wood wood-btn"
+              style={{ backgroundSize: "cover" }}
+              onClick={() => {
+                UnLikeFunc(
+                  {
+                    ownId: state.user.uid,
+                    uid: state.modal["user-info"].uid.toString(),
+                  },
+                  firebaseApp
+                );
+              }}
+            >
+              Bỏ yêu thích
+            </div>
+          )}
           <div
             className="flex-fill text-center brown-border shadow rounded ml-1 bg-gold-wood wood-btn"
             style={{ backgroundSize: "cover" }}
