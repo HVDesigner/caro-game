@@ -1,5 +1,4 @@
 import React from "react";
-// import moment from "moment";
 import useSmoothScroll from "use-smooth-scroll";
 import {
   useFirestore,
@@ -8,8 +7,6 @@ import {
   useFirestoreDocData,
   useDatabase,
 } from "reactfire";
-// import firebase from "firebase/app";
-// import _ from "lodash";
 
 // SVG
 import ExitSVG from "./../../assets/Exit.svg";
@@ -175,11 +172,6 @@ function ServeChat() {
                       >
                         {value.text}
                       </div>
-                      {/* <small className="ml-2 text-right">
-                    {value.createdAt
-                      ? moment(value.createdAt.toDate()).fromNow()
-                      : ""}
-                  </small> */}
                     </div>
                   );
                 })}

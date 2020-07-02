@@ -130,7 +130,14 @@ function Dashboard() {
         <Row>
           <Col>
             <div className="svg_btn mb-1">
-              <img src={QuestionSVG} alt="question" className="wood-btn"></img>
+              <img
+                src={QuestionSVG}
+                alt="question"
+                className="wood-btn"
+                onClick={() => {
+                  changeRoute("fun-quiz");
+                }}
+              ></img>
             </div>
           </Col>
         </Row>

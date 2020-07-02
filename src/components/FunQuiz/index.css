@@ -1,0 +1,5 @@
+.answer:hover {
+  background-color: #76b8ff !important;
+  cursor: pointer;
+  color: white;
+}
