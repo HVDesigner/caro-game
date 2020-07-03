@@ -54,7 +54,11 @@ function Login() {
     e.preventDefault();
 
     const newUserdata = {
-      coin: 1000,
+      coin: 5000,
+      "login-time": {
+        "login-at": firebase.firestore.FieldValue.serverTimestamp(),
+        value: 1,
+      },
       elo: { gomoku: 1000, "block-head": 1000 },
       image_url: "",
       locale: "vi_VN",

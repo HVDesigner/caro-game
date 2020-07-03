@@ -1,6 +1,5 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import numeral from "numeral";
 import { useFirebaseApp } from "reactfire";
 import { LOADING_OVERLAY } from "./../../context/ActionTypes";
 
@@ -50,9 +49,7 @@ function Dashboard() {
               </li>
               <li className="nav-item text-white pl-2 pr-2 pb-2 pt-2 coin_dashboard">
                 <img src={CoinSVG} alt="logo"></img>
-                <h5 className="ml-3 mr-3 mb-0">
-                  {`${numeral(state.user.coin).format("0a")} xu`}
-                </h5>
+                <h5 className="ml-3 mr-3 mb-0">{`${state.user.coin} xu`}</h5>
                 <img src={AddCoinSVG} alt="logo" className="m-0 wood-btn"></img>
               </li>
               <li
