@@ -8,7 +8,6 @@
 .header-profile img {
   width: 90px;
   height: 90px;
-  border: 2px solid #4e311d;
 }
 
 .header-profile h4 {
@@ -28,4 +27,9 @@
   width: 50%;
   margin: 0 auto;
   display: block;
+}
+
+.profile-medal img {
+  width: 70px;
+  height: 70px;
 }

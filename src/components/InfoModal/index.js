@@ -13,7 +13,10 @@ import AppContext from "./../../context/";
 import { LANGUAGE_BY_LOCALE } from "./../../locale-constant";
 
 // Functions
-import { LikeFunc, UnLikeFunc } from "./../../functions/";
+import { LikeFunc, UnLikeFunc, filterElo } from "./../../functions/";
+
+// Component
+import Medal from "./../Medal/";
 
 function InfoModal() {
   const firebaseApp = useFirebaseApp();
@@ -64,13 +67,32 @@ function InfoModal() {
         <h3 className="text-stroke-carotv text-warning text-center">
           Thông tin
         </h3>
+
         <div className="d-flex flex-column justify-content-center align-items-center w-100">
-          <img
-            src={user.image_url ? user.image_url : UserSVG}
-            alt="user"
-            style={{ maxWidth: "60px", maxHeight: "60px" }}
-            className={user.image_url ? "rounded-circle brown-border" : ""}
-          />
+          <div className="d-flex">
+            <div className="mr-3 info-modal-medal d-flex flex-column align-items-center">
+              <Medal elo={user.elo.gomoku} />
+              <p className="m-0 text-stroke-carotv text-white">
+                {filterElo(user.elo.gomoku)}
+              </p>
+              <p className="m-0 text-stroke-carotv text-white">(Gomoku)</p>
+            </div>
+            <img
+              src={user.image_url ? user.image_url : UserSVG}
+              alt="user"
+              style={{ maxWidth: "60px", maxHeight: "60px" }}
+              className={`${
+                user.image_url ? "rounded-circle brown-border" : ""
+              }`}
+            />
+            <div className="ml-3 info-modal-medal d-flex flex-column align-items-center">
+              <Medal elo={user.elo["block-head"]} />
+              <p className="m-0 text-stroke-carotv text-white">
+                {filterElo(user.elo["block-head"])}
+              </p>
+              <p className="m-0 text-stroke-carotv text-white">(Chặn 2 đầu)</p>
+            </div>
+          </div>
           <p className="text-stroke-carotv text-white m-0">{user.name.value}</p>
           <p className="text-stroke-carotv text-white">
             {user.locale ? LANGUAGE_BY_LOCALE[user.locale] : "..."}
@@ -103,6 +125,7 @@ function InfoModal() {
             </tr>
           </tbody>
         </table>
+
         <div className="overflow-auto h-100 mb-2" style={{ maxHeight: "100%" }}>
           <table className="table table-bordered h-100 m-0 table-info-modal">
             <tbody>
@@ -110,6 +133,15 @@ function InfoModal() {
                 <td className="text-stroke-carotv text-warning">Elo</td>
                 <td className="text-stroke-carotv text-white">
                   {gameType ? user.elo.gomoku : user.elo["block-head"]}
+                </td>
+              </tr>
+
+              <tr>
+                <td className="text-stroke-carotv text-warning">Cấp độ</td>
+                <td className="text-stroke-carotv text-white">
+                  {filterElo(
+                    gameType ? user.elo.gomoku : user.elo["block-head"]
+                  )}
                 </td>
               </tr>
 

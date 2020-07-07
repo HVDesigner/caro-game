@@ -4,3 +4,8 @@
   padding-top: 2px !important;
   padding-bottom: 2px !important;
 } */
+
+.info-modal-medal img {
+  width: 60px;
+  height: 60px;
+}
