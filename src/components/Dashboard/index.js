@@ -1,6 +1,15 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import { useFirebaseApp } from "reactfire";
+import {
+  useFirebaseApp,
+  useFirestore,
+  useFirestoreDocData,
+  SuspenseWithPerf,
+} from "reactfire";
+import _ from "lodash";
+import firebase from "firebase/app";
+
+// Action Types
 import { LOADING_OVERLAY } from "./../../context/ActionTypes";
 
 // Styles
@@ -96,6 +105,7 @@ function Dashboard() {
             </div>
           </Col>
         </Row>
+
         <Row>
           <Col>
             <div className="svg_btn mb-1">
@@ -124,20 +134,11 @@ function Dashboard() {
             </div>
           </Col>
         </Row>
-        <Row>
-          <Col>
-            <div className="svg_btn mb-1">
-              <img
-                src={QuestionSVG}
-                alt="question"
-                className="wood-btn"
-                onClick={() => {
-                  changeRoute("fun-quiz");
-                }}
-              ></img>
-            </div>
-          </Col>
-        </Row>
+
+        <SuspenseWithPerf fallback={<div></div>} traceId={"load-fun-quiz"}>
+          <FunQuizButton />
+        </SuspenseWithPerf>
+
         <Row>
           <Col>
             <div className="svg_btn mb-1">
@@ -152,6 +153,7 @@ function Dashboard() {
             </div>
           </Col>
         </Row>
+
         <Row>
           <Col>
             <div className="d-flex extend mt-1 mb-3">
@@ -188,3 +190,43 @@ function Dashboard() {
   );
 }
 export default Dashboard;
+
+function FunQuizButton() {
+  const { state, changeRoute } = React.useContext(AppContext);
+
+  const funQuizRef = useFirestore().collection("fun-quiz").doc(state.user.uid);
+
+  const funQuiz = useFirestoreDocData(funQuizRef);
+
+  const funQuizClick = () => {
+    if (_.isEmpty(funQuiz)) {
+      funQuizRef
+        .set({
+          step: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          changeRoute("fun-quiz");
+        });
+    } else {
+      changeRoute("fun-quiz");
+    }
+  };
+
+  return (
+    <Row>
+      <Col>
+        <div className="svg_btn mb-1">
+          <img
+            src={QuestionSVG}
+            alt="question"
+            className="wood-btn"
+            onClick={() => {
+              funQuizClick();
+            }}
+          ></img>
+        </div>
+      </Col>
+    </Row>
+  );
+}
