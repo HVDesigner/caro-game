@@ -2,7 +2,7 @@ import React from "react";
 import { Row, Nav } from "react-bootstrap";
 import { useFirebaseApp } from "reactfire";
 
-// SVGs
+// SVG
 import CoinSVG from "./../../../assets/Dashboard/Coin.svg";
 
 // Contexts
