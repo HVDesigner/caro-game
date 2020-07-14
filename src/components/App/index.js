@@ -43,14 +43,43 @@ function App() {
 
   React.useEffect(() => {
     if (process.env.NODE_ENV === "production") {
-      window.FBInstant.initializeAsync().then(function () {
-        window.FBInstant.startGameAsync()
-          .then(() => {
+      const script = document.createElement("script");
+      script.src = "https://connect.facebook.net/en_US/fbinstant.6.2.js";
+      script.id = "fbinstant";
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        window.fbAsyncInit = function () {
+          window.FB.init({
+            appId: "884825245326079",
+            xfbml: true,
+            version: "v6.2",
+          });
+
+          window.FBInstant.initializeAsync().then(function () {
+            window.FBInstant.player
+              .getSignedPlayerInfoAsync()
+              .then(function (result) {
+                console.log(result);
+              });
+
+            window.FBInstant.startGameAsync().then(() => {
+              setLoading(false);
+            });
+
             const playerName = window.FBInstant.player.getName();
             const playerPic = window.FBInstant.player.getPhoto();
             const playerId = window.FBInstant.player.getID();
             const playerLocale = window.FBInstant.getLocale();
             const platform = window.FBInstant.getPlatform();
+
+            console.log({
+              playerId,
+              playerName,
+              playerPic,
+              playerLocale,
+              platform: platform.toLowerCase(),
+            });
 
             setUserInfo({
               playerId,
@@ -59,11 +88,9 @@ function App() {
               playerLocale,
               platform: platform.toLowerCase(),
             });
-          })
-          .then(() => {
-            setLoading(false);
           });
-      });
+        };
+      };
     }
 
     if (process.env.NODE_ENV === "development") {
@@ -151,7 +178,7 @@ function App() {
         }
       }
 
-      if (userInfo.playerId) {
+      if (userInfo.playerId !== "") {
         userCollectionFirestore
           .doc(userInfo.playerId)
           .get()
