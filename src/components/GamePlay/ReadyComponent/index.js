@@ -52,11 +52,12 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
           setShowLoadingExitBtn(true);
         });
     } else if (roomData.type === "quick-play") {
-      let roomRef = firebaseApp
+      const roomRef = firebaseApp
         .firestore()
         .collection("rooms")
         .doc(state.user.room_id.value);
-      let userCollection = firebaseApp.firestore().collection("users");
+
+      const userCollection = firebaseApp.firestore().collection("users");
 
       firebaseApp.firestore().runTransaction(function (transaction) {
         return transaction.get(roomRef).then(function (sfDoc) {

@@ -286,14 +286,6 @@ function NoSOFT({ roomData }) {
     }
 
     if (checkRow < 0) {
-      console.log(roomData);
-      console.log({
-        status: true,
-        gamePlay: roomData["game-play"],
-        rowString: row.toUpperCase(),
-        row: checkRow,
-        col: parseInt(col),
-      });
       setErr("Ký tự hàng không tồn tại!");
       return;
     }

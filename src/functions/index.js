@@ -5,8 +5,8 @@ import firebaseApp from "firebase/app";
  *
  * Chức năng rời khỏi bàn chơi.
  *
- * @param {({roomId, userId})} data
- * @param {firebaseApp} firebase
+ * @param { {roomId, userId} } data
+ * @param {*} firebase
  */
 export const leaveRoom = async (data, firebase) => {
   const { roomId, userId } = data;
@@ -39,12 +39,7 @@ export const leaveRoom = async (data, firebase) => {
 
             const playerID = doc.data().participants.player.id;
 
-            // update master
-            // remove player in participants list
-            // update turn
-            // remove player ready
-            // remove history
-            // update game status
+            // update master, player and game
             transaction.update(docRooms, {
               "participants.master.id": playerID,
               "participants.master.status": "waiting",
@@ -65,12 +60,7 @@ export const leaveRoom = async (data, firebase) => {
 
             const watcherId = doc.data().participants.watcher[0];
 
-            // update master
-            // remove watcher in participants list
-            // update turn
-            // remove player ready
-            // remove history
-            // update game status
+            // update master, player and game
             transaction.update(docRooms, {
               "participants.master.id": watcherId,
               "participants.master.status": "waiting",
@@ -97,25 +87,17 @@ export const leaveRoom = async (data, firebase) => {
         ) {
           // if player leave room
 
-          // update master
-          // remove player in participants list
-          // update turn
-          // remove player ready
-          // remove history
-          // update game status
+          // update master, player and game
           transaction.update(docRooms, {
             "participants.master.status": "waiting",
             "participants.master.win": 0,
+            "participants.player": firebaseApp.firestore.FieldValue.delete(),
             "game.turn.uid": doc.data().participants.master.id,
             "game.player": {},
             "game.history": [],
             "game.current-step": {},
             "game.status.ready": 0,
             "game.tie-request": [],
-          });
-
-          transaction.update(docRooms, {
-            "participants.player": firebaseApp.firestore.FieldValue.delete(),
           });
         } else {
           // if watcher leave room
@@ -132,7 +114,6 @@ export const leaveRoom = async (data, firebase) => {
 
     return { code: 1, text: "Leave succeeded." };
   } catch (error) {
-    console.log("Leave failed: " + error.message);
     return { code: -1, text: "Leave failed: " + error.message };
   }
 };
