@@ -7,7 +7,7 @@ function UserInRoomModal({ setShowUserList, roomData }) {
   return (
     <div
       className="d-flex justify-content-center position-absolute align-items-center h-100vh w-100vw"
-      style={{ zIndex: "9999", backgroundColor: " #48484891" }}
+      style={{ zIndex: "999", backgroundColor: " #48484891" }}
     >
       <div
         className="d-flex flex-column p-2 bg-brown-wood brown-border rounded shadow"
@@ -48,6 +48,8 @@ function UserInRoomModal({ setShowUserList, roomData }) {
 export default UserInRoomModal;
 
 function MasterUser({ roomData }) {
+  const { toggleInfoModal } = React.useContext(AppContext);
+
   const userRef = useFirestore()
     .collection("users")
     .doc(roomData.participants.master.id);
@@ -61,6 +63,9 @@ function MasterUser({ roomData }) {
         alt="user"
         style={{ height: "50px", width: "50px" }}
         className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
+        onClick={() => {
+          toggleInfoModal(true, roomData.participants.master.id);
+        }}
       />
       <div className="w-100">
         <p className="text-white text-stroke-carotv mb-0 mr-3">
@@ -75,15 +80,13 @@ function MasterUser({ roomData }) {
 }
 
 function PlayerUser({ roomData }) {
-  const { state } = React.useContext(AppContext);
+  const { state, toggleInfoModal } = React.useContext(AppContext);
 
   const userRef = useFirestore()
     .collection("users")
     .doc(roomData.participants.player.id);
 
   const user = useFirestoreDocDataOnce(userRef);
-
-  console.log(user);
 
   return (
     <div className="d-flex align-items-center mb-2">
@@ -92,6 +95,9 @@ function PlayerUser({ roomData }) {
         alt="user"
         style={{ height: "50px", width: "50px" }}
         className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
+        onClick={() => {
+          toggleInfoModal(true, roomData.participants.player.id);
+        }}
       />
       <div className="w-100">
         <p className="text-white text-stroke-carotv mb-0 mr-3">
@@ -115,6 +121,8 @@ function PlayerUser({ roomData }) {
 }
 
 function WatcherUser({ uid }) {
+  const { toggleInfoModal } = React.useContext(AppContext);
+
   const userRef = useFirestore().collection("users").doc(uid);
 
   const user = useFirestoreDocDataOnce(userRef);
@@ -126,6 +134,9 @@ function WatcherUser({ uid }) {
         alt="user"
         style={{ height: "50px", width: "50px" }}
         className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
+        onClick={() => {
+          toggleInfoModal(true, uid);
+        }}
       />
       <p className="text-white text-stroke-carotv mb-0 mr-3">
         {user.name.value}

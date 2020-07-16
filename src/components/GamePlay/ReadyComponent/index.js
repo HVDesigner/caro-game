@@ -16,9 +16,6 @@ import {
   changeToWatch,
 } from "./../../../functions/";
 
-// Components
-import WatcherList from "./WatcherList/";
-
 // Context
 import AppContext from "./../../../context/";
 
@@ -386,7 +383,6 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
       <div className="d-flex flex-column justify-content-center mt-3 mb-3">
         {showReadyBtnFunc()}
       </div>
-      {ownType === "watcher" ? "" : <WatcherList roomData={roomData} />}
     </div>
   );
 }

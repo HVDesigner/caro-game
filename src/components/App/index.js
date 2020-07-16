@@ -24,7 +24,6 @@ const Lobby = React.lazy(() => import("./../Lobby/"));
 const Login = React.lazy(() => import("./../login/"));
 const CreateRoom = React.lazy(() => import("./../Lobby/CreateRoom/"));
 const TopList = React.lazy(() => import("./../TopList/"));
-const Tournament = React.lazy(() => import("./../Tournament/"));
 const ServeChat = React.lazy(() => import("./../ServeChat/"));
 const FunQuiz = React.lazy(() => import("./../FunQuiz/"));
 
@@ -273,12 +272,6 @@ function App() {
         return (
           <React.Suspense fallback={<LoadingComponent />}>
             <TopList />
-          </React.Suspense>
-        );
-      case "tournament":
-        return (
-          <React.Suspense fallback={<LoadingComponent />}>
-            <Tournament />
           </React.Suspense>
         );
       case "serve-chat":
