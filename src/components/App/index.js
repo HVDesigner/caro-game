@@ -49,47 +49,39 @@ function App() {
       document.body.appendChild(script);
 
       script.onload = () => {
-        window.fbAsyncInit = function () {
-          window.FB.init({
-            appId: "884825245326079",
-            xfbml: true,
-            version: "v6.2",
+        window.FBInstant.initializeAsync().then(function () {
+          window.FBInstant.player
+            .getSignedPlayerInfoAsync()
+            .then(function (result) {
+              console.log(result);
+            });
+
+          window.FBInstant.startGameAsync().then(() => {
+            setLoading(false);
           });
 
-          window.FBInstant.initializeAsync().then(function () {
-            window.FBInstant.player
-              .getSignedPlayerInfoAsync()
-              .then(function (result) {
-                console.log(result);
-              });
+          const playerName = window.FBInstant.player.getName();
+          const playerPic = window.FBInstant.player.getPhoto();
+          const playerId = window.FBInstant.player.getID();
+          const playerLocale = window.FBInstant.getLocale();
+          const platform = window.FBInstant.getPlatform();
 
-            window.FBInstant.startGameAsync().then(() => {
-              setLoading(false);
-            });
-
-            const playerName = window.FBInstant.player.getName();
-            const playerPic = window.FBInstant.player.getPhoto();
-            const playerId = window.FBInstant.player.getID();
-            const playerLocale = window.FBInstant.getLocale();
-            const platform = window.FBInstant.getPlatform();
-
-            console.log({
-              playerId,
-              playerName,
-              playerPic,
-              playerLocale,
-              platform: platform.toLowerCase(),
-            });
-
-            setUserInfo({
-              playerId,
-              playerName,
-              playerPic,
-              playerLocale,
-              platform: platform.toLowerCase(),
-            });
+          console.log({
+            playerId,
+            playerName,
+            playerPic,
+            playerLocale,
+            platform: platform.toLowerCase(),
           });
-        };
+
+          setUserInfo({
+            playerId,
+            playerName,
+            playerPic,
+            playerLocale,
+            platform: platform.toLowerCase(),
+          });
+        });
       };
     }
 

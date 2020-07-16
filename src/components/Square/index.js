@@ -68,7 +68,7 @@ function Square({ rowkey, colkey, onClickSquare, value, roomData }) {
       onClick={() => {
         if (
           roomData.game["no-soft"].status &&
-          roomData.game["no-soft"].col === colkey &&
+          roomData.game["no-soft"].col - 1 === colkey &&
           roomData.game["no-soft"].row === rowkey
         ) {
         } else {
