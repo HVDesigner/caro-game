@@ -1,4 +1,5 @@
 import React from "react";
+import firebase from "firebase/app";
 import { useFirebaseApp } from "reactfire";
 
 // Components
@@ -14,6 +15,8 @@ import { parseInt } from "lodash";
 function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
+
+  const [showLoadingExitBtn, setShowLoadingExitBtn] = React.useState(true);
 
   // true Bật
   // false Tắt
@@ -52,6 +55,124 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
       firebaseApp
     );
     setShowMenu(false);
+  };
+
+  const onLeaveRoom = () => {
+    setShowLoadingExitBtn(false);
+
+    if (roomData.type === "room") {
+      leaveRoom(
+        {
+          roomId: state.user.room_id.value,
+          userId: state.user.uid,
+          userType: ownType,
+        },
+        firebaseApp
+      )
+        .then()
+        .catch((error) => {
+          console.log(error);
+          setShowLoadingExitBtn(true);
+        });
+    } else if (roomData.type === "quick-play") {
+      const roomRef = firebaseApp
+        .firestore()
+        .collection("rooms")
+        .doc(state.user.room_id.value);
+
+      const userCollection = firebaseApp.firestore().collection("users");
+
+      firebaseApp.firestore().runTransaction(function (transaction) {
+        return transaction.get(roomRef).then(function (sfDoc) {
+          if (!sfDoc.exists) {
+            console.log("Document does not exist!");
+          }
+
+          switch (ownType) {
+            case "master":
+              if (sfDoc.data().participants.player) {
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.master.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+                transaction.update(roomRef, {
+                  "participants.master": firebase.firestore.FieldValue.delete(),
+                  "game.turn.uid": sfDoc.data().participants.player.id,
+                });
+              } else {
+                if (sfDoc.data().participants.watcher) {
+                  for (const iterator of sfDoc.data().participants.watcher) {
+                    transaction.update(userCollection.doc(iterator), {
+                      "location.path": "lobby",
+                      room_id: { type: "none", value: 0 },
+                    });
+                  }
+                }
+
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.master.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+
+                transaction.delete(roomRef);
+              }
+              break;
+            case "player":
+              if (sfDoc.data().participants.master) {
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.player.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+                transaction.update(roomRef, {
+                  "participants.player": firebase.firestore.FieldValue.delete(),
+                  "game.turn.uid": sfDoc.data().participants.master.id,
+                });
+              } else {
+                if (sfDoc.data().participants.watcher) {
+                  for (const iterator of sfDoc.data().participants.watcher) {
+                    transaction.update(userCollection.doc(iterator), {
+                      "location.path": "lobby",
+                      room_id: { type: "none", value: 0 },
+                    });
+                  }
+                }
+
+                transaction.update(
+                  userCollection.doc(sfDoc.data().participants.player.id),
+                  {
+                    "location.path": "playnow",
+                    room_id: { type: "none", value: 0 },
+                  }
+                );
+
+                transaction.delete(roomRef);
+              }
+              break;
+
+            default:
+              transaction.update(userCollection.doc(state.user.uid), {
+                "location.path": "lobby",
+                room_id: { type: "none", value: 0 },
+              });
+              transaction.update(roomRef, {
+                "participants.watcher": firebase.firestore.FieldValue.arrayRemove(
+                  state.user.uid
+                ),
+              });
+              break;
+          }
+        });
+      });
+    }
   };
 
   return (
@@ -172,25 +293,40 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
               <span
                 className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2"
                 onClick={() => {
-                  leaveRoom(
-                    {
-                      roomId: state.user.room_id.value,
-                      userId: state.user.uid,
-                      userType: ownType,
-                    },
-                    firebaseApp
-                  )
-                    .then()
-                    .catch((error) => {
-                      console.log(error);
-                    });
+                  if (showLoadingExitBtn) {
+                    onLeaveRoom();
+                  }
                 }}
               >
-                <h5 className="text-center brown-color mb-0">Thoát</h5>
+                <h5 className="text-center brown-color mb-0">
+                  {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                </h5>
               </span>
             ) : (
               ""
             )}
+
+            {ownType === "master" || ownType === "player" ? (
+              roomData.game.player[state.user.uid] ? (
+                ""
+              ) : (
+                <span
+                  className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2"
+                  onClick={() => {
+                    if (showLoadingExitBtn) {
+                      onLeaveRoom();
+                    }
+                  }}
+                >
+                  <h5 className="text-center brown-color mb-0">
+                    {showLoadingExitBtn ? "Thoát" : "Đang thoát..."}
+                  </h5>
+                </span>
+              )
+            ) : (
+              ""
+            )}
+
             <span className="brown-border bg-gold-wood rounded wood-btn p-1 mb-2">
               <h5 className="text-center brown-color mb-0">Chia sẻ</h5>
             </span>
