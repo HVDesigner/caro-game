@@ -119,10 +119,12 @@ function App() {
               gomoku: 1000,
               "block-head": 1000,
             },
-            image_url: userInfo.playerPic,
+            image_url: userInfo.playerPic ? userInfo.playerPic : "",
             name: {
               status: "original",
-              value: userInfo.playerName,
+              value: userInfo.playerName
+                ? userInfo.playerName
+                : `user${userInfo.playerId}`,
               cost: 500,
             },
             locale: userInfo.playerLocale,
@@ -194,7 +196,7 @@ function App() {
 
     let unsubscribe;
 
-    if (state.user.uid) {
+    if (state.user.uid !== "") {
       unsubscribe = userCollectionFirestore
         .doc(state.user.uid)
         .onSnapshot(function (querySnapshot) {
