@@ -91,3 +91,11 @@ p {
 .others-btn {
   background-image: url("./../../assets/backgroung_carotv_2.svg");
 }
+
+.number-row::after {
+  content: "" attr(title) "";
+}
+
+.alphabet-col::after {
+  content: "" attr(title) "";
+}

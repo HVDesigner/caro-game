@@ -3,6 +3,8 @@ import { Container, Row, Col } from "react-bootstrap";
 import "./GamePlay.css";
 import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 import Sound from "react-sound";
 
 // Sounds
@@ -10,6 +12,7 @@ import BackgroundSound from "./../../assets/sound/background-music.mp3";
 
 // SVG
 import UserSVG from "./../../assets/Dashboard/user.svg";
+import MoreSVG from "./../../assets/Rooms/more.svg";
 
 // Components
 import Loading from "./../Loading/";
@@ -31,6 +34,7 @@ function GamePlayComponent() {
   const { state, getPositonSquare } = React.useContext(AppContext);
   const firebaseApp = useFirebaseApp();
 
+  const [showChat, setShowChat] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
 
   // menu modal
@@ -139,6 +143,24 @@ function GamePlayComponent() {
     }
   };
 
+  const countUserInRoom = () => {
+    let total = 0;
+
+    if (roomData.participants.watcher) {
+      total = roomData.participants.watcher.length + total;
+    }
+
+    if (roomData.participants.player) {
+      total = total + 1;
+    }
+
+    if (roomData.participants.master) {
+      total = total + 1;
+    }
+
+    return total;
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -182,7 +204,6 @@ function GamePlayComponent() {
         style={{
           height: "100%",
           minHeight: "100vh",
-          width: "100vw",
         }}
         onMouseMove={(e) => {
           if (state.user.platform === "web") {
@@ -282,38 +303,83 @@ function GamePlayComponent() {
           style={{ maxHeight: "100%" }}
           ref={chatContainer}
         >
-          <div
-            style={
-              chatContainer.current && chatInputContainer.current
-                ? {
-                    height:
-                      chatContainer.current.clientHeight -
-                      chatInputContainer.current.clientHeight,
-                  }
-                : {
-                    height: 0,
-                  }
-            }
-          >
-            <Chat
-              roomData={roomData}
-              setShowMenu={setShowMenu}
-              ownType={ownType}
-              setShowUserList={setShowUserList}
-            />
-          </div>
+          {showChat ? (
+            <div
+              style={
+                chatContainer.current && chatInputContainer.current
+                  ? {
+                      height:
+                        chatContainer.current.clientHeight -
+                        chatInputContainer.current.clientHeight,
+                    }
+                  : {
+                      height: 0,
+                    }
+              }
+            >
+              <Chat
+                roomData={roomData}
+                setShowMenu={setShowMenu}
+                ownType={ownType}
+                setShowUserList={setShowUserList}
+              />
+            </div>
+          ) : (
+            ""
+          )}
           <Row>
             <Col>
-              <div className="p-1 rounded" ref={chatInputContainer}>
+              <div
+                className="pr-1 pt-1 pb-1 rounded d-flex"
+                ref={chatInputContainer}
+              >
+                <div
+                  className="brown-border bg-gold-wood rounded pl-2 pr-2 mr-2"
+                  onClick={() => {
+                    setShowChat(!showChat);
+                  }}
+                >
+                  <strong>{showChat ? "-" : "+"}</strong>
+                </div>
                 <form onSubmit={onSendMessage}>
                   <input
-                    className="input-carotv-2 text-white text-left w-100"
+                    className="input-carotv-2 text-white text-left"
                     placeholder="Nhập tin nhắn..."
                     type="text"
                     onChange={(e) => setMessageText(e.target.value)}
                     value={messageText}
                   />
                 </form>
+                {showChat ? (
+                  ""
+                ) : (
+                  <div className="d-flex align-items-center ml-2">
+                    <img
+                      src={MoreSVG}
+                      alt="more"
+                      style={{ maxWidth: "1.5em", maxHeight: "1.5em" }}
+                      className="shadow wood-btn mr-2"
+                      onClick={() => {
+                        setShowMenu(true);
+                      }}
+                    />
+                    <div
+                      className="d-flex align-items-center"
+                      onClick={() => {
+                        setShowUserList(true);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faEye}
+                        className="text-warning mr-1"
+                      />
+                      <span className="text-stroke-carotv text-white">
+                        {countUserInRoom()}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </Col>
           </Row>

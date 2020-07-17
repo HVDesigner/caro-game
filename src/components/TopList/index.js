@@ -12,6 +12,9 @@ import AppContext from "./../../context/";
 // SVGs
 import UserSVG from "./../../assets/Dashboard/user.svg";
 
+// Components
+import Medal from "./../Medal";
+
 function TopList() {
   const { changeRoute } = React.useContext(AppContext);
   const firebaseApp = useFirebaseApp();
@@ -96,7 +99,10 @@ function TopList() {
           <Col className="pt-2 pb-2">
             {listTop.map((value, key) => {
               return (
-                <div className="d-flex user-list-top mb-1" key={key}>
+                <div
+                  className="d-flex align-items-center user-list-top mb-1"
+                  key={key}
+                >
                   <div>
                     <h1
                       className="text-stroke-carotv text-warning"
@@ -120,6 +126,11 @@ function TopList() {
                     <p className="m-0 text-warning text-stroke-carotv">
                       {filterElo(value.elo[gameType ? "gomoku" : "block-head"])}
                     </p>
+                  </div>
+                  <div className="ml-2">
+                    <Medal
+                      elo={value.elo[gameType ? "gomoku" : "block-head"]}
+                    />
                   </div>
                 </div>
               );

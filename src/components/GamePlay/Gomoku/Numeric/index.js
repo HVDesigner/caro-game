@@ -17,14 +17,13 @@ function Numeric() {
             ></span>
             {row.map((colValue, colkey) => (
               <span
+                title={colValue}
                 key={colkey}
-                className="number-bottom text-white text-center"
+                className="number-bottom text-white text-center number-row"
                 style={{
                   fontSize: "12px",
                 }}
-              >
-                {colValue}
-              </span>
+              ></span>
             ))}
           </span>
         );

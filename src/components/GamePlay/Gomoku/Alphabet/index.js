@@ -28,10 +28,9 @@ function Alphabet({ rowkey }) {
         textAlign: "center",
         fontSize: "12px",
       }}
-      className="text-white d-flex flex-fill justify-content-center align-items-center"
-    >
-      {alphabet[rowkey]}
-    </span>
+      className="text-white d-flex flex-fill justify-content-center align-items-center alphabet-col"
+      title={alphabet[rowkey]}
+    ></span>
   );
 }
 

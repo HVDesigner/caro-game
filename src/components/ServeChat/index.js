@@ -234,7 +234,7 @@ function User({ uid }) {
 
   return (
     <p className="mb-0 mr-2" style={{ cursor: "pointer" }}>
-      <strong>{user.name.value}:</strong>
+      <strong>{user.name ? user.name.value : ""}:</strong>
     </p>
   );
 }
