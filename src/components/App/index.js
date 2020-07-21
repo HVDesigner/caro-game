@@ -28,8 +28,6 @@ const ServeChat = React.lazy(() => import("./../ServeChat/"));
 const FunQuiz = React.lazy(() => import("./../FunQuiz/"));
 
 function App() {
-  const firebaseApp = useFirebaseApp();
-  const { state, dispatch } = React.useContext(AppContext);
   const [loading, setLoading] = React.useState(true);
 
   const [userInfo, setUserInfo] = React.useState({
@@ -49,176 +47,158 @@ function App() {
 
       script.onload = () => {
         window.FBInstant.initializeAsync().then(function () {
-          window.FBInstant.player
-            .getSignedPlayerInfoAsync()
-            .then(function (result) {
-              console.log(result);
-            });
-
-          window.FBInstant.startGameAsync().then(() => {
-            setLoading(false);
-          });
-
-          const playerName = window.FBInstant.player.getName();
-          const playerPic = window.FBInstant.player.getPhoto();
           const playerId = window.FBInstant.player.getID();
-          const playerLocale = window.FBInstant.getLocale();
           const platform = window.FBInstant.getPlatform();
 
-          console.log({
-            playerId,
-            playerName,
-            playerPic,
-            playerLocale,
-            platform: platform.toLowerCase(),
-          });
+          window.FBInstant.startGameAsync().then(() => {
+            const playerName = window.FBInstant.player.getName();
+            const playerPic = window.FBInstant.player.getPhoto();
+            const playerLocale = window.FBInstant.getLocale();
 
-          setUserInfo({
-            playerId,
-            playerName,
-            playerPic,
-            playerLocale,
-            platform: platform.toLowerCase(),
+            setUserInfo({
+              playerId,
+              playerName,
+              playerPic,
+              playerLocale,
+              platform: platform.toLowerCase(),
+            });
+
+            setLoading(false);
           });
         });
       };
-    }
-
-    if (process.env.NODE_ENV === "development") {
+    } else if (process.env.NODE_ENV === "development") {
       setLoading(false);
     }
   }, []);
 
-  React.useEffect(() => {
-    const userCollectionFirestore = firebaseApp.firestore().collection("users");
+  if (loading) {
+    return <LoadingComponent />;
+  } else {
+    console.log(userInfo);
+    return <Pages userInfo={userInfo} />;
+  }
+}
 
-    if (process.env.NODE_ENV === "production") {
-      function doGet(doc) {
-        if (doc.exists) {
-          if (
-            doc.data().name.value !== userInfo.playerName &&
-            doc.data().name.status === "original"
-          ) {
-            userCollectionFirestore
-              .doc(userInfo.playerId)
-              .update({ "name.value": userInfo.playerName });
-          }
-
-          dispatch({
-            type: SET_USER_DATA,
-            payload: { uid: doc.id, ...doc.data() },
-          });
-        } else {
-          const newUserdata = {
-            coin: 5000,
-            "login-time": {
-              "login-at": firebase.firestore.FieldValue.serverTimestamp(),
-              value: 1,
-            },
-            elo: {
-              gomoku: 1000,
-              "block-head": 1000,
-            },
-            image_url: userInfo.playerPic ? userInfo.playerPic : "",
-            name: {
-              status: "original",
-              value: userInfo.playerName
-                ? userInfo.playerName
-                : `user${userInfo.playerId}`,
-              cost: 500,
-            },
-            locale: userInfo.playerLocale,
-            setting: {
-              music: { background: true, effect: true },
-              language: {
-                status: "original",
-                value: userInfo.playerLocale === "vi_VN" ? "vn" : "en",
-              },
-              matchingByElo: true,
-            },
-            location: {
-              path: "dashboard",
-            },
-            game: {
-              win: { gomoku: 0, "block-head": 0 },
-              lost: { gomoku: 0, "block-head": 0 },
-              tie: { gomoku: 0, "block-head": 0 },
-            },
-            on_queue: false,
-            room_id: { value: 0, type: "none" },
-            "game-type-select": { value: "gomoku" },
-            like: [],
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          };
-
-          userCollectionFirestore
-            .doc(userInfo.playerId)
-            .set(newUserdata)
-            .then(function () {
-              dispatch({
-                type: SET_USER_DATA,
-                payload: {
-                  ...newUserdata,
-                  uid: userInfo.playerId,
-                  platform: userInfo.platform,
-                },
-              });
-            })
-            .catch(function (error) {
-              console.error("Error writing document: ", error);
-            });
-        }
-      }
-
-      if (userInfo.playerId !== "") {
-        userCollectionFirestore
-          .doc(userInfo.playerId)
-          .get()
-          .then(doGet)
-          .catch(function (error) {
-            console.log("Error getting document:", error);
-          });
-      }
-    }
-  }, [
-    firebaseApp,
-    userInfo.playerId,
-    userInfo.platform,
-    userInfo.playerLocale,
-    userInfo.playerName,
-    userInfo.playerPic,
-    dispatch,
-  ]);
+function Pages({ userInfo }) {
+  const { state, dispatch } = React.useContext(AppContext);
+  const firebaseApp = useFirebaseApp();
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const userCollectionFirestore = firebaseApp.firestore().collection("users");
 
     let unsubscribe;
 
-    if (state.user.uid !== "") {
-      unsubscribe = userCollectionFirestore
-        .doc(state.user.uid)
-        .onSnapshot(function (querySnapshot) {
-          if (querySnapshot.exists) {
+    function doGet(doc) {
+      if (doc.exists) {
+        if (
+          userInfo.playerName &&
+          doc.data().name.value !== userInfo.playerName &&
+          doc.data().name.status === "original"
+        ) {
+          userCollectionFirestore
+            .doc(userInfo.playerId)
+            .update({ "name.value": userInfo.playerName });
+        }
+
+        dispatch({
+          type: SET_USER_DATA,
+          payload: { uid: doc.id, ...doc.data() },
+        });
+
+        setLoading(false);
+      } else {
+        const newUserdata = {
+          coin: 5000,
+          "login-time": {
+            "login-at": firebase.firestore.FieldValue.serverTimestamp(),
+            value: 1,
+          },
+          elo: {
+            gomoku: 1000,
+            "block-head": 1000,
+          },
+          image_url: userInfo.playerPic ? userInfo.playerPic : "image",
+          name: {
+            status: "original",
+            value: userInfo.playerName ? userInfo.playerName : `user`,
+            cost: 500,
+          },
+          locale: userInfo.playerLocale,
+          setting: {
+            music: { background: true, effect: true },
+            language: {
+              status: "original",
+              value: userInfo.playerLocale === "vi_VN" ? "vn" : "en",
+            },
+            matchingByElo: true,
+          },
+          location: {
+            path: "dashboard",
+          },
+          game: {
+            win: { gomoku: 0, "block-head": 0 },
+            lost: { gomoku: 0, "block-head": 0 },
+            tie: { gomoku: 0, "block-head": 0 },
+          },
+          on_queue: false,
+          room_id: { value: 0, type: "none" },
+          "game-type-select": { value: "gomoku" },
+          like: [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        };
+
+        userCollectionFirestore
+          .doc(userInfo.playerId)
+          .set(newUserdata)
+          .then(function () {
             dispatch({
               type: SET_USER_DATA,
               payload: {
-                ...querySnapshot.data(),
-                uid: state.user.uid,
+                ...newUserdata,
+                uid: userInfo.playerId,
                 platform: userInfo.platform,
               },
             });
-          }
-        });
+
+            setLoading(false);
+          })
+          .catch(function (error) {
+            console.error("Error writing document: ", error);
+          });
+      }
+    }
+
+    if (
+      userInfo.playerId ||
+      (state.user.uid && process.env.NODE_ENV === "development")
+    ) {
+      unsubscribe = userCollectionFirestore
+        .doc(
+          process.env.NODE_ENV === "development"
+            ? state.user.uid
+            : userInfo.playerId
+        )
+        .onSnapshot(doGet);
     }
 
     return () => {
-      if (state.user.uid) {
+      if (userInfo.playerId) {
         return unsubscribe();
       }
     };
-  }, [dispatch, state.user.uid, userInfo.platform, firebaseApp]);
+  }, [
+    dispatch,
+    firebaseApp,
+    state.user.uid,
+    userInfo.platform,
+    userInfo.playerLocale,
+    userInfo.playerName,
+    userInfo.playerPic,
+    userInfo.playerId,
+  ]);
 
   const PageShow = (path) => {
     switch (path) {
@@ -292,25 +272,28 @@ function App() {
     }
   };
 
-  if (loading) {
+  // console.log("Pages");
+
+  if (loading && process.env.NODE_ENV === "production") {
     return <LoadingComponent />;
   }
 
-  if (!state.user.uid && process.env.NODE_ENV === "development")
+  if (!state.user.uid && process.env.NODE_ENV === "development") {
     return (
       <React.Suspense fallback={<LoadingComponent />}>
         <Login />
       </React.Suspense>
     );
-
-  return (
-    <div className="position-relative">
-      {state.dialog.status ? <DialogComponent /> : ""}
-      {state["loading-overlay"] ? <LoadingOverlay /> : ""}
-      {state.modal["user-info"].status ? <InfoModal /> : ""}
-      {PageShow(state.user.location.path)}
-    </div>
-  );
+  } else {
+    return (
+      <div className="position-relative">
+        {state.dialog.status ? <DialogComponent /> : ""}
+        {state["loading-overlay"] ? <LoadingOverlay /> : ""}
+        {state.modal["user-info"].status ? <InfoModal /> : ""}
+        {PageShow(state.user.location.path)}
+      </div>
+    );
+  }
 }
 
 export default App;

@@ -37,7 +37,7 @@ function Counter({ time, roomData, userType, ownType }) {
     }
 
     timer = setInterval(() => {
-      let t = parseInt(Date.now()) - parseInt(roomData.game.turn.updatedAt);
+      let t = Date.now() - roomData.game.turn.updatedAt;
 
       const calHour = Math.floor(
         (t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)

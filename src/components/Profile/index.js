@@ -60,14 +60,20 @@ function ProfileComponent() {
                 </p>
               </div>
               <img
-                src={state.user.image_url ? state.user.image_url : UserSVG}
+                src={
+                  state.user.image_url !== "image"
+                    ? state.user.image_url
+                    : UserSVG
+                }
                 alt="img-profile"
                 className={`mr-3 ml-3 ${
-                  state.user.image_url
+                  state.user.image_url !== "image"
                     ? "rounded-circle shadow brown-border"
                     : ""
                 }`}
-                style={state.user.image_url ? {} : { border: "none" }}
+                style={
+                  state.user.image_url !== "image" ? {} : { border: "none" }
+                }
               />
               <div className="profile-medal d-flex flex-column align-items-center">
                 <Medal elo={state.user.elo["block-head"]} />

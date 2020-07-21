@@ -85,10 +85,12 @@ function MasterComponent({ roomData, ownType }) {
         className="d-flex justify-content-center align-items-center"
       >
         <img
-          src={thisUser.imageUrl ? thisUser.imageUrl : UserSVG}
+          src={thisUser.imageUrl !== "image" ? thisUser.imageUrl : UserSVG}
           alt="user"
           className={
-            thisUser.imageUrl ? `rounded-circle brown-border shadow` : ""
+            thisUser.imageUrl !== "image"
+              ? `rounded-circle brown-border shadow`
+              : ""
           }
           style={{ width: "40px", height: "40px" }}
           onClick={() => {

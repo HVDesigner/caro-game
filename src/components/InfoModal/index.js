@@ -78,11 +78,11 @@ function InfoModal() {
               <p className="m-0 text-stroke-carotv text-white">(Gomoku)</p>
             </div>
             <img
-              src={user.image_url ? user.image_url : UserSVG}
+              src={user.image_url !== "image" ? user.image_url : UserSVG}
               alt="user"
               style={{ maxWidth: "60px", maxHeight: "60px" }}
               className={`${
-                user.image_url ? "rounded-circle brown-border" : ""
+                user.image_url !== "image" ? "rounded-circle brown-border" : ""
               }`}
             />
             <div className="ml-3 info-modal-medal d-flex flex-column align-items-center">

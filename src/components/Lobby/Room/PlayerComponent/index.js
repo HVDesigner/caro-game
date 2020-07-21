@@ -55,7 +55,7 @@ function PlayerInRoom({ roomData }) {
         )}
       </div>
       <img
-        src={imageUrl ? imageUrl : UserSVG}
+        src={imageUrl !== "image" ? imageUrl : UserSVG}
         alt="user-playing"
         className={`player-inroom-img ml-2 ${
           imageUrl ? "rounded-circle circle-avartar" : ""

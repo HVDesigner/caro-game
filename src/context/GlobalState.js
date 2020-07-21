@@ -21,7 +21,7 @@ function GlobalState(props) {
       coin: 0,
       createdAt: 0,
       elo: { gomoku: 0, "block-head": 0 },
-      image_url: "",
+      image_url: "image",
       locale: "",
       location: { path: "dashboard" },
       name: { value: "", status: "original" },

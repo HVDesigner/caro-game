@@ -172,10 +172,16 @@ function Dashboard() {
               </div>
               <div className="svg_btn">
                 <img
-                  src={state.user.image_url ? state.user.image_url : UserSVG}
+                  src={
+                    state.user.image_url !== "image"
+                      ? state.user.image_url
+                      : UserSVG
+                  }
                   alt="user"
                   className={
-                    state.user.image_url ? "rounded-circle border" : "wood-btn"
+                    state.user.image_url !== "image"
+                      ? "rounded-circle border"
+                      : "wood-btn"
                   }
                   onClick={() => {
                     changeRoute("profile");

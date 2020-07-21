@@ -204,6 +204,7 @@ function GamePlayComponent() {
         style={{
           height: "100%",
           minHeight: "100vh",
+          overflow: "hidden",
         }}
         onMouseMove={(e) => {
           if (state.user.platform === "web") {
@@ -254,8 +255,11 @@ function GamePlayComponent() {
                 </small>
 
                 <small className="text-warning text-stroke-carotv">
-                  {`${roomData.bet} xu`} - {roomData.time}s -{" "}
-                  {roomData.rule === "6-win" ? "6 thắng" : "Chỉ 5 quân"}
+                  {`${
+                    roomData.type === "room" ? roomData.bet + " xu" : "Elo"
+                  } - ${roomData.time}s - ${
+                    roomData.rule === "6-win" ? "6 thắng" : "Chỉ 5 quân"
+                  }`}
                 </small>
               </div>
 

@@ -279,11 +279,13 @@ function PlayNow() {
       <div className="d-flex align-items-center mt-3 mb-3">
         <div style={{ width: "50%" }} className="player p-2 ml-2 mr-1 shadow">
           <img
-            src={state.user.image_url ? state.user.image_url : UserSVG}
+            src={
+              state.user.image_url !== "image" ? state.user.image_url : UserSVG
+            }
             alt="proflie_image"
             style={{ width: "15vw" }}
             className={`${
-              state.user.image_url ? "rounded-circle border" : ""
+              state.user.image_url !== "image" ? "rounded-circle border" : ""
             } m-auto d-block`}
           />
           <p className="text-center text-white mb-0">

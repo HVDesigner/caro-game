@@ -104,10 +104,10 @@ function PlayerComponent({ roomData, ownType }) {
           )}
         </div>
         <img
-          src={thisUser.imageUrl ? thisUser.imageUrl : UserSVG}
+          src={thisUser.imageUrl !== "image" ? thisUser.imageUrl : UserSVG}
           alt="user"
           className={
-            thisUser.imageUrl
+            thisUser.imageUrl !== "image"
               ? `rounded-circle align-items-center brown-border shadow mt-1`
               : "mt-1"
           }

@@ -60,7 +60,7 @@ function Login() {
         value: 1,
       },
       elo: { gomoku: 1000, "block-head": 1000 },
-      image_url: "",
+      image_url: "image",
       locale: "vi_VN",
       location: { path: "dashboard" },
       name: { value: name, status: "original", cost: 500 },

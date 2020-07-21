@@ -49,7 +49,7 @@ function MasterInRoom({ roomData }) {
   return (
     <div className="d-flex align-items-center">
       <img
-        src={imageUrl ? imageUrl : UserSVG}
+        src={imageUrl !== "image" ? imageUrl : UserSVG}
         alt="user-playing"
         className={`player-inroom-img mr-2 ${
           imageUrl ? "rounded-circle circle-avartar" : ""

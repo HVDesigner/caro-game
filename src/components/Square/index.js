@@ -36,7 +36,12 @@ function Square({ rowkey, colkey, onClickSquare, value, roomData }) {
 
     const noSoft = roomData.game["no-soft"];
 
-    if (noSoft.status && noSoft.col - 1 === colkey && noSoft.row === rowkey) {
+    if (
+      roomData.type === "room" &&
+      noSoft.status &&
+      noSoft.col - 1 === colkey &&
+      noSoft.row === rowkey
+    ) {
       return classString;
     }
 
@@ -67,6 +72,7 @@ function Square({ rowkey, colkey, onClickSquare, value, roomData }) {
       className={getClass(value)}
       onClick={() => {
         if (
+          roomData.type === "room" &&
           roomData.game["no-soft"].status &&
           roomData.game["no-soft"].col - 1 === colkey &&
           roomData.game["no-soft"].row === rowkey

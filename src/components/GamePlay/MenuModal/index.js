@@ -277,7 +277,8 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
               ""
             )}
 
-            {ownType === "master" &&
+            {roomData.type === "room" &&
+            ownType === "master" &&
             roomData.participants[ownType].status === "waiting" ? (
               <div className="d-flex flex-column mb-2 brown-border rounded p-2">
                 <p className="text-white text-center mb-2 text-stroke-carotv">

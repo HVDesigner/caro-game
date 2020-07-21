@@ -59,10 +59,12 @@ function MasterUser({ roomData }) {
   return (
     <div className="d-flex align-items-center mb-2">
       <img
-        src={user.image_url ? user.image_url : UserSVG}
+        src={user.image_url !== "image" ? user.image_url : UserSVG}
         alt="user"
         style={{ height: "50px", width: "50px" }}
-        className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
+        className={`${
+          user.image_url !== "image" ? "rounded-pill brown-border" : ""
+        } mr-2`}
         onClick={() => {
           toggleInfoModal(true, roomData.participants.master.id);
         }}
@@ -72,7 +74,7 @@ function MasterUser({ roomData }) {
           {user.name.value}
         </p>
         <small className="text-warning text-stroke-carotv mb-0 mr-3">
-          Chủ phòng
+          {roomData.type === "room" ? "Chủ phòng" : "Người chơi"}
         </small>
       </div>
     </div>
@@ -91,10 +93,12 @@ function PlayerUser({ roomData }) {
   return (
     <div className="d-flex align-items-center mb-2">
       <img
-        src={user.image_url ? user.image_url : UserSVG}
+        src={user.image_url !== "image" ? user.image_url : UserSVG}
         alt="user"
         style={{ height: "50px", width: "50px" }}
-        className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
+        className={`${
+          user.image_url !== "image" ? "rounded-pill brown-border" : ""
+        } mr-2`}
         onClick={() => {
           toggleInfoModal(true, roomData.participants.player.id);
         }}
@@ -130,10 +134,12 @@ function WatcherUser({ uid }) {
   return (
     <div className="d-flex align-items-center mb-2">
       <img
-        src={user.image_url ? user.image_url : UserSVG}
+        src={user.image_url !== "image" ? user.image_url : UserSVG}
         alt="user"
         style={{ height: "50px", width: "50px" }}
-        className={`${user.image_url ? "rounded-pill brown-border" : ""} mr-2`}
+        className={`${
+          user.image_url !== "image" ? "rounded-pill brown-border" : ""
+        } mr-2`}
         onClick={() => {
           toggleInfoModal(true, uid);
         }}
