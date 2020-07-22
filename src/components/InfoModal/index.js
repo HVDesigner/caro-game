@@ -69,7 +69,7 @@ function InfoModal() {
         </h3>
 
         <div className="d-flex flex-column justify-content-center align-items-center w-100">
-          <div className="d-flex">
+          <div className="d-flex w-100 justify-content-center">
             <div className="mr-3 info-modal-medal d-flex flex-column align-items-center">
               <Medal elo={user.elo.gomoku} />
               <p className="m-0 text-stroke-carotv text-white">

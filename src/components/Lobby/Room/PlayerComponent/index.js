@@ -58,7 +58,7 @@ function PlayerInRoom({ roomData }) {
         src={imageUrl !== "image" ? imageUrl : UserSVG}
         alt="user-playing"
         className={`player-inroom-img ml-2 ${
-          imageUrl ? "rounded-circle circle-avartar" : ""
+          imageUrl !== "image" ? "rounded-circle circle-avartar" : ""
         }`}
         onClick={() => {
           toggleInfoModal(true, roomData.participants.player.id);

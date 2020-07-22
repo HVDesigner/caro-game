@@ -17,6 +17,17 @@ function PasswordInput({ roomData }) {
   const [passError, setPassError] = React.useState({ status: false, text: "" });
 
   const onPasswordSubmit = () => {
+    // Kiểm tra pan.
+    if (roomData.pan.findIndex((value) => value === state.user.uid) >= 0) {
+      return dispatch({
+        type: TOGGLE_DIALOG,
+        payload: {
+          status: true,
+          message: "Bạn đã bị cấm vào phòng này!",
+        },
+      });
+    }
+
     // Kiểm tra xu.
     if (parseInt(roomData.bet) > parseInt(state.user.coin)) {
       return dispatch({
@@ -60,6 +71,16 @@ function PasswordInput({ roomData }) {
 
   const onWatchSubmit = () => {
     if (pass) {
+      if (roomData.pan.findIndex((value) => value === state.user.uid) >= 0) {
+        return dispatch({
+          type: TOGGLE_DIALOG,
+          payload: {
+            status: true,
+            message: "Bạn đã bị cấm vào phòng này!",
+          },
+        });
+      }
+
       loginWatch(
         { uid: state.user.uid, ...roomData, rawText: pass },
         firebaseApp

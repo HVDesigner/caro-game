@@ -1,3 +1,7 @@
+/**
+ * Cập nhật câu hỏi mới phải xóa fun-quiz collection để reset.
+ */
+
 const quizList = [
   {
     title: `1. Trên tay cầm một cây thước và một cây bút, làm thế nào để bạn vẽ được một vòng tròn thật chính xác ?`,

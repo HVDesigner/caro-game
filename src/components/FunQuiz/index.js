@@ -1,8 +1,15 @@
 import React from "react";
 import "./index.css";
+import useSound from "use-sound";
 import firebase from "firebase/app";
 import { Container, Col, Row, Nav } from "react-bootstrap";
 import { useFirestore, useFirestoreDocData } from "reactfire";
+import Sound from "react-sound";
+
+// Sounds
+import WinSound from "./../../assets/sound/win-sound.mp3";
+import LostSound from "./../../assets/sound/lost-sound.mp3";
+import BackgroundSound from "./../../assets/sound/background-music.mp3";
 
 // SVG
 import CoinSVG from "./../../assets/Dashboard/Coin.svg";
@@ -26,6 +33,8 @@ function FunQuiz() {
     status: false,
     type: false,
   });
+  const [playWin] = useSound(WinSound);
+  const [playLost] = useSound(LostSound);
 
   const funQuizRef = useFirestore().collection("fun-quiz").doc(state.user.uid);
 
@@ -47,6 +56,10 @@ function FunQuiz() {
       });
     } else {
       if (choice) {
+        if (state.user.setting.music.effect) {
+          playWin();
+        }
+
         userRef
           .update({
             coin: firebase.firestore.FieldValue.increment(
@@ -57,6 +70,10 @@ function FunQuiz() {
             setToggleModal({ status: true, type: true });
           });
       } else {
+        if (state.user.setting.music.effect) {
+          playLost();
+        }
+
         userRef
           .update({
             coin: firebase.firestore.FieldValue.increment(
@@ -76,6 +93,15 @@ function FunQuiz() {
 
   return (
     <React.Fragment>
+      {state.user.setting.music.background ? (
+        <Sound
+          url={BackgroundSound}
+          playStatus={Sound.status.PLAYING}
+          loop={true}
+        />
+      ) : (
+        ""
+      )}
       {toggleModal.status ? (
         <Container
           fluid

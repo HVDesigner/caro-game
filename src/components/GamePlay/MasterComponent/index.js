@@ -80,10 +80,7 @@ function MasterComponent({ roomData, ownType }) {
 
   return (
     <div className="d-flex flex-column pl-2">
-      <div
-        style={{ width: "100%" }}
-        className="d-flex justify-content-center align-items-center"
-      >
+      <div style={{ width: "100%" }} className="d-flex align-items-center">
         <img
           src={thisUser.imageUrl !== "image" ? thisUser.imageUrl : UserSVG}
           alt="user"

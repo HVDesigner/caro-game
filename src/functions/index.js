@@ -361,6 +361,69 @@ export const readyAction = (data, firebase) => {
 };
 
 /**
+ * Chức năng kick người chơi.
+ *
+ * @param { {roomId, uid, kickId} } data
+ * @param {*} firebase
+ */
+export const kickUser = (data, firebase) => {
+  const { roomId, uid, kickId } = data;
+
+  const room = firebase.firestore().collection("rooms").doc(roomId);
+  const user = firebase.firestore().collection("users").doc(kickId);
+
+  return firebase.firestore().runTransaction((transaction) => {
+    return transaction.get(room).then((doc) => {
+      if (!doc.exists) {
+        return Promise.reject({ message: "Phòng không tồn tại!" });
+      }
+
+      transaction.update(user, {
+        "location.path": "lobby",
+        "room_id.value": 0,
+        "room_id.type": "none",
+      });
+
+      if (
+        doc.data().participants.master.id === uid &&
+        doc.data().type === "room"
+      ) {
+        if (doc.data().participants.player.id === kickId) {
+          transaction.update(room, {
+            "game.status.ready": 0,
+            "game.player": {},
+            "game.turn": { uid: doc.data().participants.master.id },
+            "game.tie-request": [],
+            "participants.player": firebaseApp.firestore.FieldValue.delete(),
+            pan: firebaseApp.firestore.FieldValue.arrayUnion(kickId),
+          });
+        } else {
+          transaction.update(room, {
+            "participants.watcher": firebaseApp.firestore.FieldValue.arrayRemove(
+              kickId
+            ),
+            pan: firebaseApp.firestore.FieldValue.arrayUnion(kickId),
+          });
+        }
+      }
+
+      if (
+        (doc.data().participants.master.id === uid ||
+          doc.data().participants.player.id === uid) &&
+        doc.data().type === "quick-play"
+      ) {
+        transaction.update(room, {
+          "participants.watcher": firebaseApp.firestore.FieldValue.arrayRemove(
+            kickId
+          ),
+          pan: firebaseApp.firestore.FieldValue.arrayUnion(kickId),
+        });
+      }
+    });
+  });
+};
+
+/**
  * Chức năng chuyển sang ngồi xem.
  *
  * @param { {roomId, uid} } data
@@ -377,16 +440,32 @@ export const changeToWatch = (data, firebase) => {
         return Promise.reject({ message: "Phòng không tồn tại!" });
       }
 
-      transaction.update(room, {
-        "game.status.ready": 0,
-        "game.player": {},
-        "game.turn": { uid: doc.data().participants.master.id },
-        "game.tie-request": [],
-        "participants.player": firebaseApp.firestore.FieldValue.delete(),
-        "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
-          uid
-        ),
-      });
+      if (doc.data().participants.master.id === uid) {
+        transaction.update(room, {
+          "game.status.ready": 0,
+          "game.player": {},
+          "game.turn": { uid: doc.data().participants.player.id },
+          "game.tie-request": [],
+          "participants.master.id": doc.data().participants.player.id,
+          "participants.player": firebaseApp.firestore.FieldValue.delete(),
+          "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
+            uid
+          ),
+        });
+      }
+
+      if (doc.data().participants.player.id === uid) {
+        transaction.update(room, {
+          "game.status.ready": 0,
+          "game.player": {},
+          "game.turn": { uid: doc.data().participants.master.id },
+          "game.tie-request": [],
+          "participants.player": firebaseApp.firestore.FieldValue.delete(),
+          "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
+            uid
+          ),
+        });
+      }
     });
   });
 };

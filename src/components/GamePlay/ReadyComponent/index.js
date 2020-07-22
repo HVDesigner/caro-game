@@ -105,15 +105,37 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
                 {roomData.participants.player &&
                 roomData.participants.master &&
                 !roomData.game.player[state.user.uid] ? (
-                  <div
-                    className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
-                    onClick={() => {
-                      setLoadingReady(true);
-                      onReadyPlay();
-                    }}
-                  >
-                    <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
-                  </div>
+                  <React.Fragment>
+                    <div
+                      className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                      onClick={() => {
+                        setLoadingReady(true);
+                        onReadyPlay();
+                      }}
+                    >
+                      <h3 className="mb-0 text-center brown-color">SẴN SÀNG</h3>
+                    </div>
+                    {roomData.type === "room" ? (
+                      <div
+                        className="ready-btn p-2 mb-1 rounded-pill brown-border shadow wood-btn"
+                        onClick={() => {
+                          changeToWatch(
+                            {
+                              roomId: state.user.room_id.value,
+                              uid: state.user.uid,
+                            },
+                            firebaseApp
+                          );
+                        }}
+                      >
+                        <h3 className="mb-0 text-center brown-color">
+                          ĐỨNG XEM
+                        </h3>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </React.Fragment>
                 ) : (
                   ""
                 )}

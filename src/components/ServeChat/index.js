@@ -8,9 +8,6 @@ import {
   useDatabase,
 } from "reactfire";
 
-// SVG
-import ExitSVG from "./../../assets/Exit.svg";
-
 // Context
 import AppContext from "./../../context/";
 
@@ -210,16 +207,23 @@ function ServeChat() {
           </p>
         </div>
       </div>
-      <div className="d-flex justify-content-center">
-        <img
-          style={{ width: "40%" }}
-          src={ExitSVG}
-          alt="exit"
+      <div className="d-flex justify-content-center p-2">
+        <div
+          className="wood-btn flex-fill bg-gold-wood p-1 rounded brown-border mr-1"
           onClick={() => {
             changeRoute("dashboard");
           }}
-          className="wood-btn mb-2"
-        />
+        >
+          <p className="m-0 text-center">TRANG CHỦ</p>
+        </div>
+        <div
+          className="wood-btn flex-fill bg-gold-wood p-1 rounded brown-border ml-1"
+          onClick={() => {
+            changeRoute("lobby");
+          }}
+        >
+          <p className="m-0 text-center">PHÒNG CHƠI</p>
+        </div>
       </div>
     </div>
   );

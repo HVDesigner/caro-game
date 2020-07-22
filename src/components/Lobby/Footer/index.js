@@ -38,6 +38,17 @@ function FooterComponent() {
         <Nav.Item
           className="text-white p-2 text-center wood-btn-back"
           onClick={() => {
+            changeRoute("serve-chat");
+          }}
+        >
+          <h5 className="m-0 text-stroke-carotv">CHAT</h5>
+        </Nav.Item>
+        <Nav.Item
+          className="text-white p-2 text-center wood-btn-back"
+          style={{
+            borderLeft: "2px solid #4e311d",
+          }}
+          onClick={() => {
             findRoom();
           }}
         >

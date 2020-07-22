@@ -126,6 +126,7 @@ function CreateRoom() {
           title: name ? name : `Phòng của ${state.user.name.value}`,
           type: "room",
           conversation: [],
+          pan: [],
           participants: {
             master: {
               id: state.user.uid,

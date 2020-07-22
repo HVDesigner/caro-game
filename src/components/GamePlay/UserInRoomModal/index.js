@@ -1,7 +1,16 @@
 import React from "react";
 import UserSVG from "./../../../assets/Dashboard/user.svg";
-import { useFirestore, useFirestoreDocDataOnce } from "reactfire";
+import {
+  useFirestore,
+  useFirestoreDocDataOnce,
+  useFirebaseApp,
+} from "reactfire";
+
+// Contexts
 import AppContext from "./../../../context/";
+
+// Functions
+import { kickUser } from "./../../../functions/";
 
 function UserInRoomModal({ setShowUserList, roomData }) {
   return (
@@ -26,7 +35,9 @@ function UserInRoomModal({ setShowUserList, roomData }) {
           {roomData.participants.watcher &&
           roomData.participants.watcher.length !== 0
             ? roomData.participants.watcher.map((value) => {
-                return <WatcherUser key={value} uid={value} />;
+                return (
+                  <WatcherUser key={value} uid={value} roomData={roomData} />
+                );
               })
             : ""}
         </div>
@@ -83,6 +94,7 @@ function MasterUser({ roomData }) {
 
 function PlayerUser({ roomData }) {
   const { state, toggleInfoModal } = React.useContext(AppContext);
+  const firebaseApp = useFirebaseApp();
 
   const userRef = useFirestore()
     .collection("users")
@@ -111,9 +123,25 @@ function PlayerUser({ roomData }) {
           Người chơi
         </small>
       </div>
-      {state.user.uid === roomData.participants.master.id ? (
+      {(state.user.uid === roomData.participants.master.id &&
+        roomData.type === "room") ||
+      ((state.user.uid === roomData.participants.master.id ||
+        state.user.uid === roomData.participants.player.id) &&
+        roomData.type === "quick-play") ? (
         <div>
-          <div className="bg-gold-wood brown-border rounded wood-btn p-1">
+          <div
+            className="bg-gold-wood brown-border rounded wood-btn p-1"
+            onClick={() => {
+              kickUser(
+                {
+                  roomId: roomData.rid,
+                  uid: state.user.uid,
+                  kickId: roomData.participants.player.id,
+                },
+                firebaseApp
+              );
+            }}
+          >
             <p className="mb-0 text-center mr-2 ml-2 brown-color">Đuổi</p>
           </div>
         </div>
@@ -124,8 +152,9 @@ function PlayerUser({ roomData }) {
   );
 }
 
-function WatcherUser({ uid }) {
-  const { toggleInfoModal } = React.useContext(AppContext);
+function WatcherUser({ uid, roomData }) {
+  const { state, toggleInfoModal } = React.useContext(AppContext);
+  const firebaseApp = useFirebaseApp();
 
   const userRef = useFirestore().collection("users").doc(uid);
 
@@ -144,9 +173,40 @@ function WatcherUser({ uid }) {
           toggleInfoModal(true, uid);
         }}
       />
-      <p className="text-white text-stroke-carotv mb-0 mr-3">
-        {user.name.value}
-      </p>
+      <div className="w-100">
+        <p className="text-white text-stroke-carotv mb-0 mr-3">
+          {user.name.value}
+        </p>
+        <small className="text-warning text-stroke-carotv mb-0 mr-3">
+          Người xem
+        </small>
+      </div>
+
+      {(state.user.uid === roomData.participants.master.id &&
+        roomData.type === "room") ||
+      ((state.user.uid === roomData.participants.master.id ||
+        state.user.uid === roomData.participants.player.id) &&
+        roomData.type === "quick-play") ? (
+        <div>
+          <div
+            className="bg-gold-wood brown-border rounded wood-btn p-1"
+            onClick={() => {
+              kickUser(
+                {
+                  roomId: roomData.rid,
+                  uid: state.user.uid,
+                  kickId: uid,
+                },
+                firebaseApp
+              );
+            }}
+          >
+            <p className="mb-0 text-center mr-2 ml-2 brown-color">Đuổi</p>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 }

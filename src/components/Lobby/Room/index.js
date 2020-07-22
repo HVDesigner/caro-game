@@ -53,6 +53,19 @@ function FooterNormal({ roomData }) {
 
     switch (roomData.type) {
       case "room":
+        if (
+          roomData.pan &&
+          roomData.pan.findIndex((value) => value === state.user.uid) >= 0
+        ) {
+          return dispatch({
+            type: TOGGLE_DIALOG,
+            payload: {
+              status: true,
+              message: "Bạn đã bị cấm vào phòng này!",
+            },
+          });
+        }
+
         if (parseInt(roomData.bet) > parseInt(state.user.coin)) {
           return dispatch({
             type: TOGGLE_DIALOG,
@@ -85,18 +98,15 @@ function FooterNormal({ roomData }) {
                 roomUpdates["participants.player.win"] = 0;
               }
 
-              return transaction.update(roomWithIdRef, roomUpdates);
-            })
-            .then(async () => {
-              return await firebaseApp
-                .firestore()
-                .collection("users")
-                .doc(state.user.uid)
-                .update({
+              transaction.update(roomWithIdRef, roomUpdates);
+              transaction.update(
+                firebaseApp.firestore().collection("users").doc(state.user.uid),
+                {
                   "room_id.type": roomData["game-play"],
                   "room_id.value": roomData.rid,
                   "location.path": "room",
-                });
+                }
+              );
             })
             .catch((err) => {
               console.log(err);
