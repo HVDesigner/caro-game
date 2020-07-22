@@ -75,7 +75,6 @@ function App() {
   if (loading) {
     return <LoadingComponent />;
   } else {
-    console.log(userInfo);
     return <Pages userInfo={userInfo} />;
   }
 }

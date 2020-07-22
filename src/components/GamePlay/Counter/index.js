@@ -19,8 +19,6 @@ function Counter({ time, roomData, userType, ownType }) {
   const [playOne] = useSound(OneSecondLastSound);
 
   React.useEffect(() => {
-    let timer = setInterval(() => {}, 1000);
-
     function updateAction() {
       const updateRoom = {};
       updateRoom[`participants.${userType}.status`] = "loser";
@@ -29,6 +27,7 @@ function Counter({ time, roomData, userType, ownType }) {
       ] = "winner";
       updateRoom[`game.status.ready`] = 0;
       updateRoom[`game.player`] = {};
+
       firebaseApp
         .firestore()
         .collection("rooms")
@@ -36,45 +35,34 @@ function Counter({ time, roomData, userType, ownType }) {
         .update(updateRoom);
     }
 
+    var dateNow = Date.now();
+    var datePrev = roomData.game.turn.updatedAt;
+
+    if ((((dateNow - datePrev) % 60000) / 1000).toFixed(0) >= time) {
+      setCounter(0);
+      updateAction();
+    } else {
+      setCounter(time - (((dateNow - datePrev) % 60000) / 1000).toFixed(0));
+    }
+
+    let timer = setInterval(() => {}, 1000);
+
     timer = setInterval(() => {
-      let t = Date.now() - roomData.game.turn.updatedAt;
-
-      const calHour = Math.floor(
-        (t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const calMinute = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
-      const calSecond = Math.floor((t % (1000 * 60)) / 1000);
-
-      setCounter(time - calSecond);
-
-      if (calHour > 0) {
-        setCounter(0);
-        clearInterval(timer);
-        updateAction();
-      } else if (calMinute) {
-        setCounter(0);
-        clearInterval(timer);
-        updateAction();
-      } else if (counter === 0) {
-        setCounter(0);
-        clearInterval(timer);
-        updateAction();
-      }
+      setCounter(counter - 1);
     }, 1000);
+
+    if (counter === 0) {
+      clearInterval(timer);
+      updateAction();
+    }
 
     return () => clearInterval(timer);
   }, [
     counter,
     firebaseApp,
-    userType,
-    roomData.bet,
-    roomData.participants,
-    roomData.type,
-    state.user.coin,
     state.user.room_id.value,
-    state.user.uid,
-    ownType,
     roomData.game.turn.updatedAt,
+    userType,
     time,
   ]);
 
