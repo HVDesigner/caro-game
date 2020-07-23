@@ -52,8 +52,12 @@ function InfoModal() {
 
   return (
     <div
-      className="d-flex position-absolute w-100vw h-100vh justify-content-center align-items-center"
-      style={{ zIndex: "9999", backgroundColor: "#48484891" }}
+      className="d-flex position-absolute w-100vw h-100 justify-content-center align-items-center"
+      style={{
+        zIndex: "9999",
+        backgroundColor: "#48484891",
+        minHeight: "100vh",
+      }}
     >
       <div
         className="brown-border shadow bg-brown-wood p-2 rounded d-flex flex-column"

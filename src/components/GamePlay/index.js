@@ -35,6 +35,7 @@ function GamePlayComponent() {
   const firebaseApp = useFirebaseApp();
 
   const [showChat, setShowChat] = React.useState(true);
+  const [showMobileChatInput, setShowMobileChatInput] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 
   // menu modal
@@ -123,8 +124,13 @@ function GamePlayComponent() {
   }, [firebaseApp, state.user.room_id.value, state.user.uid]);
 
   const onSendMessage = (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
+
     if (messageText) {
+      setShowMobileChatInput(false);
+
       firebaseApp
         .firestore()
         .collection("rooms")
@@ -173,6 +179,52 @@ function GamePlayComponent() {
           playStatus={Sound.status.PLAYING}
           loop={true}
         />
+      ) : (
+        ""
+      )}
+      {state.user.platform !== "web" && showMobileChatInput ? (
+        <div
+          className="position-absolute w-100"
+          style={{
+            zIndex: "999",
+            backgroundColor: "#48484891",
+            height: "100vh",
+          }}
+        >
+          <div className="p-2 w-100 bg-white rounded d-flex">
+            <form className="w-100 d-flex" onSubmit={onSendMessage}>
+              <div
+                className="pr-2"
+                onClick={() => {
+                  setShowMobileChatInput(false);
+                }}
+              >
+                Hủy
+              </div>
+              <input
+                type="text"
+                className="w-100 input-carotv text-left"
+                ref={(input) => input && input.focus()}
+                onChange={(e) => setMessageText(e.target.value)}
+                value={messageText}
+              />
+              <div
+                className="pl-2"
+                onClick={() => {
+                  onSendMessage();
+                }}
+              >
+                Gửi
+              </div>
+            </form>
+          </div>
+          <div
+            className="h-100 w-100"
+            onClick={() => {
+              setShowMobileChatInput(false);
+            }}
+          ></div>
+        </div>
       ) : (
         ""
       )}
@@ -311,13 +363,19 @@ function GamePlayComponent() {
             <div
               style={
                 chatContainer.current && chatInputContainer.current
-                  ? {
-                      height:
-                        chatContainer.current.clientHeight -
-                        chatInputContainer.current.clientHeight,
-                    }
+                  ? chatContainer.current.clientHeight -
+                      chatInputContainer.current.clientHeight <
+                    48
+                    ? {
+                        height: "48px",
+                      }
+                    : {
+                        height:
+                          chatContainer.current.clientHeight -
+                          chatInputContainer.current.clientHeight,
+                      }
                   : {
-                      height: 0,
+                      height: "48px",
                     }
               }
             >
@@ -345,14 +403,25 @@ function GamePlayComponent() {
                 >
                   <strong>{showChat ? "-" : "+"}</strong>
                 </div>
-                <form onSubmit={onSendMessage}>
+                <form onSubmit={onSendMessage} className="d-flex">
                   <input
                     className="input-carotv-2 text-white text-left"
                     placeholder="Nhập tin nhắn..."
                     type="text"
                     onChange={(e) => setMessageText(e.target.value)}
                     value={messageText}
+                    onFocus={() => {
+                      setShowMobileChatInput(true);
+                    }}
                   />
+                  <div
+                    className="brown-border bg-gold-wood rounded pl-2 pr-2 ml-2"
+                    onClick={() => {
+                      onSendMessage();
+                    }}
+                  >
+                    Gửi
+                  </div>
                 </form>
                 {showChat ? (
                   ""

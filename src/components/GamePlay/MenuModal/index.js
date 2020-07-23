@@ -178,7 +178,10 @@ function MenuModal({ showMenu, setShowMenu, roomData, ownType }) {
   return (
     <React.Fragment>
       {showMenu ? (
-        <div className="menu-more d-flex justify-content-center">
+        <div
+          className="menu-more d-flex justify-content-center"
+          style={{ height: "100%" }}
+        >
           <div
             className="menu-more-content bg-brown-wood rounded d-flex flex-column justify-content-center align-self-center p-2 brown-border"
             style={{ maxWidth: "80vw" }}

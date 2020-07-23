@@ -110,16 +110,28 @@ function PlayNow() {
       .firestore()
       .collection("quick-play-queue")
       .doc("user-list");
-    const batch = firebaseApp.firestore().batch();
-    batch.update(queueDoc, finalData);
-    batch.update(
-      firebaseApp.firestore().collection("users").doc(state.user.uid),
-      {
-        on_queue: true,
-      }
-    );
 
-    batch.commit();
+    firebaseApp.firestore().runTransaction(function (transaction) {
+      return transaction.get(queueDoc).then(function (sfDoc) {
+        if (!sfDoc.exists) {
+          transaction.set(queueDoc, finalData);
+          transaction.update(
+            firebaseApp.firestore().collection("users").doc(state.user.uid),
+            {
+              on_queue: true,
+            }
+          );
+        } else {
+          transaction.update(queueDoc, finalData);
+          transaction.update(
+            firebaseApp.firestore().collection("users").doc(state.user.uid),
+            {
+              on_queue: true,
+            }
+          );
+        }
+      });
+    });
   };
 
   const cancelFindPlay = () => {

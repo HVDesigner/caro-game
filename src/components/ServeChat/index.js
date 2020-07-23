@@ -18,6 +18,7 @@ function ServeChat() {
   const [message, setMessage] = React.useState("");
   const [messageList, setMessageList] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [showMobileChatInput, setShowMobileChatInput] = React.useState(false);
 
   const scrollRef = React.useRef(null);
   const scrollTo = useSmoothScroll("y", scrollRef);
@@ -87,6 +88,7 @@ function ServeChat() {
         // createdAt: firebase.database.FieldValue.serverTimestamp(),
       });
       setMessage("");
+      setShowMobileChatInput(false);
     }
   };
 
@@ -113,119 +115,177 @@ function ServeChat() {
   };
 
   return (
-    <div
-      className="d-flex flex-column h-100vh w-100vw bg-brown-wood"
-      style={{ maxHeight: "100vh" }}
-    >
-      <div className="flex-fill">
-        <h3 className="text-center text-warning text-stroke-carotv mt-2 mb-0">
-          Chat
-        </h3>
-      </div>
-      <div
-        className="flex-fill h-100 w-100 position-relative"
-        style={{ maxHeight: "100%" }}
-      >
-        <div className="p-2 position-absolute h-100 w-100">
+    <React.Fragment>
+      {state.user.platform !== "web" && showMobileChatInput ? (
+        <div
+          className="position-absolute w-100"
+          style={{
+            zIndex: "999",
+            backgroundColor: "#48484891",
+            height: "100vh",
+          }}
+        >
+          <div className="p-2 w-100 bg-white rounded d-flex">
+            <form
+              className="w-100 d-flex"
+              onSubmit={(e) => {
+                e.preventDefault();
+                addChatText();
+              }}
+            >
+              <div
+                className="pr-2"
+                onClick={() => {
+                  setShowMobileChatInput(false);
+                }}
+              >
+                Hủy
+              </div>
+              <input
+                type="text"
+                className="w-100 input-carotv text-left"
+                ref={(input) => input && input.focus()}
+                onChange={(e) => setMessage(e.target.value)}
+                value={message}
+              />
+              <div
+                className="pl-2"
+                onClick={() => {
+                  addChatText();
+                }}
+              >
+                Gửi
+              </div>
+            </form>
+          </div>
           <div
-            className="p-2 d-flex flex-column h-100 w-100 brown-border rounded shadow overflow-auto"
-            style={{
-              backgroundColor: "#f9da7f",
-              maxHeight: "100%",
-              height: "100%",
+            className="h-100 w-100"
+            onClick={() => {
+              setShowMobileChatInput(false);
             }}
-            ref={scrollRef}
-          >
-            {loading ? (
-              <p className="text-center m-0">Loading...</p>
-            ) : (
-              <React.Fragment>
-                {countTotalMessage.message > messageList.length ? (
-                  <div
-                    className="w-100 brown-border rounded bg-gold-wood wood-btn"
-                    onClick={() => {
-                      loadMore();
-                    }}
-                  >
-                    <p className="text-center m-0">Xem thêm</p>
-                  </div>
-                ) : (
-                  ""
-                )}
-                {messageList.map((value) => {
-                  return (
+          ></div>
+        </div>
+      ) : (
+        ""
+      )}
+
+      <div
+        className="d-flex flex-column h-100vh w-100vw bg-brown-wood"
+        style={{ maxHeight: "100vh" }}
+      >
+        <div className="flex-fill">
+          <h3 className="text-center text-warning text-stroke-carotv mt-2 mb-0">
+            Chat
+          </h3>
+        </div>
+        <div
+          className="flex-fill h-100 w-100 position-relative"
+          style={{ maxHeight: "100%" }}
+        >
+          <div className="p-2 position-absolute h-100 w-100">
+            <div
+              className="p-2 d-flex flex-column h-100 w-100 brown-border rounded shadow overflow-auto"
+              style={{
+                backgroundColor: "#f9da7f",
+                maxHeight: "100%",
+                height: "100%",
+              }}
+              ref={scrollRef}
+            >
+              {loading ? (
+                <p className="text-center m-0">Loading...</p>
+              ) : (
+                <React.Fragment>
+                  {countTotalMessage.message > messageList.length ? (
                     <div
-                      className="d-flex w-100"
-                      key={value.key}
-                      style={{ borderBottom: "0.5px solid" }}
+                      className="w-100 brown-border rounded bg-gold-wood wood-btn"
+                      onClick={() => {
+                        loadMore();
+                      }}
                     >
-                      <User uid={value.uid} />
-                      <div
-                        className="d-flex mr-auto"
-                        style={{
-                          wordWrap: "normal",
-                          overflowWrap: "anywhere",
-                        }}
-                      >
-                        {value.text}
-                      </div>
+                      <p className="text-center m-0">Xem thêm</p>
                     </div>
-                  );
-                })}
-              </React.Fragment>
-            )}
+                  ) : (
+                    ""
+                  )}
+                  {messageList.map((value) => {
+                    return (
+                      <div
+                        className="d-flex w-100"
+                        key={value.key}
+                        style={{ borderBottom: "0.5px solid" }}
+                      >
+                        <User uid={value.uid} />
+                        <div
+                          className="d-flex mr-auto"
+                          style={{
+                            wordWrap: "normal",
+                            overflowWrap: "anywhere",
+                          }}
+                        >
+                          {value.text}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="p-2 d-flex flex-fill">
+          <form
+            className="w-100"
+            onSubmit={(e) => {
+              e.preventDefault();
+              addChatText();
+            }}
+          >
+            <input
+              className="input-carotv-2 text-white text-left w-100"
+              placeholder="Nhập tin nhắn..."
+              type="text"
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
+              onFocus={() => {
+                setShowMobileChatInput(true);
+              }}
+            />
+          </form>
+          <div className="ml-2">
+            <p
+              className="m-0 text-warning text-stroke-carotv"
+              onClick={() => {
+                addChatText();
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              Gửi
+            </p>
+          </div>
+        </div>
+        <div className="d-flex justify-content-center p-2">
+          <div
+            className="wood-btn flex-fill bg-gold-wood p-1 rounded brown-border mr-1"
+            onClick={() => {
+              changeRoute("dashboard");
+            }}
+          >
+            <p className="m-0 text-center">TRANG CHỦ</p>
+          </div>
+          <div
+            className="wood-btn flex-fill bg-gold-wood p-1 rounded brown-border ml-1"
+            onClick={() => {
+              changeRoute("lobby");
+            }}
+          >
+            <p className="m-0 text-center">PHÒNG CHƠI</p>
           </div>
         </div>
       </div>
-      <div className="p-2 d-flex flex-fill">
-        <form
-          className="w-100"
-          onSubmit={(e) => {
-            e.preventDefault();
-            addChatText();
-          }}
-        >
-          <input
-            className="input-carotv-2 text-white text-left w-100"
-            placeholder="Nhập tin nhắn..."
-            type="text"
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value);
-            }}
-          />
-        </form>
-        <div className="ml-2">
-          <p
-            className="m-0 text-warning text-stroke-carotv"
-            onClick={() => {
-              addChatText();
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            Gửi
-          </p>
-        </div>
-      </div>
-      <div className="d-flex justify-content-center p-2">
-        <div
-          className="wood-btn flex-fill bg-gold-wood p-1 rounded brown-border mr-1"
-          onClick={() => {
-            changeRoute("dashboard");
-          }}
-        >
-          <p className="m-0 text-center">TRANG CHỦ</p>
-        </div>
-        <div
-          className="wood-btn flex-fill bg-gold-wood p-1 rounded brown-border ml-1"
-          onClick={() => {
-            changeRoute("lobby");
-          }}
-        >
-          <p className="m-0 text-center">PHÒNG CHƠI</p>
-        </div>
-      </div>
-    </div>
+    </React.Fragment>
   );
 }
 

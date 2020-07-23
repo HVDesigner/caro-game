@@ -103,7 +103,7 @@ function Pages({ userInfo }) {
 
         dispatch({
           type: SET_USER_DATA,
-          payload: { uid: doc.id, ...doc.data() },
+          payload: { uid: doc.id, platform: userInfo.platform, ...doc.data() },
         });
 
         setLoading(false);

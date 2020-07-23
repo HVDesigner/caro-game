@@ -15,8 +15,12 @@ import { kickUser } from "./../../../functions/";
 function UserInRoomModal({ setShowUserList, roomData }) {
   return (
     <div
-      className="d-flex justify-content-center position-absolute align-items-center h-100vh w-100vw"
-      style={{ zIndex: "999", backgroundColor: " #48484891" }}
+      className="d-flex justify-content-center position-absolute align-items-center w-100vw h-100"
+      style={{
+        zIndex: "999",
+        backgroundColor: " #48484891",
+        minHeight: "100vh",
+      }}
     >
       <div
         className="d-flex flex-column p-2 bg-brown-wood brown-border rounded shadow"
