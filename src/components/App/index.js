@@ -89,16 +89,88 @@ function Pages({ userInfo }) {
 
     let unsubscribe;
 
-    function doGet(doc) {
+    const dateCoin = (data, uid) => {
+      const prevDate = data["login-at"].toDate();
+
+      const date = new Date(prevDate).getDate();
+      const month = new Date(prevDate).getMonth();
+      const year = new Date(prevDate).getFullYear();
+
+      if (
+        date !== new Date().getDate() &&
+        month === new Date().getMonth() &&
+        year === new Date().getFullYear()
+      ) {
+        if (new Date().getDate() - date === 1) {
+          if (data.value > 0 && data.value < 7) {
+            userCollectionFirestore.doc(uid).update({
+              coin: firebase.firestore.FieldValue.increment(data.value * 1000),
+              "login-time.value": firebase.firestore.FieldValue.increment(1),
+              "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+            });
+          } else if (data.value === 7) {
+            userCollectionFirestore.doc(uid).update({
+              coin: firebase.firestore.FieldValue.increment(10000),
+              "login-time.value": firebase.firestore.FieldValue.increment(1),
+              "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+            });
+          } else if (data.value > 7 && data.value < 14) {
+            userCollectionFirestore.doc(uid).update({
+              coin: firebase.firestore.FieldValue.increment(2000),
+              "login-time.value": firebase.firestore.FieldValue.increment(1),
+              "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+            });
+          } else if (data.value === 14) {
+            userCollectionFirestore.doc(uid).update({
+              coin: firebase.firestore.FieldValue.increment(20000),
+              "login-time.value": firebase.firestore.FieldValue.increment(1),
+              "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+            });
+          } else if (data.value > 14 && data.value < 30) {
+            userCollectionFirestore.doc(uid).update({
+              coin: firebase.firestore.FieldValue.increment(3000),
+              "login-time.value": firebase.firestore.FieldValue.increment(1),
+              "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+            });
+          } else if (data.value >= 30) {
+            userCollectionFirestore.doc(uid).update({
+              coin: firebase.firestore.FieldValue.increment(50000),
+              "login-time.value": firebase.firestore.FieldValue.increment(1),
+              "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+            });
+          }
+        } else if (new Date().getUTCDate() - date > 1) {
+          userCollectionFirestore.doc(uid).update({
+            coin: firebase.firestore.FieldValue.increment(1000),
+            "login-time.value": 2,
+            "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+      } else if (
+        month !== new Date().getUTCMonth() ||
+        year !== new Date().getUTCFullYear()
+      ) {
+        userCollectionFirestore.doc(uid).update({
+          coin: firebase.firestore.FieldValue.increment(1000),
+          "login-time.value": 2,
+          "login-time.login-at": firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    };
+
+    const doGet = (doc) => {
       if (doc.exists) {
         if (
-          userInfo.playerName &&
           doc.data().name.value !== userInfo.playerName &&
           doc.data().name.status === "original"
         ) {
           userCollectionFirestore
-            .doc(userInfo.playerId)
+            .doc(doc.id)
             .update({ "name.value": userInfo.playerName });
+        }
+
+        if (doc.data()["login-time"]["login-at"]) {
+          dateCoin(doc.data()["login-time"], doc.id);
         }
 
         dispatch({
@@ -168,7 +240,7 @@ function Pages({ userInfo }) {
             console.error("Error writing document: ", error);
           });
       }
-    }
+    };
 
     if (
       userInfo.playerId ||
@@ -270,8 +342,6 @@ function Pages({ userInfo }) {
         );
     }
   };
-
-  // console.log("Pages");
 
   if (loading && process.env.NODE_ENV === "production") {
     return <LoadingComponent />;

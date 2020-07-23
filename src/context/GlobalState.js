@@ -36,6 +36,10 @@ function GlobalState(props) {
         lost: { gomoku: 0, "block-head": 0 },
         tie: { gomoku: 0, "block-head": 0 },
       },
+      "login-time": {
+        "login-at": "",
+        value: "",
+      },
       on_queue: false,
       uid: "",
       updatedAt: 0,
