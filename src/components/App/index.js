@@ -161,6 +161,7 @@ function Pages({ userInfo }) {
     const doGet = (doc) => {
       if (doc.exists) {
         if (
+          userInfo.playerName &&
           doc.data().name.value !== userInfo.playerName &&
           doc.data().name.status === "original"
         ) {
