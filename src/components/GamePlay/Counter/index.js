@@ -19,7 +19,7 @@ function Counter({ time, roomData, userType, ownType }) {
   const [playOne] = useSound(OneSecondLastSound);
 
   React.useEffect(() => {
-    function updateAction() {
+    const updateAction = () => {
       const updateRoom = {};
       updateRoom[`participants.${userType}.status`] = "loser";
       updateRoom[
@@ -33,22 +33,25 @@ function Counter({ time, roomData, userType, ownType }) {
         .collection("rooms")
         .doc(state.user.room_id.value)
         .update(updateRoom);
-    }
+    };
 
-    var dateNow = Date.now();
-    var datePrev = roomData.game.turn.updatedAt;
-
-    if ((((dateNow - datePrev) % 60000) / 1000).toFixed(0) >= time) {
-      setCounter(0);
-      updateAction();
-    } else {
-      setCounter(time - (((dateNow - datePrev) % 60000) / 1000).toFixed(0));
-    }
-
-    let timer = setInterval(() => {}, 1000);
-
-    timer = setInterval(() => {
-      setCounter(counter - 1);
+    let timer = setInterval(() => {
+      if (
+        (((Date.now() - roomData.game.turn.updatedAt) % 60000) / 1000).toFixed(
+          0
+        ) >= time
+      ) {
+        setCounter(0);
+        updateAction();
+      } else {
+        setCounter(
+          time -
+            (
+              ((Date.now() - roomData.game.turn.updatedAt) % 60000) /
+              1000
+            ).toFixed(0)
+        );
+      }
     }, 1000);
 
     if (counter === 0) {

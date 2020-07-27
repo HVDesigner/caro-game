@@ -122,7 +122,7 @@ export const leaveRoom = async (data, firebase) => {
  * --------------------------------------------------------------------------------------
  * Chức năng cập nhật thông tin khi thắng cuộc.
  *
- * @param {({ownType, roomId})} data
+ * @param { {ownType, roomId} } data
  * @param {function} firebase
  */
 export const winAction = async (data, firebase) => {

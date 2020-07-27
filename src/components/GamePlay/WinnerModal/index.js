@@ -18,7 +18,7 @@ function WinnerModal({ roomData, ownType }) {
 
   const onNextAction = () => {
     setLoadingNextBtn(true);
-    let roomUpdate = {};
+    const roomUpdate = {};
     roomUpdate[
       `game.player.${state.user.uid}`
     ] = firebase.firestore.FieldValue.delete();
@@ -91,6 +91,10 @@ function WinnerContent({ roomData }) {
     } else {
       stop();
     }
+
+    return () => {
+      stop();
+    };
   }, [play, stop, state.user.setting.music.effect]);
 
   return (
@@ -120,6 +124,10 @@ function LoserContent({ roomData }) {
     } else {
       stop();
     }
+
+    return () => {
+      stop();
+    };
   }, [play, stop, state.user.setting.music.effect]);
 
   return (

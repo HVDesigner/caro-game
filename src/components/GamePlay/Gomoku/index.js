@@ -181,15 +181,10 @@ function GamePlayComponent({ roomData, ownType }) {
           roomData.rule
         ).checkAround(element.row, element.col);
 
-        /**
-         * ------------------------------------------------------------------------
-         */
+        // ------------------------------------------------------------------------
         if (!newStatusOfGame.isPlay) {
-          /**
-           * Nếu đã có người thắng.
-           *
-           * Cập nhật trạng thái người chơi.
-           */
+          // Nếu đã có người thắng.
+          // Cập nhật trạng thái người chơi.
           setStatusGame(newStatusOfGame);
         }
       }
@@ -239,10 +234,7 @@ function GamePlayComponent({ roomData, ownType }) {
   const changeTurn = () => {
     const RoomsCollection = firebaseApp.firestore().collection("rooms");
 
-    /**
-     * ---------------------------------------------------------------------------------
-     *
-     */
+    // ---------------------------------------------------------------------------------
     if (roomData.participants.player.id === roomData.game.turn.uid) {
       /**
        * Nếu lượt đánh đang thuộc về Player.

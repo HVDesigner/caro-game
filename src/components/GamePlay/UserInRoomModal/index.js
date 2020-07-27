@@ -4,7 +4,10 @@ import {
   useFirestore,
   useFirestoreDocDataOnce,
   useFirebaseApp,
+  SuspenseWithPerf,
 } from "reactfire";
+
+import LoadingOverlay from "./../../LoadingOverlay/";
 
 // Contexts
 import AppContext from "./../../../context/";
@@ -40,7 +43,13 @@ function UserInRoomModal({ setShowUserList, roomData }) {
           roomData.participants.watcher.length !== 0
             ? roomData.participants.watcher.map((value) => {
                 return (
-                  <WatcherUser key={value} uid={value} roomData={roomData} />
+                  <SuspenseWithPerf
+                    fallback={<LoadingOverlay />}
+                    traceId={"load-user-watcher"}
+                    key={value}
+                  >
+                    <WatcherUser uid={value} roomData={roomData} />
+                  </SuspenseWithPerf>
                 );
               })
             : ""}
@@ -188,8 +197,9 @@ function WatcherUser({ uid, roomData }) {
 
       {(state.user.uid === roomData.participants.master.id &&
         roomData.type === "room") ||
-      ((state.user.uid === roomData.participants.master.id ||
-        state.user.uid === roomData.participants.player.id) &&
+      (roomData.participants.player &&
+        (state.user.uid === roomData.participants.master.id ||
+          state.user.uid === roomData.participants.player.id) &&
         roomData.type === "quick-play") ? (
         <div>
           <div
