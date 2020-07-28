@@ -18,20 +18,44 @@ function WinnerModal({ roomData, ownType }) {
 
   const onNextAction = () => {
     setLoadingNextBtn(true);
-    const roomUpdate = {};
-    roomUpdate[
-      `game.player.${state.user.uid}`
-    ] = firebase.firestore.FieldValue.delete();
-    if (roomData.participants[ownType].status === "winner") {
-      roomUpdate[`game.turn.uid`] = state.user.uid;
-    }
-    roomUpdate[`participants.${ownType}.status`] = "waiting";
 
-    firebaseApp
+    const roomRef = firebaseApp
       .firestore()
       .collection("rooms")
-      .doc(state.user.room_id.value)
-      .update(roomUpdate);
+      .doc(state.user.room_id.value);
+
+    firebaseApp.firestore().runTransaction(function (transaction) {
+      return transaction.get(roomRef).then(function (sfDoc) {
+        if (!sfDoc.exists) {
+          console.log("Document does not exist!");
+        }
+
+        const roomUpdate = {};
+
+        roomUpdate[
+          `game.player.${state.user.uid}`
+        ] = firebase.firestore.FieldValue.delete();
+
+        if (sfDoc.data().participants[ownType].status === "winner") {
+          if (
+            sfDoc.data().game.history.length === 0 ||
+            sfDoc.data().game.history.length === 1
+          ) {
+            roomUpdate[`game.turn.uid`] =
+              sfDoc.data().participants["player"] &&
+              sfDoc.data().participants["master"].id ===
+                sfDoc.data().game.turn.uid
+                ? sfDoc.data().participants["player"].id
+                : sfDoc.data().participants["master"].id;
+          } else {
+            roomUpdate[`game.turn.uid`] = sfDoc.data().game.history[1].uid;
+          }
+        }
+        roomUpdate[`participants.${ownType}.status`] = "waiting";
+
+        transaction.update(roomRef, roomUpdate);
+      });
+    });
   };
 
   return (

@@ -25,13 +25,17 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
   const firebaseApp = useFirebaseApp();
 
   const [loadingReady, setLoadingReady] = React.useState(false);
-  const [play] = useSound(ReadySound);
+  const [play, { stop }] = useSound(ReadySound);
 
   React.useEffect(() => {
     if (roomData.game.player && roomData.game.player[state.user.uid]) {
       setLoadingReady(false);
     }
-  }, [roomData.game.player, state.user.uid]);
+
+    return () => {
+      stop();
+    };
+  }, [roomData.game.player, state.user.uid, stop]);
 
   const onReadyPlay = () => {
     if (

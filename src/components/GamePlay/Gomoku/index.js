@@ -282,9 +282,7 @@ function GamePlayComponent({ roomData, ownType }) {
          * Nếu như ô đang chọn có trạng thái bằng 0 (rỗng) hoặc bằng 3 (đã chọn).
          */
 
-        /**
-         * --------------------------------------------------------------------------------------------
-         */
+        // --------------------------------------------------------------------------------------------
         switch (choicePosition.clickCount) {
           case 1:
             /**
@@ -298,24 +296,25 @@ function GamePlayComponent({ roomData, ownType }) {
                * Nếu đã chọn ô khác và khác ô đã click lần đầu.
                */
 
+              // -------------------------------------------------------------------------------
+
               /**
-               * -------------------------------------------------------------------------------
-               *
                * Chuyển trạng thái 0 (rỗng) cho ô đã chọn lần đầu.
                */
               setCaroTable(
                 choicePositionHide(choicePosition.rowkey, choicePosition.colkey)
               );
 
+              // -------------------------------------------------------------------------------
+
               /**
-               * -------------------------------------------------------------------------------
-               *
                * Cập nhật trạng thái 3 (đã chọn) cho ô mới vừa được chọn.
                */
               setCaroTable(choicePositionShow(rowkey, colkey));
 
+              // -------------------------------------------------------------------------------
+
               /**
-               * -------------------------------------------------------------------------------
                * Cập nhật vị trí cho ỗ đã chọn và số lần click.
                */
               setChoicePosition({ rowkey, colkey, clickCount: 1 });
@@ -361,9 +360,9 @@ function GamePlayComponent({ roomData, ownType }) {
                */
               setChoicePosition({ rowkey: "", colkey: "", clickCount: 0 });
 
+              // -------------------------------------------------------------------------------
+
               /**
-               * -------------------------------------------------------------------------------
-               *
                * Lưu lịch sử mới lên database.
                */
               firebaseApp
@@ -375,6 +374,7 @@ function GamePlayComponent({ roomData, ownType }) {
                     row: rowkey,
                     col: colkey,
                     value: roomData.game.player[roomData.game.turn.uid].value,
+                    uid: roomData.game.turn.uid,
                   }),
                   "game.current-step": {
                     row: rowkey,
@@ -382,9 +382,7 @@ function GamePlayComponent({ roomData, ownType }) {
                   },
                 });
 
-              /**
-               * -------------------------------------------------------------------------------
-               */
+              // -------------------------------------------------------------------------------
               if (gameNewStatus_.isPlay) {
                 /**
                  * Nếu như chưa có người thắng xuất hiện.

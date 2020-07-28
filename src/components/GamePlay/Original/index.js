@@ -375,6 +375,7 @@ function GamePlayComponent({ roomData, ownType }) {
                     row: rowkey,
                     col: colkey,
                     value: roomData.game.player[roomData.game.turn.uid].value,
+                    uid: roomData.game.turn.uid,
                   }),
                   "game.current-step": {
                     row: rowkey,
