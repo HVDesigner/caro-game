@@ -37,16 +37,16 @@ function WinnerModal({ roomData, ownType }) {
         ] = firebase.firestore.FieldValue.delete();
 
         if (sfDoc.data().participants[ownType].status === "winner") {
-          if (
-            sfDoc.data().game.history.length === 0 ||
-            sfDoc.data().game.history.length === 1
-          ) {
+          if (sfDoc.data().game.history.length === 0) {
             roomUpdate[`game.turn.uid`] =
               sfDoc.data().participants["player"] &&
               sfDoc.data().participants["master"].id ===
                 sfDoc.data().game.turn.uid
                 ? sfDoc.data().participants["player"].id
                 : sfDoc.data().participants["master"].id;
+          }
+          if (sfDoc.data().game.history.length === 1) {
+            roomUpdate[`game.turn.uid`] = sfDoc.data().game.turn.uid;
           } else {
             roomUpdate[`game.turn.uid`] = sfDoc.data().game.history[1].uid;
           }
