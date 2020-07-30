@@ -10,13 +10,13 @@ import AppContext from "./../../../context/";
 import FiveSecondLastSound from "./../../../assets/sound/second-sound.mp3";
 import OneSecondLastSound from "./../../../assets/sound/one-second-last.mp3";
 
-function Counter({ time, roomData, userType, ownType }) {
+function Counter({ time, roomData, userType }) {
   const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
 
   const [counter, setCounter] = React.useState(time);
   const [playFive, { stop: stopFive }] = useSound(FiveSecondLastSound);
-  const [playOne] = useSound(OneSecondLastSound);
+  const [playOne, { stop: stopOne }] = useSound(OneSecondLastSound);
 
   React.useEffect(() => {
     const updateAction = () => {
@@ -35,31 +35,37 @@ function Counter({ time, roomData, userType, ownType }) {
         .update(updateRoom);
     };
 
-    let timer = setInterval(() => {
-      if (
-        (((Date.now() - roomData.game.turn.updatedAt) % 60000) / 1000).toFixed(
-          0
-        ) >= time
-      ) {
-        setCounter(0);
-        updateAction();
-      } else {
-        setCounter(
-          time -
-            (
-              ((Date.now() - roomData.game.turn.updatedAt) % 60000) /
-              1000
-            ).toFixed(0)
-        );
-      }
-    }, 1000);
+    const timer = setInterval(
+      (updatedAt, timeConst) => {
+        if (
+          (((Date.now() - updatedAt) % 60000) / 1000).toFixed(0) >= timeConst
+        ) {
+          setCounter(0);
+          updateAction();
+        } else {
+          setCounter(
+            timeConst - (((Date.now() - updatedAt) % 60000) / 1000).toFixed(0)
+          );
+        }
+      },
+      1000,
+      roomData.game.turn.updatedAt,
+      time
+    );
+
+    console.log(((Date.now() - roomData.game.turn.updatedAt) % 60000) / 1000);
+    console.log(
+      (((Date.now() - roomData.game.turn.updatedAt) % 60000) / 1000).toFixed(0)
+    );
 
     if (counter === 0) {
       clearInterval(timer);
       updateAction();
     }
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
   }, [
     counter,
     firebaseApp,
@@ -78,8 +84,16 @@ function Counter({ time, roomData, userType, ownType }) {
     }
     return () => {
       stopFive();
+      stopOne();
     };
-  }, [counter, stopFive, playOne, playFive, state.user.setting.music.effect]);
+  }, [
+    counter,
+    stopOne,
+    stopFive,
+    playOne,
+    playFive,
+    state.user.setting.music.effect,
+  ]);
 
   return (
     <div

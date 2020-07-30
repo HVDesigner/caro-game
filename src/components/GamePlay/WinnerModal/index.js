@@ -44,8 +44,7 @@ function WinnerModal({ roomData, ownType }) {
                 sfDoc.data().game.turn.uid
                 ? sfDoc.data().participants["player"].id
                 : sfDoc.data().participants["master"].id;
-          }
-          if (sfDoc.data().game.history.length === 1) {
+          } else if (sfDoc.data().game.history.length === 1) {
             roomUpdate[`game.turn.uid`] = sfDoc.data().game.turn.uid;
           } else {
             roomUpdate[`game.turn.uid`] = sfDoc.data().game.history[1].uid;
