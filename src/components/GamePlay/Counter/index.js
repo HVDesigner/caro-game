@@ -35,23 +35,27 @@ function Counter({ time, roomData, userType }) {
         .update(updateRoom);
     };
 
-    const timer = setInterval(
-      (updatedAt, timeConst) => {
-        if (
-          (((Date.now() - updatedAt) % 60000) / 1000).toFixed(0) >= timeConst
-        ) {
-          setCounter(0);
-          updateAction();
-        } else {
-          setCounter(
-            timeConst - (((Date.now() - updatedAt) % 60000) / 1000).toFixed(0)
-          );
-        }
-      },
-      1000,
-      roomData.game.turn.updatedAt,
-      time
-    );
+    let timer;
+
+    if (roomData.game.turn.updatedAt) {
+      timer = setInterval(
+        function (updatedAt, timeConst) {
+          if (
+            (((Date.now() - updatedAt) % 60000) / 1000).toFixed(0) >= timeConst
+          ) {
+            setCounter(0);
+            updateAction();
+          } else {
+            setCounter(
+              timeConst - (((Date.now() - updatedAt) % 60000) / 1000).toFixed(0)
+            );
+          }
+        },
+        1000,
+        roomData.game.turn.updatedAt,
+        time
+      );
+    }
 
     console.log(((Date.now() - roomData.game.turn.updatedAt) % 60000) / 1000);
     console.log(

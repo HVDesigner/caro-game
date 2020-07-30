@@ -48,7 +48,21 @@ function Setting() {
       e.preventDefault();
     }
 
-    if (newName !== "") {
+    const checkSpace = (str) => {
+      var arr = str.split("");
+
+      for (let index = 0; index < arr.length; index++) {
+        const element = arr[index];
+
+        if (element === " ") {
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    if (newName !== "" && checkSpace(newName) && newName.length <= 8) {
       if (state.user.coin >= state.user.name.cost * 2) {
         firebaseApp
           .firestore()
@@ -71,6 +85,8 @@ function Setting() {
       } else {
         setMessage("Bạn không đủ xu!");
       }
+    } else if (!checkSpace(newName)) {
+      setMessage("Không được phép dùng khoảng trắng!");
     } else {
       setMessage("Bạn chưa nhập tên mới!");
     }
@@ -223,6 +239,7 @@ function Setting() {
                 onChange={(e) => {
                   setNewName(e.target.value);
                 }}
+                maxLength="8"
               />
             </form>
             <div
