@@ -243,7 +243,7 @@ function GamePlayComponent({ roomData, ownType }) {
        */
       RoomsCollection.doc(state.user.room_id.value).update({
         "game.turn.uid": roomData.participants.master.id,
-        "game.turn.updatedAt": Date.now(),
+        "game.turn.updatedAt": firebase.firestore.FieldValue.serverTimestamp(),
       });
     } else if (roomData.participants.master.id === roomData.game.turn.uid) {
       /**
@@ -253,7 +253,7 @@ function GamePlayComponent({ roomData, ownType }) {
        */
       RoomsCollection.doc(state.user.room_id.value).update({
         "game.turn.uid": roomData.participants.player.id,
-        "game.turn.updatedAt": Date.now(),
+        "game.turn.updatedAt": firebase.firestore.FieldValue.serverTimestamp(),
       });
     }
   };

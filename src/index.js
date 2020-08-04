@@ -14,7 +14,7 @@ import Loading from "./components/Loading/";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHFTkRPLU8yWYTDWKk1QhtogcOVoafHww",
-  authDomain: "caro-new.firebaseapp.com",
+  authDomain: "https://caro-new.firebaseapp.com/__/auth/handler",
   databaseURL: "https://caro-new.firebaseio.com",
   projectId: "caro-new",
   storageBucket: "caro-new.appspot.com",

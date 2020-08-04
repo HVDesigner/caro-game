@@ -330,7 +330,9 @@ export const readyAction = (data, firebase) => {
         firstUpdateGame[`game.player.${uid}.value`] =
           player[0].value === 1 ? 2 : 1;
         firstUpdateGame[`game.current-step`] = {};
-        firstUpdateGame[`game.turn.updatedAt`] = Date.now();
+        firstUpdateGame[
+          `game.turn.updatedAt`
+        ] = firebaseApp.firestore.FieldValue.serverTimestamp();
         firstUpdateGame["game.tie-request"] = [];
         firstUpdateGame[`participants.master.status`] = "playing";
         firstUpdateGame[`participants.player.status`] = "playing";

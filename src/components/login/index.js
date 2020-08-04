@@ -6,12 +6,17 @@ import {
   useFirebaseApp,
 } from "reactfire";
 import firebase from "firebase/app";
+import moment from "moment";
+import "moment/locale/vi";
 
 // Contexts
 import AppContext from "./../../context/";
 
 // Action Types
 import { SET_USER_DATA } from "./../../context/ActionTypes";
+
+// SVG
+import UserSVG from "./../../assets/Dashboard/user.svg";
 
 function Login() {
   const { dispatch } = React.useContext(AppContext);
@@ -128,14 +133,33 @@ function Login() {
               return (
                 <Card key={value.uid} className="mb-2">
                   <Card.Body
-                    className="d-flex"
+                    className="d-flex align-items-center"
                     onClick={() => {
                       setUserData(value);
                     }}
                   >
-                    <p className="mb-0 mr-auto">
-                      <strong>{value.name.value}</strong>
-                    </p>
+                    <img
+                      src={
+                        value.image_url === "image" ? UserSVG : value.image_url
+                      }
+                      alt="ava"
+                      className={
+                        value.image_url === "image"
+                          ? "mr-2"
+                          : "rounded-circle mr-2 border"
+                      }
+                      style={{ width: "40px", height: "40px" }}
+                    />
+                    <div className="mr-auto">
+                      <p className="mb-0">
+                        <strong>{value.name.value}</strong>
+                      </p>
+                      <p className="mb-0">
+                        {moment(value["login-time"]["login-at"].toDate())
+                          .locale("vi")
+                          .fromNow()}
+                      </p>
+                    </div>
                     <p className="mb-0">{value.uid}</p>
                   </Card.Body>
                   <Card.Footer>
