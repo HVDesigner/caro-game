@@ -136,11 +136,9 @@ function PlayerUser({ roomData }) {
           Người chơi
         </small>
       </div>
-      {(state.user.uid === roomData.participants.master.id &&
-        roomData.type === "room") ||
-      ((state.user.uid === roomData.participants.master.id ||
-        state.user.uid === roomData.participants.player.id) &&
-        roomData.type === "quick-play") ? (
+      {state.user.uid === roomData.participants.master.id &&
+      roomData.participants.master.status === "waiting" &&
+      roomData.type === "room" ? (
         <div>
           <div
             className="bg-gold-wood brown-border rounded wood-btn p-1"

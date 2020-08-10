@@ -35,11 +35,12 @@ function Counter({ time, roomData, userType }) {
         .update(updateRoom);
     };
 
-    const timer = setInterval(
+    var timer = setInterval(
       function (updatedAt, timeConst) {
         if (
+          updatedAt &&
           Math.floor(((Date.now() - updatedAt.toMillis()) % 60000) / 1000) >=
-          timeConst
+            timeConst
         ) {
           setCounter(0);
           updateAction();
@@ -50,14 +51,18 @@ function Counter({ time, roomData, userType }) {
               (((Date.now() - updatedAt.toMillis()) % 60000) / 1000).toFixed(0)
             )
           );
-          setCounter(
-            timeConst -
-              parseInt(
-                (((Date.now() - updatedAt.toMillis()) % 60000) / 1000).toFixed(
-                  0
+
+          if (updatedAt) {
+            setCounter(
+              timeConst -
+                parseInt(
+                  (
+                    ((Date.now() - updatedAt.toMillis()) % 60000) /
+                    1000
+                  ).toFixed(0)
                 )
-              )
-          );
+            );
+          }
         }
       },
       1000,
