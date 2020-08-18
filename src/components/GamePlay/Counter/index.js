@@ -35,34 +35,21 @@ function Counter({ time, roomData, userType }) {
         .update(updateRoom);
     };
 
-    var timer = setInterval(
+    const timer = setInterval(
       function (updatedAt, timeConst) {
         if (
           updatedAt &&
-          Math.floor(((Date.now() - updatedAt.toMillis()) % 60000) / 1000) >=
+          (((Date.now() - updatedAt.toMillis()) % 60000) / 1000).toFixed(0) >=
             timeConst
         ) {
           setCounter(0);
           updateAction();
-        } else {
-          console.log(
-            timeConst,
-            parseInt(
+          clearInterval(timer);
+        } else if (updatedAt) {
+          setCounter(
+            time -
               (((Date.now() - updatedAt.toMillis()) % 60000) / 1000).toFixed(0)
-            )
           );
-
-          if (updatedAt) {
-            setCounter(
-              timeConst -
-                parseInt(
-                  (
-                    ((Date.now() - updatedAt.toMillis()) % 60000) /
-                    1000
-                  ).toFixed(0)
-                )
-            );
-          }
         }
       },
       1000,
@@ -74,6 +61,7 @@ function Counter({ time, roomData, userType }) {
       clearInterval(timer);
     };
   }, [
+    counter,
     firebaseApp,
     state.user.room_id.value,
     roomData.game.turn.updatedAt,

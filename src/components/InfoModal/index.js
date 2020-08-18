@@ -32,16 +32,14 @@ function InfoModal() {
 
   const user = useFirestoreDocData(userRef);
 
-  const winPercent = () => {
+  const winPercent = (type) => {
     const { lost, win, tie } = user.game;
 
-    const winTotal = parseInt(win.gomoku) + parseInt(win["block-head"]);
+    const winTotal = parseInt(type ? win.gomoku : win["block-head"]);
     const all =
       winTotal +
-      parseInt(lost.gomoku) +
-      parseInt(lost["block-head"]) +
-      parseInt(tie.gomoku) +
-      parseInt(tie["block-head"]);
+      parseInt(type ? lost.gomoku : lost["block-head"]) +
+      parseInt(type ? tie.gomoku : tie["block-head"]);
 
     if (winTotal === 0 && all === 0) {
       return 100;
@@ -179,7 +177,7 @@ function InfoModal() {
               <tr>
                 <td className="text-stroke-carotv text-warning">Tỉ lệ thắng</td>
                 <td className="text-stroke-carotv text-white">
-                  {winPercent()}%
+                  {winPercent(gameType)}%
                 </td>
               </tr>
               <tr>

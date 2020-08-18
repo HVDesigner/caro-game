@@ -111,9 +111,7 @@ function GamePlayComponent({ roomData, ownType }) {
     );
   };
 
-  /**
-   * -------------------------------------------------------------------------
-   */
+  // -------------------------------------------------------------------------
   React.useEffect(() => {
     if (
       roomData.participants[ownType] &&
@@ -123,9 +121,9 @@ function GamePlayComponent({ roomData, ownType }) {
        * Nếu trạng thái của người chơi là 'playing'.
        */
 
+      // ------------------------------------------------------------------------
+
       /**
-       * ------------------------------------------------------------------------
-       *
        * Chuyển sang trạng thái chơi game, chưa có người thắng.
        */
       setStatusGame({
@@ -134,17 +132,13 @@ function GamePlayComponent({ roomData, ownType }) {
       });
     }
 
+    // ------------------------------------------------------------------------
+
     /**
-     * ---------------------------------------------------------------------------
-     *
      * Cập nhật những ô đã đánh trên bàn cờ, qua dữ liệu đã lưu.
-     *
-     * @param {number} rowkey
-     * @param {number} colkey
-     * @param {(1 | 2)} value
      */
-    const updatePositionWithValue = (rowkey, colkey, value) => {
-      const _caroTableLocal = caroTable;
+    const updatePositionWithValue = (rowkey, colkey, value, caroTableSub) => {
+      let _caroTableLocal = caroTableSub;
       const _changeCol = _caroTableLocal[rowkey];
 
       _changeCol.splice(colkey, 1, value);
@@ -164,11 +158,17 @@ function GamePlayComponent({ roomData, ownType }) {
        * ---------------------------------------------------------------------------
        * Cập nhật bàn chơi với dữ liệu đã có.
        */
+
       for (let index = 0; index < roomData.game.history.length; index++) {
         const element = roomData.game.history[index];
 
         setCaroTable(
-          updatePositionWithValue(element.row, element.col, element.value)
+          updatePositionWithValue(
+            element.row,
+            element.col,
+            element.value,
+            caroTable
+          )
         );
 
         /**

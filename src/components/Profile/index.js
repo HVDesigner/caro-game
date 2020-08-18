@@ -25,16 +25,14 @@ function ProfileComponent() {
   // gameType false block-head
   const [gameType, setGameType] = React.useState(true);
 
-  const winPercent = () => {
+  const winPercent = (type) => {
     const { lost, win, tie } = state.user.game;
 
-    const winTotal = parseInt(win.gomoku) + parseInt(win["block-head"]);
+    const winTotal = parseInt(type ? win.gomoku : win["block-head"]);
     const all =
       winTotal +
-      parseInt(lost.gomoku) +
-      parseInt(lost["block-head"]) +
-      parseInt(tie.gomoku) +
-      parseInt(tie["block-head"]);
+      parseInt(type ? lost.gomoku : lost["block-head"]) +
+      parseInt(type ? tie.gomoku : tie["block-head"]);
 
     if (winTotal === 0 && all === 0) {
       return 100;
@@ -150,6 +148,7 @@ function ProfileComponent() {
                 </span>
               </h5>
             </ListGroup.Item>
+
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
@@ -162,6 +161,7 @@ function ProfileComponent() {
                 </span>
               </h5>
             </ListGroup.Item>
+
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
@@ -174,6 +174,7 @@ function ProfileComponent() {
                 </span>
               </h5>
             </ListGroup.Item>
+
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
@@ -199,22 +200,23 @@ function ProfileComponent() {
                 </span>
               </h5>
             </ListGroup.Item>
-          </ListGroup>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <ListGroup className="statistic shadow mb-3">
+
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
                   Tỉ lệ thắng
                 </span>
                 <span className="text-white text-stroke-carotv">
-                  {winPercent()}%
+                  {winPercent(gameType)}%
                 </span>
               </h5>
             </ListGroup.Item>
+          </ListGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <ListGroup className="statistic shadow mb-3">
             <ListGroup.Item>
               <h5 className="m-0 d-flex">
                 <span className="text-warning title text-stroke-carotv">
