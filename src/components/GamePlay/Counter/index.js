@@ -37,22 +37,21 @@ function Counter({ time, roomData, userType }) {
 
     const timer = setInterval(
       function (updatedAt, timeConst) {
-        if (
-          updatedAt &&
-          (((Date.now() - updatedAt.toMillis()) % 60000) / 1000).toFixed(0) >=
-            timeConst
-        ) {
+        const calTime = (
+          ((Date.now() - updatedAt.toMillis()) % 60000) /
+          1000
+        ).toFixed(0);
+
+        if (calTime >= timeConst) {
           setCounter(0);
           updateAction();
           clearInterval(timer);
         } else if (updatedAt) {
-          setCounter(
-            time -
-              (((Date.now() - updatedAt.toMillis()) % 60000) / 1000).toFixed(0)
-          );
+          // console.log(time, calTime);
+          setCounter(time - calTime);
         }
       },
-      1000,
+      1001,
       roomData.game.turn.updatedAt,
       time
     );

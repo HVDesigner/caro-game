@@ -293,25 +293,42 @@ function GamePlayComponent() {
                 style={{ width: "100%" }}
                 className="d-flex flex-fill flex-column align-items-center"
               >
-                <p className="text-white mb-0">
-                  {state.user.room_id.type === "gomoku"
-                    ? "GOMOKU"
-                    : "CHẶN 2 ĐẦU"}
-                </p>
+                <div className="d-flex">
+                  <h1 className="flex-fill text-center text-white text-stroke-carotv m-0">
+                    {roomData.participants.master
+                      ? roomData.participants.master.win
+                      : 0}
+                  </h1>
 
-                <small className="text-white">
-                  <span className="text-warning mr-1 text-stroke-carotv">
-                    id:
-                  </span>
-                  {state.user.room_id.value}
-                </small>
+                  <div className="d-flex flex-fill flex-column align-items-center">
+                    <p className="text-white mb-0">
+                      {state.user.room_id.type === "gomoku"
+                        ? "GOMOKU"
+                        : "CHẶN 2 ĐẦU"}
+                    </p>
+
+                    <small className="text-white">
+                      <span className="text-warning mr-1 text-stroke-carotv">
+                        id:
+                      </span>
+                      {state.user.room_id.value}
+                    </small>
+                    <small className="text-warning text-stroke-carotv">
+                      {`${roomData.time}s - ${
+                        roomData.rule === "6-win" ? "6 thắng" : "Chỉ 5 quân"
+                      }`}
+                    </small>
+                  </div>
+                  
+                  <h1 className="flex-fill text-center text-white text-stroke-carotv m-0">
+                    {roomData.participants.player
+                      ? roomData.participants.player.win
+                      : 0}
+                  </h1>
+                </div>
 
                 <small className="text-warning text-stroke-carotv">
-                  {`${
-                    roomData.type === "room" ? roomData.bet + " xu" : "Elo"
-                  } - ${roomData.time}s - ${
-                    roomData.rule === "6-win" ? "6 thắng" : "Chỉ 5 quân"
-                  }`}
+                  {`${roomData.type === "room" ? roomData.bet + " xu" : "Elo"}`}
                 </small>
               </div>
 

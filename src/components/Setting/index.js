@@ -62,7 +62,7 @@ function Setting() {
       return true;
     };
 
-    if (newName !== "" && checkSpace(newName) && newName.length <= 8) {
+    if (newName !== "" && checkSpace(newName) && newName.length <= 9) {
       if (state.user.coin >= state.user.name.cost * 2) {
         firebaseApp
           .firestore()
@@ -239,7 +239,7 @@ function Setting() {
                 onChange={(e) => {
                   setNewName(e.target.value);
                 }}
-                maxLength="8"
+                maxLength="9"
               />
             </form>
             <div

@@ -153,41 +153,45 @@ function Dashboard() {
             </div>
           </Col>
         </Row>
+      </Container>
 
+      <Container style={{ width: "55vw" }} className="mt-1 mb-3">
         <Row>
-          <Col>
-            <div className="d-flex extend mt-1 mb-3">
-              <div className="svg_btn">
-                <img
-                  src={Chat}
-                  alt="chat"
-                  className="wood-btn"
-                  onClick={() => {
-                    changeRoute("serve-chat");
-                  }}
-                ></img>
-              </div>
-              <div className="svg_btn pl-2 pr-2 m-auto">
-                <img src={Shop} alt="shop" className="wood-btn"></img>
-              </div>
-              <div className="svg_btn">
-                <img
-                  src={
-                    state.user.image_url !== "image"
-                      ? state.user.image_url
-                      : UserSVG
-                  }
-                  alt="user"
-                  className={
-                    state.user.image_url !== "image"
-                      ? "rounded-circle border"
-                      : "wood-btn"
-                  }
-                  onClick={() => {
-                    changeRoute("profile");
-                  }}
-                ></img>
-              </div>
+          <Col className="pr-2">
+            <div className="svg_btn">
+              <img
+                src={Chat}
+                alt="chat"
+                className="wood-btn"
+                onClick={() => {
+                  changeRoute("serve-chat");
+                }}
+              ></img>
+            </div>
+          </Col>
+          <Col className="p-0">
+            <div className="svg_btn">
+              <img src={Shop} alt="shop" className="wood-btn"></img>
+            </div>
+          </Col>
+          <Col className="pl-2">
+            <div className="svg_btn">
+              <img
+                src={
+                  state.user.image_url !== "image"
+                    ? state.user.image_url
+                    : UserSVG
+                }
+                alt="user"
+                className={
+                  state.user.image_url !== "image"
+                    ? "rounded-circle border"
+                    : "wood-btn"
+                }
+                onClick={() => {
+                  changeRoute("profile");
+                }}
+              ></img>
             </div>
           </Col>
         </Row>

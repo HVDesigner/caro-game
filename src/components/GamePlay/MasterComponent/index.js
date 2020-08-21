@@ -162,7 +162,7 @@ function MasterComponent({ roomData, ownType }) {
           ) : (
             ""
           )}
-          <Badge
+          {/* <Badge
             pill
             variant={
               roomData.participants.master.id === state.user.uid
@@ -176,7 +176,7 @@ function MasterComponent({ roomData, ownType }) {
                 ? roomData.participants.master.win
                 : 0}
             </p>
-          </Badge>
+          </Badge> */}
         </div>
       )}
     </div>

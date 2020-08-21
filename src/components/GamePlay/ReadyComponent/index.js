@@ -255,7 +255,7 @@ function ReadyComponent({ roomData, ownType, setStatusGame }) {
 
   return (
     <div className="position-absolute w-100 h-100 p-2" style={{ zIndex: "1" }}>
-      <div className="d-flex flex-column justify-content-center mt-3 mb-3">
+      <div className="d-flex flex-column justify-content-center mb-3">
         {showReadyBtnFunc()}
       </div>
     </div>

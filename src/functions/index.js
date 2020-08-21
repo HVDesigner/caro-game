@@ -1,6 +1,55 @@
 import bcrypt from "bcryptjs";
 import firebaseApp from "firebase/app";
 
+const participantsDataConstant = (id) => {
+  return {
+    id,
+    status: "waiting",
+    win: 0,
+  };
+};
+
+// const roomDataConstant = (bet, password) => {
+//   let createRoom = {
+//     bet,
+//     password: {
+//       status: password ? true : false,
+//       text: password ? bcrypt.hashSync(password, 10) : "",
+//     },
+//     game: {
+//       "current-step": {},
+//       player: {},
+//       history: [],
+//       status: { ready: 0 },
+//       turn: { uid: state.user.uid },
+//       "tie-request": [],
+//       "no-soft": {
+//         status: false,
+//         gamePlay: "",
+//         rowString: "",
+//         row: 0,
+//         col: 0,
+//       },
+//     },
+//     rule: rule ? "6-win" : "6-no-win",
+//     time: getTime().type,
+//     title: name ? name : `Phòng của ${state.user.name.value}`,
+//     type: "room",
+//     conversation: [],
+//     pan: [],
+//     participants: {
+//       master: {
+//         id: state.user.uid,
+//         status: "waiting",
+//         win: 0,
+//       },
+//     },
+//     "game-play": gamePlay ? "gomoku" : "block-head",
+//     createdAt: firebaseApp.firestore.FieldValue.serverTimestamp(),
+//     updatedAt: firebaseApp.firestore.FieldValue.serverTimestamp(),
+//   };
+// };
+
 /**
  *
  * Chức năng rời khỏi bàn chơi.
@@ -396,6 +445,9 @@ export const kickUser = (data, firebase) => {
             "game.player": {},
             "game.turn": { uid: doc.data().participants.master.id },
             "game.tie-request": [],
+            "participants.master": participantsDataConstant(
+              doc.data().participants.master.id
+            ),
             "participants.player": firebaseApp.firestore.FieldValue.delete(),
             pan: firebaseApp.firestore.FieldValue.arrayUnion(kickId),
           });
@@ -448,7 +500,9 @@ export const changeToWatch = (data, firebase) => {
           "game.player": {},
           "game.turn": { uid: doc.data().participants.player.id },
           "game.tie-request": [],
-          "participants.master.id": doc.data().participants.player.id,
+          "participants.master": participantsDataConstant(
+            doc.data().participants.player.id
+          ),
           "participants.player": firebaseApp.firestore.FieldValue.delete(),
           "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
             uid
@@ -462,6 +516,9 @@ export const changeToWatch = (data, firebase) => {
           "game.player": {},
           "game.turn": { uid: doc.data().participants.master.id },
           "game.tie-request": [],
+          "participants.master": participantsDataConstant(
+            doc.data().participants.master.id
+          ),
           "participants.player": firebaseApp.firestore.FieldValue.delete(),
           "participants.watcher": firebaseApp.firestore.FieldValue.arrayUnion(
             uid
