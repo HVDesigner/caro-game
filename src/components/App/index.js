@@ -160,6 +160,12 @@ function Pages({ userInfo }) {
 
     const doGet = (doc) => {
       if (doc.exists) {
+        if (userInfo.playerPic && doc.data().image_url !== userInfo.playerPic) {
+          userCollectionFirestore
+            .doc(doc.id)
+            .update({ "image_url": userInfo.playerPic });
+        }
+
         if (
           userInfo.playerName &&
           doc.data().name.value !== userInfo.playerName &&
