@@ -90,7 +90,7 @@ function Pages({ userInfo }) {
     let unsubscribe;
 
     const dateCoin = (data, uid) => {
-      const prevDate = data["login-at"].toDate();
+      const prevDate = data["login-at"] ? data["login-at"].toDate() : "";
 
       const date = new Date(prevDate).getDate();
       const month = new Date(prevDate).getMonth();
@@ -163,7 +163,7 @@ function Pages({ userInfo }) {
         if (userInfo.playerPic && doc.data().image_url !== userInfo.playerPic) {
           userCollectionFirestore
             .doc(doc.id)
-            .update({ "image_url": userInfo.playerPic });
+            .update({ image_url: userInfo.playerPic });
         }
 
         if (

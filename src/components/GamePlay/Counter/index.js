@@ -2,6 +2,7 @@ import React from "react";
 import { Badge } from "react-bootstrap";
 import { useFirebaseApp } from "reactfire";
 import useSound from "use-sound";
+import moment from "moment";
 
 // Context
 import AppContext from "./../../../context/";
@@ -37,21 +38,24 @@ function Counter({ time, roomData, userType }) {
 
     const timer = setInterval(
       function (updatedAt, timeConst) {
-        const calTime = (
-          ((Date.now() - updatedAt.toMillis()) % 60000) /
-          1000
-        ).toFixed(0);
+        // const calTime = (
+        //   ((Date.now() - updatedAt.toMillis()) % 60000) /
+        //   1000
+        // ).toFixed(0);
+        const calTime = moment
+          .duration(moment().diff(roomData.game.turn.updatedAt.toDate()))
+          .asSeconds()
+          .toFixed(0);
 
         if (calTime >= timeConst) {
           setCounter(0);
           updateAction();
           clearInterval(timer);
         } else if (updatedAt) {
-          // console.log(time, calTime);
           setCounter(time - calTime);
         }
       },
-      1001,
+      1000,
       roomData.game.turn.updatedAt,
       time
     );

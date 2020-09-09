@@ -120,6 +120,7 @@ function CreateRoom() {
               row: 0,
               col: 0,
             },
+            "sound-tick": false,
           },
           rule: rule ? "6-win" : "6-no-win",
           time: getTime().type,

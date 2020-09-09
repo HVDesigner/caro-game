@@ -3,7 +3,7 @@ import "./../GamePlay.css";
 import { Row, Col } from "react-bootstrap";
 import { useFirebaseApp } from "reactfire";
 import firebase from "firebase/app";
-import useSound from "use-sound";
+import Sound from "react-sound";
 
 // Sound
 import TickSound from "./../../../assets/sound/tick-sound.mp3";
@@ -26,7 +26,6 @@ import AppContext from "./../../../context/";
 function GamePlayComponent({ roomData, ownType }) {
   const firebaseApp = useFirebaseApp();
   const { state } = React.useContext(AppContext);
-  const [play] = useSound(TickSound);
 
   const [caroTable, setCaroTable] = React.useState([
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -334,13 +333,6 @@ function GamePlayComponent({ roomData, ownType }) {
               setCaroTable(updatePosition(rowkey, colkey));
 
               /**
-               * Phát ra âm thanh.
-               */
-              if (state.user.setting.music.effect) {
-                play();
-              }
-
-              /**
                * ------------------------------------------------------------------------------
                *
                * Kiểm tra đã có người thắng chưa.
@@ -383,6 +375,7 @@ function GamePlayComponent({ roomData, ownType }) {
                     row: rowkey,
                     col: colkey,
                   },
+                  "game.sound-tick": true,
                 });
 
               /**
@@ -479,6 +472,25 @@ function GamePlayComponent({ roomData, ownType }) {
 
   return (
     <div>
+      {state.user.setting.music.effect && roomData.game["sound-tick"] ? (
+        <Sound
+          url={TickSound}
+          playStatus={Sound.status.PLAYING}
+          loop={false}
+          onFinishedPlaying={() => {
+            firebaseApp
+              .firestore()
+              .collection("rooms")
+              .doc(state.user.room_id.value)
+              .update({
+                "game.sound-tick": false,
+              });
+          }}
+        />
+      ) : (
+        ""
+      )}
+
       {roomData.participants[ownType] &&
       (roomData.participants[ownType].status === "waiting" ||
         ownType === "watcher") ? (

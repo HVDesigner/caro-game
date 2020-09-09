@@ -319,7 +319,7 @@ function GamePlayComponent() {
                       }`}
                     </small>
                   </div>
-                  
+
                   <h1 className="flex-fill text-center text-white text-stroke-carotv m-0">
                     {roomData.participants.player
                       ? roomData.participants.player.win
